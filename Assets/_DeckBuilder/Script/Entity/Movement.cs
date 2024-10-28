@@ -199,39 +199,39 @@ public class Movement : MonoBehaviour
 		lookAt.y = 0f;
 
 		Quaternion lookRot = Vector3.SqrMagnitude(lookAt) == 0 ? Quaternion.LookRotation(transform.forward) : Quaternion.LookRotation(lookAt);
-		transform.rotation = lookRot;
+		body.rotation = lookRot;
 
-		int index = 0;
 		float elapsedTime = 0;
 
-		while (Vector3.Distance(body.position, dashPosition[^1]) > 0.001f)
+		while (elapsedTime < dashDuration)
 		{
 			elapsedTime += Time.deltaTime;
 			float normalizedTime = Mathf.Clamp01(elapsedTime / dashDuration);
-			float speed = dashData.dashCurve.Evaluate(normalizedTime) * dashData.dashSpeed;
 
-			body.MovePosition(Vector3.MoveTowards(body.position, nextPos, speed * Time.deltaTime));
+			float curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
 
-			if (Vector3.Distance(body.position, nextPos) <= 0.001f && index < dashPosition.Count - 1)
-			{
-				index++;
-				startPos = nextPos;
-				nextPos = dashPosition[index];
+			Vector3 interpolatedPosition = InterpolatePath(dashPosition, curvePosition);
 
-				Debug.DrawLine(startPos, nextPos, Color.green, 3f);
+			body.MovePosition(interpolatedPosition);
 
-				lookAt = nextPos - startPos;
-				lookAt.y = 0f;
 
-				lookRot = Vector3.SqrMagnitude(lookAt) == 0 ? Quaternion.LookRotation(transform.forward) : Quaternion.LookRotation(lookAt);
-				body.rotation = lookRot;
-
-			}
-			yield return null;
+			yield return new WaitForFixedUpdate();
 		}
 
 		agent.enabled = true;
 		body.interpolation = RigidbodyInterpolation.None;
 		canMove = true;
+	}
+
+	private Vector3 InterpolatePath(List<Vector3> path, float t)
+	{
+		float pathLength = path.Count - 1;
+		float segmentIndex = t * pathLength;
+		int currentSegment = Mathf.FloorToInt(segmentIndex);
+		int nextSegment = Mathf.Clamp(currentSegment + 1, 0, path.Count - 1);
+
+		float segmentFraction = segmentIndex - currentSegment;
+
+		return Vector3.Lerp(path[currentSegment], path[nextSegment], segmentFraction);
 	}
 }
