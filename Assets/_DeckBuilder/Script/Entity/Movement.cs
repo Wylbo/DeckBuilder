@@ -44,15 +44,21 @@ public class Movement : MonoBehaviour
 
 	private bool canMove = true;
 	private Coroutine dashRoutine;
-	private float HalfHeight => capsuleCollider.height / 2;
+	private Vector3 wantedVelocity = Vector3.zero;
 
+	private float HalfHeight => capsuleCollider.height / 2;
 	public bool CanMove => canMove;
-	public bool isMoving => agent.velocity.magnitude > 0;
+	public bool IsMoving => wantedVelocity.magnitude > 0;
 	public Rigidbody Body => body;
 
 	private void Reset()
 	{
 		body = GetComponent<Rigidbody>();
+	}
+
+	private void Update()
+	{
+		wantedVelocity = agent.velocity;
 	}
 
 	public bool MoveTo(Vector3 worldTo)
@@ -71,6 +77,18 @@ public class Movement : MonoBehaviour
 
 		agent.ResetPath();
 		agent.velocity = Vector3.zero;
+		wantedVelocity = Vector3.zero;
+	}
+
+	public void DisableMovement()
+	{
+		StopMovement();
+		canMove = false;
+	}
+
+	public void EnableMovement()
+	{
+		canMove = true;
 	}
 
 	public void Dash()

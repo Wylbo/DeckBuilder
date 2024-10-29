@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: AbilityDash
   m_EditorClassIdentifier: 
   rotateCasterToCastDirection: 1
+  stopMovementOnCast: 1
+  cooldown: 2
   dashData:
     dashDistance: 3
     dashSpeed: 6

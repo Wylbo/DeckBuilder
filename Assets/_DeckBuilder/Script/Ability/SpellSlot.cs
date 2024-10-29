@@ -4,11 +4,12 @@ using UnityEngine;
 [Serializable]
 public class SpellSlot
 {
-	[SerializeField]
+	[SerializeField, InlineEditor]
 	public Ability Ability;
 
-	[HideInInspector]
+	[ReadOnly]
 	public Timer cooldown;
+
 
 	public bool CanCast => !cooldown.IsRunning;
 
@@ -17,10 +18,8 @@ public class SpellSlot
 	public void Cast(AbilityCaster caster, Vector3 worldPos)
 	{
 		this.caster = caster;
-		if (Ability.RotateCasterToCastDirection)
-			LookAtCastDirection(worldPos);
 
-		Ability.Cast();
+		Ability.Cast(worldPos);
 		cooldown = new Timer(Ability.Cooldown);
 		cooldown.Start();
 	}
@@ -30,12 +29,4 @@ public class SpellSlot
 		cooldown.Update(dt);
 	}
 
-
-	private void LookAtCastDirection(Vector3 worldPos)
-	{
-		Vector3 castDirection = worldPos - caster.transform.position;
-		castDirection.y = 0;
-		Debug.DrawRay(caster.transform.position, castDirection, Color.yellow, 1f);
-		caster.transform.LookAt(caster.transform.position + castDirection);
-	}
 }

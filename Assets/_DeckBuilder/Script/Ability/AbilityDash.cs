@@ -6,10 +6,10 @@ public class AbilityDash : Ability
 	[SerializeField]
 	private Movement.DashData dashData;
 
-	public override void Cast()
+	protected override void DoCast(Vector3 worldPos)
 	{
-		Movement movement = Caster.GetComponent<Movement>();
-		movement.Dash(dashData);
+		movement.Dash(dashData, worldPos);
+		base.DoCast(worldPos);
 	}
 
 
