@@ -5,8 +5,12 @@ public abstract class Ability : ScriptableObject
 {
 	[SerializeField]
 	private bool rotateCasterToCastDirection = true;
+	[SerializeField]
+	private float cooldown;
 	public AbilityCaster Caster { get; private set; }
 	public bool RotateCasterToCastDirection => rotateCasterToCastDirection;
+
+	public float Cooldown => cooldown;
 
 	public virtual void Initialize(AbilityCaster caster)
 	{

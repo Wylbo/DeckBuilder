@@ -14,29 +14,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotateCasterToCastDirection: 1
   dashData:
-    dashDistance: 10
-    dashSpeed: 20
-    slideOnWalls: 0
+    dashDistance: 3
+    dashSpeed: 6
+    slideOnWalls: 1
     dashCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
         value: 0
-        inSlope: 1
-        outSlope: 1
-        tangentMode: 34
-        weightedMode: 0
+        inSlope: -0.000050481292
+        outSlope: -0.000050481292
+        tangentMode: 0
+        weightedMode: 3
         inWeight: 0
-        outWeight: 0
+        outWeight: 0.5992335
       - serializedVersion: 3
         time: 1
         value: 1
-        inSlope: 1
-        outSlope: 1
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0
+        inSlope: 0.00048190306
+        outSlope: 0.00048190306
+        tangentMode: 0
+        weightedMode: 3
+        inWeight: 0.5956716
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2

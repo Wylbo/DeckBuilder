@@ -249,6 +249,12 @@ MonoBehaviour:
     dashDistance: 10
     dashSpeed: 10
     slideOnWalls: 0
+    dashCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
     blockingMask:
       serializedVersion: 2
       m_Bits: 64
@@ -264,11 +270,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ce012af7a44014984138bac5877c67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilities:
-  - {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
-  - {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
-  - {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
-  - {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
+  spellSlots:
+  - Ability: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
+    cooldown:
+      duration: 0
+      OnStarted:
+        m_PersistentCalls:
+          m_Calls: []
+      OnEnded:
+        m_PersistentCalls:
+          m_Calls: []
+  - Ability: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
+    cooldown:
+      duration: 0
+      OnStarted:
+        m_PersistentCalls:
+          m_Calls: []
+      OnEnded:
+        m_PersistentCalls:
+          m_Calls: []
+  - Ability: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
+    cooldown:
+      duration: 0
+      OnStarted:
+        m_PersistentCalls:
+          m_Calls: []
+      OnEnded:
+        m_PersistentCalls:
+          m_Calls: []
+  - Ability: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
+    cooldown:
+      duration: 0
+      OnStarted:
+        m_PersistentCalls:
+          m_Calls: []
+      OnEnded:
+        m_PersistentCalls:
+          m_Calls: []
   projectileLauncher: {fileID: 6938576570393643543}
 --- !u!114 &6938576570393643543
 MonoBehaviour:

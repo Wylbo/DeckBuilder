@@ -5,7 +5,7 @@ using UnityEngine;
 public class AbilityCaster : MonoBehaviour
 {
 	[SerializeField]
-	private Ability[] abilities = new Ability[4];
+	private SpellSlot[] spellSlots = new SpellSlot[4];
 	[SerializeField]
 	private ProjectileLauncher projectileLauncher = null;
 
@@ -26,40 +26,45 @@ public class AbilityCaster : MonoBehaviour
 		projectileLauncher = GetComponent<ProjectileLauncher>();
 	}
 
+	private void Update()
+	{
+		UpdateSpellSlotsCooldowns();
+	}
+
+
 	private void InitializeAbilities()
 	{
-		foreach (Ability ability in abilities)
+		foreach (SpellSlot spellSlot in spellSlots)
 		{
-			ability.Initialize(this);
+			spellSlot.Ability.Initialize(this);
 		}
 	}
 
 	private void DisableAllAbilities()
 	{
-		foreach (Ability ability in abilities)
+		foreach (SpellSlot spellSlot in spellSlots)
 		{
-			ability.Disable();
+			spellSlot.Ability.Disable();
+		}
+	}
+
+	private void UpdateSpellSlotsCooldowns()
+	{
+		foreach (SpellSlot slot in spellSlots)
+		{
+			slot.UpdateCooldown(Time.deltaTime);
 		}
 	}
 
 	public void Cast(int index, Vector3 worldPos)
 	{
-		if (abilities[index].RotateCasterToCastDirection)
-			LookAtCastDirection(worldPos);
-
-		Cast(abilities[index]);
+		Cast(spellSlots[index], worldPos);
 	}
 
-	private void LookAtCastDirection(Vector3 worldPos)
+	private void Cast(SpellSlot spellSlot, Vector3 worldPos)
 	{
-		Vector3 castDirection = worldPos - transform.position;
-		castDirection.y = 0;
-		Debug.DrawRay(transform.position, castDirection, Color.yellow, 1f);
-		transform.LookAt(transform.position + castDirection);
+		if (spellSlot.CanCast)
+			spellSlot.Cast(this, worldPos);
 	}
 
-	private void Cast(Ability ability)
-	{
-		ability.Cast();
-	}
 }
