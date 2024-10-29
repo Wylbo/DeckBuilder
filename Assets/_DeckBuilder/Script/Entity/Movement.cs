@@ -55,8 +55,6 @@ public class Movement : MonoBehaviour
 		body = GetComponent<Rigidbody>();
 	}
 
-
-
 	public bool MoveTo(Vector3 worldTo)
 	{
 		if (!agent.enabled || !CanMove)
@@ -137,8 +135,7 @@ public class Movement : MonoBehaviour
 
 		Vector3 remaining = wantedPosition - dashPositions[^1];
 
-
-		float agentRadius = NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius;
+		float agentRadius = NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius + 0.1f;
 
 		Vector3 point1 = transform.position - Vector3.up * HalfHeight / 2;
 		Vector3 point2 = transform.position + Vector3.up * HalfHeight / 2;
@@ -152,9 +149,10 @@ public class Movement : MonoBehaviour
 			float hitAngle = Vector3.Angle(Vector3.up, forwardHit.normal);
 			bool isSlope = hitAngle <= NavMesh.GetSettingsByID(agent.agentTypeID).agentSlope;
 
+			//Draw normal hit
 			Debug.DrawRay(forwardHit.point, forwardHit.normal * 2, Color.red, 3f);
 
-			DebugDrawer.DrawSphere(forwardHit.point + (isSlope ? Vector3.up * HalfHeight : forwardHit.normal * agentRadius), .5f, Color.cyan, 3f);
+			DebugDrawer.DrawSphere(forwardHit.point + (isSlope ? Vector3.up * HalfHeight : forwardHit.normal * agentRadius), agentRadius, Color.cyan, 3f);
 
 			dashPositions.Add(forwardHit.point + (isSlope ? Vector3.up * HalfHeight : forwardHit.normal * agentRadius));
 
@@ -177,7 +175,6 @@ public class Movement : MonoBehaviour
 
 			Debug.DrawLine(point1, point2, Color.magenta, 3f);
 			forwardCheck = Physics.CapsuleCast(point1, point2, agent.radius, wantedDirection, out forwardHit, remaining.magnitude, dashData.blockingMask);
-
 		}
 
 		dashPositions.Add(dashPositions[^1] + wantedDirection * remaining.magnitude);
@@ -187,33 +184,24 @@ public class Movement : MonoBehaviour
 
 	private IEnumerator DashRoutine(List<Vector3> dashPosition, DashData dashData)
 	{
-		Vector3 startPos = transform.position;
-		Vector3 nextPos = dashPosition[0];
-
-		float dashDuration = dashData.dashDistance / dashData.dashSpeed;
+		SetBodyDashRotation(dashPosition);
 
 		agent.enabled = false;
 		body.interpolation = RigidbodyInterpolation.Interpolate;
 
-		Vector3 lookAt = nextPos - startPos;
-		lookAt.y = 0f;
-
-		Quaternion lookRot = Vector3.SqrMagnitude(lookAt) == 0 ? Quaternion.LookRotation(transform.forward) : Quaternion.LookRotation(lookAt);
-		body.rotation = lookRot;
-
+		float dashDuration = dashData.dashDistance / dashData.dashSpeed;
 		float elapsedTime = 0;
+		float normalizedTime;
+		float curvePosition;
 
 		while (elapsedTime < dashDuration)
 		{
 			elapsedTime += Time.deltaTime;
-			float normalizedTime = Mathf.Clamp01(elapsedTime / dashDuration);
+			normalizedTime = Mathf.Clamp01(elapsedTime / dashDuration);
 
-			float curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
+			curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
 
-			Vector3 interpolatedPosition = InterpolatePath(dashPosition, curvePosition);
-
-			body.MovePosition(interpolatedPosition);
-
+			body.MovePosition(InterpolatePath(dashPosition, curvePosition));
 
 			yield return new WaitForFixedUpdate();
 		}
@@ -223,10 +211,21 @@ public class Movement : MonoBehaviour
 		canMove = true;
 	}
 
+	private void SetBodyDashRotation(List<Vector3> dashPosition)
+	{
+		Vector3 startPos = transform.position;
+		Vector3 nextPos = dashPosition[0];
+
+		Vector3 lookAt = nextPos - startPos;
+		lookAt.y = 0f;
+		Quaternion lookRot = Vector3.SqrMagnitude(lookAt) == 0 ? Quaternion.LookRotation(transform.forward) : Quaternion.LookRotation(lookAt);
+		body.rotation = lookRot;
+	}
+
 	private Vector3 InterpolatePath(List<Vector3> path, float t)
 	{
-		float pathLength = path.Count - 1;
-		float segmentIndex = t * pathLength;
+		float segmentCount = path.Count - 1;
+		float segmentIndex = t * segmentCount;
 		int currentSegment = Mathf.FloorToInt(segmentIndex);
 		int nextSegment = Mathf.Clamp(currentSegment + 1, 0, path.Count - 1);
 
