@@ -17,7 +17,7 @@ public class IdleState : State
 	{
 		base.Update();
 
-		if (machine.Owner.Movement.isMoving)
+		if (machine.Owner.Movement.IsMoving)
 		{
 			machine.SetState(MovingState);
 		}

@@ -8,7 +8,7 @@ public class Moving : State
 	public override void Update()
 	{
 		base.Update();
-		if(!machine.Owner.Movement.isMoving)
+		if(!machine.Owner.Movement.IsMoving)
 		{
 			machine.SetState(idleState);
 		}

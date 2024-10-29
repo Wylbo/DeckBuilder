@@ -274,39 +274,19 @@ MonoBehaviour:
   - Ability: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
     cooldown:
       duration: 0
-      OnStarted:
-        m_PersistentCalls:
-          m_Calls: []
-      OnEnded:
-        m_PersistentCalls:
-          m_Calls: []
+      remaining: 0
   - Ability: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
     cooldown:
       duration: 0
-      OnStarted:
-        m_PersistentCalls:
-          m_Calls: []
-      OnEnded:
-        m_PersistentCalls:
-          m_Calls: []
-  - Ability: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
+      remaining: 0
+  - Ability: {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
     cooldown:
       duration: 0
-      OnStarted:
-        m_PersistentCalls:
-          m_Calls: []
-      OnEnded:
-        m_PersistentCalls:
-          m_Calls: []
-  - Ability: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
+      remaining: 0
+  - Ability: {fileID: 11400000, guid: e78a6babafb773243a5c97c3ad4aa781, type: 2}
     cooldown:
       duration: 0
-      OnStarted:
-        m_PersistentCalls:
-          m_Calls: []
-      OnEnded:
-        m_PersistentCalls:
-          m_Calls: []
+      remaining: 0
   projectileLauncher: {fileID: 6938576570393643543}
 --- !u!114 &6938576570393643543
 MonoBehaviour:

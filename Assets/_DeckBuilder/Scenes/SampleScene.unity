@@ -1253,11 +1253,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ce012af7a44014984138bac5877c67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilities:
-  - {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
-  - {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
-  - {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
-  - {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
+  spellSlots:
+  - Ability: {fileID: 0}
+    cooldown:
+      duration: 0
+      remaining: 0
+  - Ability: {fileID: 0}
+    cooldown:
+      duration: 0
+      remaining: 0
+  - Ability: {fileID: 0}
+    cooldown:
+      duration: 0
+      remaining: 0
+  - Ability: {fileID: 0}
+    cooldown:
+      duration: 0
+      remaining: 0
   projectileLauncher: {fileID: 6232740888971285813}
 --- !u!4 &5398722260642553056
 Transform:
@@ -1429,6 +1441,14 @@ PrefabInstance:
     - target: {fileID: 2949185825831420414, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: ability
+      value: 
+      objectReference: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
+    - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: timer.duration
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

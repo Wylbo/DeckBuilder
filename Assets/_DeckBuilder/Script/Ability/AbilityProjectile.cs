@@ -6,8 +6,10 @@ public class AbilityProjectile : Ability
 	[SerializeField]
 	private Projectile projectile;
 
-	public override void Cast()
+	protected override void DoCast(Vector3 worldPos)
 	{
 		Caster.ProjectileLauncher.LaunchProjectile(projectile);
+
+		base.DoCast(worldPos);
 	}
 }

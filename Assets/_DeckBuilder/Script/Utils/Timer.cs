@@ -7,15 +7,12 @@ public class Timer
 {
 	[SerializeField]
 	private float duration;
-	[SerializeField]
-	private UnityEvent OnStarted;
-	[SerializeField]
-	private UnityEvent OnEnded;
 
 	public event UnityAction On_Started;
 	public event UnityAction On_Ended;
 	public event UnityAction On_Canceled;
 
+	[SerializeField]
 	private float remaining = 0;
 
 	public float Remaining => remaining;
