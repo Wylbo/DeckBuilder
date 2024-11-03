@@ -12,5 +12,10 @@ public class AbilityDash : Ability
 		base.DoCast(worldPos);
 	}
 
+	protected  void DoCast()
+	{
+		movement.Dash(dashData);
+	}
+
 
 }

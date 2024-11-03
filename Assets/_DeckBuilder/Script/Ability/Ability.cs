@@ -15,9 +15,10 @@ public abstract class Ability : ScriptableObject
 	public float Cooldown => cooldown;
 
 	public event UnityAction On_StartCast;
-	public event UnityAction On_EndCast;
+	public event UnityAction<bool> On_EndCast;
 
 	protected Movement movement;
+	protected bool isHeld = false;
 
 	public virtual void Initialize(AbilityCaster caster)
 	{
@@ -30,9 +31,10 @@ public abstract class Ability : ScriptableObject
 		Caster = null;
 	}
 
-	public void Cast(Vector3 worldPos)
+	public void Cast(Vector3 worldPos, bool isHeld)
 	{
 		StartCast(worldPos);
+		this.isHeld = isHeld;
 	}
 
 	protected virtual void StartCast(Vector3 worldPos)
@@ -53,13 +55,15 @@ public abstract class Ability : ScriptableObject
 		EndCast(worldPos);
 	}
 
-	protected virtual void EndCast(Vector3 worldPos)
+	public virtual void EndCast(Vector3 worldPos, bool isSucessful = true)
 	{
-		On_EndCast?.Invoke();
-
-
+		On_EndCast?.Invoke(isSucessful);
 	}
 
+	public virtual void EndHold(Vector3 worldPos)
+	{
+		isHeld = false;
+	}
 	protected void LookAtCastDirection(Vector3 worldPos)
 	{
 		Vector3 castDirection = worldPos - Caster.transform.position;
