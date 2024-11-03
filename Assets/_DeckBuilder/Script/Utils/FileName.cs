@@ -9,4 +9,6 @@ public static class FileName
 	public const string State = Root + "State/";
 
 	public const string Ability = Root + "Ability/";
+
+	public const string Debuff = Root + "Debuff/";
 }
