@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotateCasterToCastDirection: 1
   stopMovementOnCast: 1
-  cooldown: 1
-  channelDuration: 1.5
+  cooldown: 5
+  holdToChannel: 1
+  channelDuration: 3
   canMoveDuringChanneling: 1
   movingInterupChanneling: 1
+  channelingVFX: {fileID: 8487423217531587600, guid: 189a50bcf955e804aba85665d622b92b, type: 3}

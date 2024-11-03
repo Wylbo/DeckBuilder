@@ -22,6 +22,7 @@ public class AbilityChanneled : Ability
 	#region runtime variables
 	protected Coroutine channelRoutine = null;
 	protected GameObject spawnedVFX = null;
+	protected float channeledRatio = 0;
 	#endregion
 
 	#region AbilityChanneled
@@ -62,7 +63,9 @@ public class AbilityChanneled : Ability
 
 			elapsed += Time.deltaTime;
 
-			Debug.Log($"[{nameof(AbilityChanneled)}] channeling {elapsed / channelDuration * 100:F1}% | isHeld: {isHeld}");
+			channeledRatio = Mathf.Clamp01(elapsed / channelDuration);
+
+			Debug.Log($"[{nameof(AbilityChanneled)}] channeling {channeledRatio * 100:F1}% | isHeld: {isHeld}");
 
 			yield return null;
 		}

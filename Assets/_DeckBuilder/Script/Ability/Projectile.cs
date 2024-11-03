@@ -21,9 +21,19 @@ public class Projectile : MonoBehaviour
 
 		if (elapsedLifeTime >= lifeTime)
 		{
-			PoolManager.Release(gameObject);
+			Kill();
 		}
 
 		elapsedLifeTime += Time.deltaTime;
+	}
+
+	public void SetLifeTime(float newLifeTime)
+	{
+		lifeTime = newLifeTime;
+	}
+
+	protected virtual void Kill()
+	{
+		PoolManager.Release(gameObject);
 	}
 }
