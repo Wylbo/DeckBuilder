@@ -13,8 +13,11 @@ public class AbilityChanneled : Ability
 	protected bool canMoveDuringChanneling = false;
 	[SerializeField]
 	protected bool movingInterupChanneling = false;
+	[SerializeField]
+	protected GameObject channelingVFX = null;
 
 	protected Coroutine channelRoutine = null;
+	protected GameObject spawnedVFX = null;
 
 	protected override void DoCast(Vector3 worldPos)
 	{
@@ -32,6 +35,7 @@ public class AbilityChanneled : Ability
 		if (!canMoveDuringChanneling)
 			movement.DisableMovement();
 
+		spawnedVFX = PoolManager.Provide(channelingVFX, Caster.transform.position, Caster.transform.rotation, PoolManager.PoolType.VFX);
 		channelRoutine = Caster.StartCoroutine(UpdateChanneling(worldPos));
 	}
 
@@ -40,12 +44,12 @@ public class AbilityChanneled : Ability
 		float elapsed = 0;
 		while (elapsed < channelDuration)
 		{
-			if(holdToChannel && !isHeld && elapsed > 0)
+			if (holdToChannel && !isHeld && elapsed > 0)
 			{
 				break;
 			}
 
-			if (movingInterupChanneling && movement.IsMoving )
+			if (movingInterupChanneling && movement.IsMoving)
 			{
 				break;
 			}
@@ -60,11 +64,12 @@ public class AbilityChanneled : Ability
 		EndCast(worldPos, elapsed >= channelDuration);
 	}
 
-    public override void EndCast(Vector3 worldPos, bool isSucessful = true)
-    {
-        base.EndCast(worldPos, isSucessful);
+	public override void EndCast(Vector3 worldPos, bool isSucessful = true)
+	{
+		base.EndCast(worldPos, isSucessful);
 		Debug.Log($"[{nameof(AbilityChanneled)}] full channeled: {isSucessful}");
 
+		PoolManager.Release(spawnedVFX);
 		movement.EnableMovement();
-    }
+	}
 }

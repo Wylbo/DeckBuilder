@@ -42,6 +42,11 @@ public class PlayerControlStrategy : ControlStrategy
 		playerInput.Gameplay.Ability3.performed -= Ability3_performed;
 		playerInput.Gameplay.Ability4.performed -= Ability4_performed;
 
+		playerInput.Gameplay.Ability1.canceled -= Ability1_canceled;
+		playerInput.Gameplay.Ability2.canceled -= Ability2_canceled;
+		playerInput.Gameplay.Ability3.canceled -= Ability3_canceled;
+		playerInput.Gameplay.Ability4.canceled -= Ability4_canceled;
+
 		playerInput.Gameplay.Disable();
 	}
 
