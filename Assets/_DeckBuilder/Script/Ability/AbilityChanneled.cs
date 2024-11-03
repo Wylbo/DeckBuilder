@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = nameof(AbilityChanneled), menuName = FileName.Ability + nameof(AbilityChanneled))]
 public class AbilityChanneled : Ability
 {
+	#region fields
 	[Space]
 	[SerializeField]
 	protected bool holdToChannel = false;
@@ -16,10 +17,14 @@ public class AbilityChanneled : Ability
 	protected bool movingInterupChanneling = false;
 	[SerializeField]
 	protected GameObject channelingVFX = null;
+	#endregion
 
+	#region runtime variables
 	protected Coroutine channelRoutine = null;
 	protected GameObject spawnedVFX = null;
+	#endregion
 
+	#region AbilityChanneled
 	protected override void DoCast(Vector3 worldPos)
 	{
 		StartChanneling(worldPos);
@@ -73,4 +78,5 @@ public class AbilityChanneled : Ability
 		PoolManager.Release(spawnedVFX);
 		movement.EnableMovement();
 	}
+	#endregion
 }
