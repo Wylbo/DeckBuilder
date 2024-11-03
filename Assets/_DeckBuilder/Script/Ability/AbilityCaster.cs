@@ -74,6 +74,6 @@ public class AbilityCaster : MonoBehaviour
 
 	private void EndHold(SpellSlot spellSlot, Vector3 worldPos)
 	{
-		spellSlot.EndHold(this,worldPos);
+		spellSlot.EndHold(this, worldPos);
 	}
 }
