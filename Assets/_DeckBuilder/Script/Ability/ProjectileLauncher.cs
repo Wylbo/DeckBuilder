@@ -2,15 +2,26 @@ using UnityEngine;
 
 public class ProjectileLauncher : MonoBehaviour
 {
-	public bool LaunchProjectile(Projectile projectile)
+
+	public Projectile LaunchProjectile(Projectile projectile)
 	{
-		return LaunchProjectile(projectile, transform.position);
+		return LaunchProjectile<Projectile>(projectile, transform.position);
 	}
 
-	public bool LaunchProjectile(Projectile projectile, Vector3 worldPosition)
+	public Projectile LaunchProjectile(Projectile projectile, Vector3 worldPos)
 	{
-		Projectile proj = PoolManager.Provide<Projectile>(projectile.gameObject, worldPosition, transform.rotation);
+		return LaunchProjectile<Projectile>(projectile, worldPos);
+	}
 
-		return proj != null;
+	public T LaunchProjectile<T>(Projectile projectile)
+	{
+		return LaunchProjectile<T>(projectile, transform.position);
+	}
+
+	public T LaunchProjectile<T>(Projectile projectile, Vector3 worldPosition)
+	{
+		T proj = PoolManager.Provide<T>(projectile.gameObject, worldPosition, transform.rotation);
+
+		return proj;
 	}
 }

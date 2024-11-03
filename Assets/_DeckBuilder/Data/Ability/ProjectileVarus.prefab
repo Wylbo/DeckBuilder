@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7232413830608538139}
   - component: {fileID: 6428266943518908824}
   m_Layer: 0
-  m_Name: Projectile
+  m_Name: ProjectileVarus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,8 +29,8 @@ Transform:
   m_GameObject: {fileID: 7648798191064158320}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.5416899, y: 11.746676, z: -8.766216}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -123,8 +123,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifeTime: 3
   maxSpeed: 50
-  hasAcceleration: 1
-  acceleration: 15
+  hasAcceleration: 0
+  acceleration: 50
   accelerationProfile:
     serializedVersion: 2
     m_Curve:
