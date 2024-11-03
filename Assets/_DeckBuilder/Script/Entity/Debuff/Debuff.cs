@@ -5,6 +5,8 @@ using UnityEngine;
 /// <summary>
 /// A <see cref="Debuff"/> can be a positif or a neganif effect.
 /// It's updated each frame by the <see cref="DebuffUpdater"/>
+/// A <see cref="Debuff"/> is removed once its <see cref="Timer"/> <see cref="duration"/> is elapsed
+/// or is removed externaly. 
 /// </summary>
 public abstract class Debuff : ScriptableObject
 {
@@ -16,8 +18,11 @@ public abstract class Debuff : ScriptableObject
 
     public DebuffStackingPolicy StackingPolicy => stackingPolicy;
 
-    public void Init()
+    protected DebuffUpdater target;
+
+    public virtual void Init(DebuffUpdater target)
     {
+        this.target = target;
         if (duration.TotalTime > 0)
         {
             duration.Start();
@@ -43,7 +48,7 @@ public abstract class Debuff : ScriptableObject
     /// </summary>
     protected abstract void UpdateDebuff();
 
-    protected void Remove()
+    protected virtual void Remove()
     {
         // TODO : send event to remove
     }
