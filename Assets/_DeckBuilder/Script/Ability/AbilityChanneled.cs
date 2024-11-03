@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = nameof(AbilityChanneled), menuName = FileName.Ability + nameof(AbilityChanneled))]
@@ -7,6 +6,7 @@ public class AbilityChanneled : Ability
 {
 	#region fields
 	[Space]
+	[SerializeField] protected bool followCursorDuringChanneling;
 	[SerializeField]
 	protected bool holdToChannel = false;
 	[SerializeField]
@@ -17,6 +17,7 @@ public class AbilityChanneled : Ability
 	protected bool movingInterupChanneling = false;
 	[SerializeField]
 	protected GameObject channelingVFX = null;
+	[SerializeField] private LayerMask groundLayerMask = 0;
 	#endregion
 
 	#region runtime variables
@@ -42,7 +43,7 @@ public class AbilityChanneled : Ability
 		if (!canMoveDuringChanneling)
 			movement.DisableMovement();
 
-		spawnedVFX = PoolManager.Provide(channelingVFX, Caster.transform.position, Caster.transform.rotation, PoolManager.PoolType.VFX);
+		spawnedVFX = PoolManager.Provide(channelingVFX, Caster.transform.position, Caster.transform.rotation, Caster.transform, PoolManager.PoolType.VFX);
 		channelRoutine = Caster.StartCoroutine(UpdateChanneling(worldPos));
 	}
 
@@ -51,6 +52,11 @@ public class AbilityChanneled : Ability
 		float elapsed = 0;
 		while (elapsed < channelDuration)
 		{
+			if (followCursorDuringChanneling)
+			{
+				LookAtCursorPosition();
+			}
+			// need to check elapsed > 0 because isHeld is not update at frame 0
 			if (holdToChannel && !isHeld && elapsed > 0)
 			{
 				break;
@@ -80,6 +86,25 @@ public class AbilityChanneled : Ability
 
 		PoolManager.Release(spawnedVFX);
 		movement.EnableMovement();
+	}
+
+
+	protected void LookAtCursorPosition()
+	{
+
+		Vector3 viewportPosition = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+		Ray ray = Camera.main.ViewportPointToRay(viewportPosition);
+
+		Vector3 worldPosition = Caster.transform.forward;
+		if (Physics.Raycast(ray, out RaycastHit info, 100, groundLayerMask))
+		{
+			worldPosition = info.point;
+
+		}
+
+		Vector3 castDirection = worldPosition - Caster.transform.position;
+		castDirection.y = 0;
+		Caster.transform.LookAt(Caster.transform.position + castDirection);
 	}
 	#endregion
 }

@@ -1450,6 +1450,10 @@ PrefabInstance:
       propertyPath: timer.duration
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: spellSlots.Array.data[3].Ability
+      value: 
+      objectReference: {fileID: 11400000, guid: bb774449982bd2a4abe182bb32f4f29d, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

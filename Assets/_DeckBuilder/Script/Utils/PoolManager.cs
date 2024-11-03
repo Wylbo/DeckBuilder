@@ -10,11 +10,13 @@ public class PoolManager : MonoBehaviour
 		public int Hash { get; private set; }
 
 		public List<GameObject> AvailableObject { get; set; }
+		public PoolType Type { get; private set; }
 
-		public Pool(int hash)
+		public Pool(int hash, PoolType type = PoolType.GameObject)
 		{
 			Hash = hash;
 			AvailableObject = new List<GameObject>();
+			Type = type;
 		}
 	}
 
@@ -40,18 +42,18 @@ public class PoolManager : MonoBehaviour
 		}
 	}
 
-	public static T Provide<T>(GameObject obj, Vector3 position, Quaternion rotation, PoolType type = PoolType.GameObject)
+	public static T Provide<T>(GameObject obj, Vector3 position, Quaternion rotation, Transform attachedTo = null, PoolType type = PoolType.GameObject)
 	{
-		return Provide(obj, position, rotation, type).GetComponent<T>();
+		return Provide(obj, position, rotation, attachedTo, type).GetComponent<T>();
 	}
 
-	public static GameObject Provide(GameObject gameObject, Vector3 position, Quaternion rotation, PoolType type = PoolType.GameObject)
+	public static GameObject Provide(GameObject gameObject, Vector3 position, Quaternion rotation, Transform attachedTo = null, PoolType type = PoolType.GameObject)
 	{
 		Pool pool = pools.Find(p => p.Hash == gameObject.name.GetHashCode());
 
 		if (pool == null)
 		{
-			pool = new Pool(gameObject.name.GetHashCode());
+			pool = new Pool(gameObject.name.GetHashCode(), type);
 			pools.Add(pool);
 		}
 
@@ -59,13 +61,16 @@ public class PoolManager : MonoBehaviour
 
 		if (providedObj == null)
 		{
-			providedObj = Instantiate(gameObject, position, rotation, GetParentToSpawnIn(type));
+			providedObj = Instantiate(gameObject, position, rotation, attachedTo == null ? GetParentToSpawnIn(type) : attachedTo);
 			providedObj.name = gameObject.name;
 		}
 		else
 		{
 			providedObj.transform.SetPositionAndRotation(position, rotation);
 			providedObj.SetActive(true);
+
+			if (attachedTo != null)
+				providedObj.transform.parent = attachedTo.transform;
 
 			pool.AvailableObject.Remove(providedObj);
 		}
@@ -84,7 +89,9 @@ public class PoolManager : MonoBehaviour
 			return;
 		}
 
+		gameObject.transform.parent = GetParentToSpawnIn(pool.Type);
 		gameObject.SetActive(false);
+
 		pool.AvailableObject.Add(gameObject);
 	}
 
