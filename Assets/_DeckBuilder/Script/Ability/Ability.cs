@@ -4,14 +4,14 @@ using UnityEngine.Events;
 public abstract class Ability : ScriptableObject
 {
 	[SerializeField]
-	private bool rotateCasterToCastDirection = true;
+	private bool rotatingCasterToCastDirection = true;
 	[SerializeField]
 	protected bool stopMovementOnCast = false;
 	[SerializeField]
 	private float cooldown;
-	
+
 	public AbilityCaster Caster { get; private set; }
-	public bool RotateCasterToCastDirection => rotateCasterToCastDirection;
+	public bool RotatingCasterToCastDirection => rotatingCasterToCastDirection;
 	public float Cooldown => cooldown;
 
 	public event UnityAction On_StartCast;
@@ -41,7 +41,7 @@ public abstract class Ability : ScriptableObject
 	{
 		On_StartCast?.Invoke();
 
-		if (rotateCasterToCastDirection)
+		if (rotatingCasterToCastDirection)
 			LookAtCastDirection(worldPos);
 
 		if (stopMovementOnCast)

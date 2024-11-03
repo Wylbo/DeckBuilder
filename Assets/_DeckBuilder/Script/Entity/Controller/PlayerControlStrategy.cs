@@ -1,5 +1,4 @@
-﻿using System;
-using MG.Extend;
+﻿using MG.Extend;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -50,6 +49,7 @@ public class PlayerControlStrategy : ControlStrategy
 		playerInput.Gameplay.Disable();
 	}
 
+	// called each frame by the controller
 	public override void Control()
 	{
 
@@ -59,9 +59,15 @@ public class PlayerControlStrategy : ControlStrategy
 	{
 		if (GetMousePositionInWorld(out Vector3 worldPos))
 		{
-			PoolManager.Provide(moveClickVFX, worldPos, Quaternion.identity, PoolManager.PoolType.VFX);
+			PoolManager.Provide(moveClickVFX, worldPos, Quaternion.identity, null, PoolManager.PoolType.VFX);
 			controller.TryMove(worldPos);
 		}
+	}
+
+	private Vector3 GetMousePositionInWorld()
+	{
+		GetMousePositionInWorld(out Vector3 worldPosition);
+		return worldPosition;
 	}
 
 	private bool GetMousePositionInWorld(out Vector3 worldPosition)
