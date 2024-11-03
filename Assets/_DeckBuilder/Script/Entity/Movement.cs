@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using MG.Extend;
 using UnityEngine.UIElements;
+using Unity.Mathematics;
 
 /// <summary>
 /// Component allowing an entity to move
@@ -45,6 +46,7 @@ public class Movement : MonoBehaviour
 	private bool canMove = true;
 	private Coroutine dashRoutine;
 	private Vector3 wantedVelocity = Vector3.zero;
+	private float baseMaxSpeed = 0;
 
 	private float HalfHeight => capsuleCollider.height / 2;
 	public bool CanMove => canMove;
@@ -56,8 +58,15 @@ public class Movement : MonoBehaviour
 		body = GetComponent<Rigidbody>();
 	}
 
+	private void Awake()
+	{
+		baseMaxSpeed = agent.speed;
+		agent.updateRotation = false;
+	}
+
 	private void Update()
 	{
+		InstantTurn();
 		wantedVelocity = agent.velocity;
 	}
 
@@ -91,6 +100,35 @@ public class Movement : MonoBehaviour
 		canMove = true;
 	}
 
+	public void SpeedChangePercent(float speedChangeRatio)
+	{
+		agent.speed = baseMaxSpeed * speedChangeRatio;
+	}
+
+	public void SpeedChange(float newSpeed)
+	{
+		agent.speed = newSpeed;
+	}
+
+	public void ResetSpeed()
+	{
+		agent.speed = baseMaxSpeed;
+	}
+
+	private void InstantTurn()
+	{
+		if (!agent.hasPath)
+			return;
+
+		Vector3 direction = agent.destination - transform.position;
+		direction.y = 0;
+		direction = direction.normalized;
+
+		Quaternion rotation = quaternion.LookRotation(direction, Vector3.up);
+		transform.rotation = rotation;
+	}
+
+	#region Dash
 	public void Dash()
 	{
 		Dash(defaultDashData, transform.position + transform.forward);
@@ -251,4 +289,5 @@ public class Movement : MonoBehaviour
 
 		return Vector3.Lerp(path[currentSegment], path[nextSegment], segmentFraction);
 	}
+	#endregion
 }
