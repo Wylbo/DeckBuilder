@@ -20,10 +20,10 @@ public class AbilityVarus : AbilityChanneled
         isSucessful = true;
         base.EndCast(worldPos, isSucessful);
 
+        LookAtCursorPosition();
         launchedProjectile = Caster.ProjectileLauncher.LaunchProjectile<LinearProjectile>(projectile);
 
         float distanceToTravel = Mathf.Lerp(minDistance, maxDistance, channeledRatio);
-        Debug.Log($"distance to travel: {distanceToTravel} | chaneled ratio: {channeledRatio}");
         launchedProjectile.SetLifeTime(distanceToTravel / launchedProjectile.MaxSpeed);
     }
 }
