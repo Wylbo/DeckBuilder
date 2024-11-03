@@ -47,7 +47,7 @@ public class AbilityChanneled : Ability
 			movement.DisableMovement();
 		else
 			movement.SpeedChangePercent(speedChangeRatio);
-		/// we might want to use a debuff system instead of using movement.changeSpeed
+		/// we might want to use a debuff system instead of using Movement.ChangeSpeed
 
 		spawnedVFX = PoolManager.Provide(channelingVFX, Caster.transform.position, Caster.transform.rotation, Caster.transform, PoolManager.PoolType.VFX);
 		channelRoutine = Caster.StartCoroutine(UpdateChanneling(worldPos));

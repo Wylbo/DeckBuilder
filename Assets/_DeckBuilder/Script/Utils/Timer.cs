@@ -15,6 +15,7 @@ public class Timer
 	[SerializeField]
 	private float remaining = 0;
 
+	public float TotalTime => duration;
 	public float Remaining => remaining;
 	public float ElapsedTime => duration - remaining;
 	public float ElapsedRatio => ElapsedTime / duration;
