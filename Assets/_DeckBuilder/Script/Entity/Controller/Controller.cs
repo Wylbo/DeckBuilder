@@ -38,4 +38,8 @@ public class Controller : MonoBehaviour
 		character.CastAbility(index, worldPos);
 	}
 
+	public void EndHold(int index, Vector3 worldPos)
+	{
+		character.EndHold(index, worldPos);
+	}
 }

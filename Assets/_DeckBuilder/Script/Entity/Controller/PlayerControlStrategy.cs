@@ -27,6 +27,10 @@ public class PlayerControlStrategy : ControlStrategy
 		playerInput.Gameplay.Ability3.performed += Ability3_performed;
 		playerInput.Gameplay.Ability4.performed += Ability4_performed;
 
+		playerInput.Gameplay.Ability1.canceled += Ability1_canceled;
+		playerInput.Gameplay.Ability2.canceled += Ability2_canceled;
+		playerInput.Gameplay.Ability3.canceled += Ability3_canceled;
+		playerInput.Gameplay.Ability4.canceled += Ability4_canceled;
 		Debug.Log("Player controller strategy initialized");
 	}
 
@@ -93,9 +97,35 @@ public class PlayerControlStrategy : ControlStrategy
 		PerformAbility(0);
 	}
 
+	private void Ability1_canceled(InputAction.CallbackContext obj)
+	{
+		EndHold(0);
+	}
+
+	private void Ability2_canceled(InputAction.CallbackContext obj)
+	{
+		EndHold(1);
+	}
+
+	private void Ability3_canceled(InputAction.CallbackContext obj)
+	{
+		EndHold(2);
+	}
+
+	private void Ability4_canceled(InputAction.CallbackContext obj)
+	{
+		EndHold(3);
+	}
+
 	private void PerformAbility(int index)
 	{
 		GetMousePositionInWorld(out Vector3 worldPos);
 		controller.CastAbility(index, worldPos);
+	}
+
+	private void EndHold(int index)
+	{
+		GetMousePositionInWorld(out Vector3 worldPos);
+		controller.EndHold(index, worldPos);
 	}
 }

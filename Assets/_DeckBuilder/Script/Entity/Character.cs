@@ -20,4 +20,9 @@ public class Character : Entity
 	{
 		abilityCaster.Cast(index, worldPos);
 	}
+	
+	public void EndHold(int index, Vector3 worldPos)
+	{
+		abilityCaster.EndHold(index, worldPos);
+	}
 }

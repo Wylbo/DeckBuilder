@@ -6,6 +6,8 @@ public class AbilityChanneled : Ability
 {
 	[Space]
 	[SerializeField]
+	protected bool holdToChannel = false;
+	[SerializeField]
 	protected float channelDuration = 0f;
 	[SerializeField, Tooltip("Can an move command can be inputed during the channeling")]
 	protected bool canMoveDuringChanneling = false;
@@ -38,27 +40,31 @@ public class AbilityChanneled : Ability
 		float elapsed = 0;
 		while (elapsed < channelDuration)
 		{
-			if (movingInterupChanneling && movement.IsMoving)
+			if(holdToChannel && !isHeld && elapsed > 0)
+			{
+				break;
+			}
+
+			if (movingInterupChanneling && movement.IsMoving )
 			{
 				break;
 			}
 
 			elapsed += Time.deltaTime;
 
-			Debug.Log($"[{nameof(AbilityChanneled)}] channeling {elapsed / channelDuration * 100:F1}%");
+			Debug.Log($"[{nameof(AbilityChanneled)}] channeling {elapsed / channelDuration * 100:F1}% | isHeld: {isHeld}");
 
 			yield return null;
 		}
 
-		EndChaneling(worldPos, elapsed >= channelDuration);
+		EndCast(worldPos, elapsed >= channelDuration);
 	}
 
-	protected virtual void EndChaneling(Vector3 worldPos, bool fullyChanneled)
-	{
-		Debug.Log($"[{nameof(AbilityChanneled)}] full channeled: {fullyChanneled}");
+    public override void EndCast(Vector3 worldPos, bool isSucessful = true)
+    {
+        base.EndCast(worldPos, isSucessful);
+		Debug.Log($"[{nameof(AbilityChanneled)}] full channeled: {isSucessful}");
 
 		movement.EnableMovement();
-		EndCast(worldPos);
-	}
-
+    }
 }

@@ -67,4 +67,13 @@ public class AbilityCaster : MonoBehaviour
 			spellSlot.Cast(this, worldPos);
 	}
 
+	public void EndHold(int index, Vector3 worldPos)
+	{
+		EndHold(spellSlots[index], worldPos);
+	}
+
+	private void EndHold(SpellSlot spellSlot, Vector3 worldPos)
+	{
+		spellSlot.EndHold(this,worldPos);
+	}
 }
