@@ -15,12 +15,14 @@ MonoBehaviour:
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
   cooldown: 1
+  debuffsOnCast:
+  - {fileID: 11400000, guid: 8f7af324beb2e5146881368dbca0bf65, type: 2}
+  debuffsOnEndCast: []
   followCursorDuringChanneling: 0
   holdToChannel: 1
   channelDuration: 3
   canMoveDuringChanneling: 1
   movingInterupChanneling: 0
-  speedChangeRatio: 0.5
   channelingVFX: {fileID: 8487423217531587600, guid: 189a50bcf955e804aba85665d622b92b, type: 3}
   groundLayerMask:
     serializedVersion: 2

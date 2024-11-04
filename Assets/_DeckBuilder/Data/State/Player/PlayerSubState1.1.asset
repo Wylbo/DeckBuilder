@@ -15,7 +15,7 @@ MonoBehaviour:
   subStates: []
   NodePosition:
     serializedVersion: 2
-    x: 925
-    y: 61
-    width: 302
+    x: 911
+    y: 368
+    width: 301
     height: 93
