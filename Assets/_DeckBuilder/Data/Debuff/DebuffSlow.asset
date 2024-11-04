@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DebuffSlow
   m_EditorClassIdentifier: 
   duration:
-    duration: 0
+    duration: 5
     remaining: 0
   stackingPolicy: 1
-  movementSpeedChangeRatio: 1
+  movementSpeedChangeRatio: 0.3

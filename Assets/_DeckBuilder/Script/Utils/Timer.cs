@@ -74,4 +74,15 @@ public class Timer
 		remaining = 0;
 		On_Ended?.Invoke();
 	}
+
+	public void AddTime(Timer addedTimer)
+	{
+		duration += addedTimer.duration;
+		remaining += addedTimer.duration;
+	}
+	public void AddTime(float addedTime)
+	{
+		duration += addedTime;
+		remaining += addedTime;
+	}
 }

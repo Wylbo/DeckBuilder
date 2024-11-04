@@ -15,11 +15,12 @@ MonoBehaviour:
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
   cooldown: 1
-  followCursorDuringChanneling: 1
+  followCursorDuringChanneling: 0
   holdToChannel: 1
   channelDuration: 3
   canMoveDuringChanneling: 1
   movingInterupChanneling: 0
+  speedChangeRatio: 0.5
   channelingVFX: {fileID: 8487423217531587600, guid: 189a50bcf955e804aba85665d622b92b, type: 3}
   groundLayerMask:
     serializedVersion: 2

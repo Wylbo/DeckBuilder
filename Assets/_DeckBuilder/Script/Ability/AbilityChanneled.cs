@@ -14,10 +14,7 @@ public class AbilityChanneled : Ability
 	[SerializeField, Tooltip("Can an move command can be inputed during the channeling")]
 	protected bool canMoveDuringChanneling = false;
 	[SerializeField]
-	/// we might want to use a debuff system instead of using movement.changeSpeed
 	protected bool movingInterupChanneling = false;
-	[SerializeField, Min(0), Tooltip("0 = no move, 1 = no change, 2 = double speed")]
-	protected float speedChangeRatio = 1;
 	[SerializeField]
 	protected GameObject channelingVFX = null;
 	[SerializeField] private LayerMask groundLayerMask = 0;
@@ -45,9 +42,6 @@ public class AbilityChanneled : Ability
 
 		if (!canMoveDuringChanneling)
 			movement.DisableMovement();
-		else
-			movement.SpeedChangePercent(speedChangeRatio);
-		/// we might want to use a debuff system instead of using Movement.ChangeSpeed
 
 		spawnedVFX = PoolManager.Provide(channelingVFX, Caster.transform.position, Caster.transform.rotation, Caster.transform, PoolManager.PoolType.VFX);
 		channelRoutine = Caster.StartCoroutine(UpdateChanneling(worldPos));

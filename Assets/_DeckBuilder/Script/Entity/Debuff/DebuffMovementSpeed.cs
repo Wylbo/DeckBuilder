@@ -1,23 +1,45 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "DebuffSlow", menuName = FileName.Debuff + "DebuffSlow", order = 0)]
-public class DebuffMovementSpeed : Debuff
+public class DebuffMovementSpeed : ScriptableDebuff
 {
     [SerializeField]
     protected float movementSpeedChangeRatio = 1;
-    protected Movement movement;
-    public override void Init(DebuffUpdater target)
+
+    public float MovementSpeedChangeRatio => movementSpeedChangeRatio;
+
+    public override DebuffApplier InitDebuff(DebuffUpdater target)
     {
-        base.Init(target);
-        movement = target.GetComponent<Movement>();
+        return new DebuffApplierMovementSpeed(this, target);
     }
-    protected override void UpdateDebuff()
+}
+
+public class DebuffApplierMovementSpeed : DebuffApplier
+{
+    private DebuffMovementSpeed speedDebuff;
+    private Movement movement;
+    public DebuffApplierMovementSpeed(ScriptableDebuff debuff, DebuffUpdater debuffUpdater)
+    : base(debuff, debuffUpdater)
     {
+        speedDebuff = debuff as DebuffMovementSpeed;
+        movement = debuffUpdater.GetComponent<Movement>();
     }
 
-    protected override void Remove()
+    public override void End()
     {
-        base.Remove();
         movement.ResetSpeed();
+    }
+
+    protected override void ApplyEffect()
+    {
+        if (movement == null)
+            return;
+
+        movement.SpeedChangePercent(speedDebuff.MovementSpeedChangeRatio);
+    }
+
+    protected override void ApplyTick()
+    {
+        Debug.Log("tick");
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,6 +10,10 @@ public abstract class Ability : ScriptableObject
 	protected bool stopMovementOnCast = false;
 	[SerializeField]
 	private float cooldown;
+	[SerializeField]
+	private List<ScriptableDebuff> debuffsOnCast;
+	[SerializeField]
+	private List<ScriptableDebuff> debuffsOnEndCast;
 
 	public AbilityCaster Caster { get; private set; }
 	public bool RotatingCasterToCastDirection => rotatingCasterToCastDirection;
@@ -34,6 +39,7 @@ public abstract class Ability : ScriptableObject
 	public void Cast(Vector3 worldPos, bool isHeld)
 	{
 		StartCast(worldPos);
+		ApplyDebuffs(debuffsOnCast);
 		this.isHeld = isHeld;
 	}
 
@@ -57,6 +63,7 @@ public abstract class Ability : ScriptableObject
 
 	public virtual void EndCast(Vector3 worldPos, bool isSucessful = true)
 	{
+		ApplyDebuffs(debuffsOnEndCast);
 		On_EndCast?.Invoke(isSucessful);
 	}
 
@@ -70,5 +77,13 @@ public abstract class Ability : ScriptableObject
 		castDirection.y = 0;
 		Debug.DrawRay(Caster.transform.position, castDirection, Color.yellow, 1f);
 		Caster.transform.LookAt(Caster.transform.position + castDirection);
+	}
+
+	protected void ApplyDebuffs(List<ScriptableDebuff> scriptableDebuffs)
+	{
+		foreach (ScriptableDebuff debuff in scriptableDebuffs)
+		{
+			Caster.AddDebuff(debuff);
+		}
 	}
 }
