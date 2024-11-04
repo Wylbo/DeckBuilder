@@ -104,6 +104,7 @@ GameObject:
   - component: {fileID: 9176447491751950743}
   - component: {fileID: 6938576570393643543}
   - component: {fileID: 1990842931319606216}
+  - component: {fileID: 6244960309705328274}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -188,7 +189,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 5
-  m_Acceleration: 10000
+  m_Acceleration: 3.4028235e+38
   avoidancePriority: 50
   m_AngularSpeed: 12000000
   m_StoppingDistance: 0
@@ -288,6 +289,7 @@ MonoBehaviour:
       duration: 0
       remaining: 0
   projectileLauncher: {fileID: 6938576570393643543}
+  debuffUpdater: {fileID: 6244960309705328274}
 --- !u!114 &6938576570393643543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -316,6 +318,18 @@ MonoBehaviour:
   rootState: {fileID: 11400000, guid: 320641f9a32f498479059716655564a5, type: 2}
   currentState: {fileID: 0}
   newState: {fileID: 0}
+--- !u!114 &6244960309705328274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2949185825831420414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 969144b235c051e4cbace73bf48ffbf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3695981659665789756
 GameObject:
   m_ObjectHideFlags: 0

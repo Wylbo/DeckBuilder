@@ -1,66 +1,57 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum DebuffStackingPolicy
 {
+    Refresh,
     Single,
     Stack,
 }
+public enum DebuffDurationPolicy
+{
+    Additive,
+    Refresh,
+    none,
+}
 public class DebuffUpdater : MonoBehaviour
 {
-    [SerializeField]
-    private List<Debuff> debuffs;
-
-    private List<Debuff> stackingDebuffs;
-    private List<Debuff> singlesDebuffs;
+    private readonly Dictionary<ScriptableDebuff, DebuffApplier> debuffs =
+     new Dictionary<ScriptableDebuff, DebuffApplier>();
 
     #region Unity messages
     private void Update()
     {
-        if (debuffs != null)
+        foreach (DebuffApplier debuff in debuffs.Values.ToList())
         {
-            UpdateDebuffs();
+            debuff.Tick(Time.deltaTime);
         }
     }
     #endregion
 
     #region DebuffUpdater
-    public bool AddDebuff(Debuff debuff)
+    public void AddDebuff(DebuffApplier debuffApplier)
     {
-        return debuff.StackingPolicy switch
+        if (debuffs.ContainsKey(debuffApplier.Debuff))
         {
-            DebuffStackingPolicy.Single => TryAddSingleDebuff(debuff),
-            DebuffStackingPolicy.Stack => TryAddStackingDebuff(debuff),
-            _ => false,
-        };
-    }
-
-    private bool TryAddSingleDebuff(Debuff debuff)
-    {
-        if (singlesDebuffs.Contains(debuff))
-            return false;
+            debuffs[debuffApplier.Debuff].Activate();
+            debuffs[debuffApplier.Debuff].On_Ended += DebuffApplier_On_Ended;
+        }
         else
         {
-            singlesDebuffs.Add(debuff);
-            return true;
+            debuffs.Add(debuffApplier.Debuff, debuffApplier);
+            debuffApplier.Activate();
+            debuffApplier.On_Ended += DebuffApplier_On_Ended;
         }
     }
 
-    private bool TryAddStackingDebuff(Debuff debuff)
+    private void DebuffApplier_On_Ended(DebuffApplier applier)
     {
-        stackingDebuffs.Add(debuff);
-        return true;
-    }
-
-
-    private void UpdateDebuffs()
-    {
-        foreach (Debuff debuff in debuffs)
-        {
-            debuff.Update();
-        }
+        applier.On_Ended -= DebuffApplier_On_Ended;
+        debuffs.Remove(applier.Debuff);
     }
     #endregion
 }

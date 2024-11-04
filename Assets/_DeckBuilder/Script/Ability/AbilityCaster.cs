@@ -1,5 +1,4 @@
 using UnityEngine;
-
 [RequireComponent(typeof(ProjectileLauncher))]
 public class AbilityCaster : MonoBehaviour
 {
@@ -7,6 +6,8 @@ public class AbilityCaster : MonoBehaviour
 	private SpellSlot[] spellSlots = new SpellSlot[4];
 	[SerializeField]
 	private ProjectileLauncher projectileLauncher = null;
+	[SerializeField]
+	private DebuffUpdater debuffUpdater = null;
 
 	public ProjectileLauncher ProjectileLauncher => projectileLauncher;
 
@@ -30,6 +31,10 @@ public class AbilityCaster : MonoBehaviour
 		UpdateSpellSlotsCooldowns();
 	}
 
+	public void AddDebuff(ScriptableDebuff scriptableDebuff)
+	{
+		debuffUpdater.AddDebuff(scriptableDebuff.InitDebuff(debuffUpdater));
+	}
 
 	private void InitializeAbilities()
 	{
