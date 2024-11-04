@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "DebuffSlow", menuName = FileName.Debuff + "DebuffSlow", order = 0)]
+[CreateAssetMenu(fileName = "DebuffMovementSpeed", menuName = FileName.Debuff + "DebuffMovementSpeed", order = 0)]
 public class DebuffMovementSpeed : ScriptableDebuff
 {
     [SerializeField]
