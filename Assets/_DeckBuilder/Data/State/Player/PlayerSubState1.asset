@@ -12,12 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90dd82d77dd8d3a4f84987a05bf03111, type: 3}
   m_Name: PlayerSubState1
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStateNone
-  subStates:
-  - {fileID: 11400000, guid: ce3faf0bb2b50d54e9751192387e8b1f, type: 2}
-  - {fileID: 11400000, guid: b6d84a12a934a394ba1d8678807d9368, type: 2}
+  subStates: []
   NodePosition:
     serializedVersion: 2
-    x: 577
-    y: 154
+    x: 901
+    y: 182
     width: 294
     height: 93

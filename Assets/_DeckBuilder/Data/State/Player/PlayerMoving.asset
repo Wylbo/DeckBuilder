@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6deb824ec98a0af469325b6c7bc5c756, type: 3}
   m_Name: PlayerMoving
   m_EditorClassIdentifier: 
-  subStates: []
+  subStates:
+  - {fileID: 11400000, guid: ce3faf0bb2b50d54e9751192387e8b1f, type: 2}
+  - {fileID: 11400000, guid: 41dbb88302601f745a6f6c89733b6722, type: 2}
   NodePosition:
     serializedVersion: 2
     x: 562
