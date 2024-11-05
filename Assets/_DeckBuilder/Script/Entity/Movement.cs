@@ -6,6 +6,7 @@ using UnityEngine.AI;
 using MG.Extend;
 using UnityEngine.UIElements;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 
 /// <summary>
 /// Component allowing an entity to move
@@ -166,7 +167,7 @@ public class Movement : MonoBehaviour
 
 		Vector3 wantedDestination = transform.position + direction * dashData.dashDistance;
 
-		List<Vector3> dashPositions = CheckForWallAndSlopes(wantedDestination, dashData);
+		List<Vector3> dashPositions = CheckWalls(wantedDestination, dashData);
 
 		for (int i = 0; i < dashPositions.Count; i++)
 		{
@@ -177,78 +178,131 @@ public class Movement : MonoBehaviour
 
 	}
 
-	private List<Vector3> CheckForWallAndSlopes(Vector3 wantedPosition, DashData dashData)
+	private List<Vector3> CheckWalls(Vector3 wantedPosition, DashData dashData)
 	{
+		Vector3 groundNormal = GetStartingGroundNormal();
+
 		List<Vector3> dashPositions = new List<Vector3>() { transform.position };
 		Vector3 wantedDirection = wantedPosition - dashPositions[^1];
-
-		Physics.Raycast(transform.position, Vector3.down, out RaycastHit down, 2f, groundLayerMask);
-		Vector3 groundNormal = down.normal;
-		Debug.DrawRay(transform.position, groundNormal, Color.red, 1f);
 
 		wantedDirection = Vector3.ProjectOnPlane(wantedDirection, groundNormal);
 		wantedDirection = wantedDirection.normalized;
 
 		Vector3 remaining = wantedPosition - dashPositions[^1];
-
 		float agentRadius = NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius + 0.1f;
 
-		Vector3 point1 = transform.position - Vector3.up * HalfHeight / 2;
-		Vector3 point2 = transform.position + Vector3.up * HalfHeight / 2;
-		Debug.DrawLine(point1, point2, Color.magenta, 3f);
-		bool forwardCheck = Physics.CapsuleCast(point1, point2, agent.radius, wantedDirection, out RaycastHit forwardHit, remaining.magnitude, dashData.blockingMask);
+		Vector3 capsuleCastPoint1 = transform.position - Vector3.up * HalfHeight / 2;
+		Vector3 capsuleCastPoint2 = transform.position + Vector3.up * HalfHeight / 2;
+		Debug.DrawLine(capsuleCastPoint1, capsuleCastPoint2, Color.magenta, 3f);
 
-		Debug.DrawLine(transform.position - Vector3.up * HalfHeight, transform.position - Vector3.up * HalfHeight + wantedDirection * remaining.magnitude, forwardCheck ? Color.magenta : Color.blue, 3f);
+		bool forwardCheck = Physics.CapsuleCast(capsuleCastPoint1, capsuleCastPoint2, agent.radius, wantedDirection,
+			out RaycastHit forwardHit, remaining.magnitude, dashData.blockingMask);
 
-		while (forwardCheck)
-		{
-			float hitAngle = Vector3.Angle(Vector3.up, forwardHit.normal);
-			bool isSlope = hitAngle <= NavMesh.GetSettingsByID(agent.agentTypeID).agentSlope;
+		// calculate positions to slide on walls
+		// while (forwardCheck)
+		// {
+		// 	//Draw normal hit
+		// 	Debug.DrawRay(forwardHit.point, forwardHit.normal * 2, Color.red, 3f);
 
-			//Draw normal hit
-			Debug.DrawRay(forwardHit.point, forwardHit.normal * 2, Color.red, 3f);
+		// 	Vector3 hitpoint = forwardHit.point;
+		// 	hitpoint.y = body.position.y;
 
-			DebugDrawer.DrawSphere(forwardHit.point + (isSlope ? Vector3.up * HalfHeight : forwardHit.normal * agentRadius), agentRadius, Color.cyan, 3f);
+		// 	DebugDrawer.DrawCapusle(forwardHit.point + forwardHit.normal * agentRadius, agentRadius - 0.1f, HalfHeight * 2, Color.green, 3f);
 
-			dashPositions.Add(forwardHit.point + (isSlope ? Vector3.up * HalfHeight : forwardHit.normal * agentRadius));
+		// 	dashPositions.Add(hitpoint + forwardHit.normal * agentRadius);
 
-			if (!isSlope && !dashData.slideOnWalls)
-			{
-				remaining = Vector3.zero;
-				break;
-			}
+		// 	if (!dashData.slideOnWalls)
+		// 	{
+		// 		remaining = Vector3.zero;
+		// 		break;
+		// 	}
 
-			// calculate the remaining distance on the hitted plane
-			remaining = wantedPosition - dashPositions[^1];
-			remaining = Vector3.ProjectOnPlane(remaining, forwardHit.normal);
-			wantedPosition = remaining + dashPositions[^1];
+		// 	// calculate the remaining distance on the hitted plane
+		// 	remaining = wantedPosition - dashPositions[^1];
+		// 	remaining = Vector3.ProjectOnPlane(remaining, forwardHit.normal);
 
-			wantedDirection = wantedPosition - dashPositions[^1];
-			wantedDirection = wantedDirection.normalized;
+		// 	wantedPosition = remaining + dashPositions[^1];
 
-			point1 = dashPositions[^1] - Vector3.up * HalfHeight / 2;
-			point2 = dashPositions[^1] + Vector3.up * HalfHeight / 2;
+		// 	wantedDirection = wantedPosition - dashPositions[^1];
+		// 	wantedDirection = wantedDirection.normalized;
 
-			Debug.DrawLine(point1, point2, Color.magenta, 3f);
-			forwardCheck = Physics.CapsuleCast(point1, point2, agent.radius, wantedDirection, out forwardHit, remaining.magnitude, dashData.blockingMask);
-		}
+		// 	capsuleCastPoint1 = dashPositions[^1] - Vector3.up * HalfHeight / 2;
+		// 	capsuleCastPoint2 = dashPositions[^1] + Vector3.up * HalfHeight / 2;
+		// 	Debug.DrawLine(capsuleCastPoint1, capsuleCastPoint2, Color.magenta, 3f);
+
+		// 	forwardCheck = Physics.CapsuleCast(capsuleCastPoint1, capsuleCastPoint2, agent.radius, wantedDirection,
+		// 		out forwardHit, remaining.magnitude, dashData.blockingMask);
+		// }
 
 		dashPositions.Add(dashPositions[^1] + wantedDirection * remaining.magnitude);
 
 		return dashPositions;
 	}
 
-	private IEnumerator DashRoutine(List<Vector3> dashPosition, DashData dashData)
+	private Vector3 GetStartingGroundNormal()
 	{
-		SetBodyDashRotation(dashPosition);
+		Physics.Raycast(transform.position, Vector3.down, out RaycastHit down, 2f, groundLayerMask);
+		Vector3 groundNormal = down.normal;
+		Debug.DrawRay(transform.position, groundNormal, Color.red, 1f);
+		return groundNormal;
+	}
 
-		agent.enabled = false;
-		body.interpolation = RigidbodyInterpolation.Interpolate;
+	private IEnumerator DashRoutine(DashData dashData, Vector3 toward)
+	{
+		Vector3 startPos = agent.nextPosition;
+		Vector3 direction = (toward - startPos).normalized;
+		float dashDuration = dashData.dashDistance / dashData.dashSpeed;
+		float elapsedTime = 0;
+
+		while (elapsedTime < dashDuration)
+		{
+			// Increment elapsed time.
+			elapsedTime += Time.deltaTime;
+			float normalizedTime = Mathf.Clamp01(elapsedTime / dashDuration);
+			float curveValue = dashData.dashCurve.Evaluate(normalizedTime);
+
+			// Calculate movement for this frame based on the dash speed and curve
+			float movementAmount = dashData.dashSpeed * Time.deltaTime; // How much to move this frame
+			Vector3 movement = direction * movementAmount * curveValue; // Apply curve value
+
+			// Check if the path is clear
+			if (IsPathClear(startPos, agent.nextPosition + movement))
+			{
+				// If the path is clear, move the agent
+				agent.nextPosition += movement;
+			}
+			else
+			{
+				// If there's an obstacle, steer toward the target
+				Vector3 obstacleAvoidanceDirection = (toward - agent.nextPosition).normalized;
+				agent.nextPosition += obstacleAvoidanceDirection * (dashData.dashSpeed * Time.deltaTime);
+			}
+
+
+			yield return null;
+		}
+		canMove = true;
+	}
+	private bool IsPathClear(Vector3 start, Vector3 end)
+	{
+		// Check for obstacles between start and end.
+		return !Physics.Linecast(start, end, out RaycastHit hit);
+	}
+
+
+	private IEnumerator DashRoutine(List<Vector3> dashPositions, DashData dashData)
+	{
+		SetBodyDashRotation(dashPositions);
 
 		float dashDuration = dashData.dashDistance / dashData.dashSpeed;
 		float elapsedTime = 0;
 		float normalizedTime;
 		float curvePosition;
+		Vector3 nextPosition;
+		Vector3 startObstrPos = Vector3.zero;
+		Vector3 endObstrPos = agent.nextPosition;
+		bool isObstruted = false;
+		bool wasObstruted = false;
 
 		while (elapsedTime < dashDuration)
 		{
@@ -256,26 +310,71 @@ public class Movement : MonoBehaviour
 			normalizedTime = Mathf.Clamp01(elapsedTime / dashDuration);
 
 			curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
+			nextPosition = StickNextPositionToGround(dashPositions, curvePosition);
 
-			body.MovePosition(InterpolatePath(dashPosition, curvePosition));
+			if (IsPathObstructed(agent.nextPosition, nextPosition, out RaycastHit hit))
+			{
+				isObstruted = true;
+				if (startObstrPos == Vector3.zero)
+					startObstrPos = agent.nextPosition;
 
-			yield return new WaitForFixedUpdate();
+				nextPosition = SlideOnWall(agent.nextPosition, nextPosition, hit);
+				dashPositions = UpdateDashPath(dashPositions, agent.nextPosition, nextPosition);
+			}
+			else
+			{
+				isObstruted = false;
+			}
+
+			if (wasObstruted && !isObstruted)
+			{
+				endObstrPos = agent.nextPosition;
+				float obstrutedTraveledDistance = Vector3.Distance(startObstrPos, endObstrPos);
+
+			}
+
+			wasObstruted = isObstruted;
+			agent.nextPosition = nextPosition;
+
+			yield return null;
 		}
 
-		agent.enabled = true;
-		body.interpolation = RigidbodyInterpolation.None;
 		canMove = true;
 	}
 
-	private void SetBodyDashRotation(List<Vector3> dashPosition)
+	private void SetBodyDashRotation(List<Vector3> dashPositions)
 	{
 		Vector3 startPos = transform.position;
-		Vector3 nextPos = dashPosition[0];
+		Vector3 nextPos = dashPositions[0];
 
 		Vector3 lookAt = nextPos - startPos;
 		lookAt.y = 0f;
 		Quaternion lookRot = Vector3.SqrMagnitude(lookAt) == 0 ? Quaternion.LookRotation(transform.forward) : Quaternion.LookRotation(lookAt);
 		body.rotation = lookRot;
+	}
+
+	private Vector3 StickNextPositionToGround(List<Vector3> dashPositions, float curvePosition)
+	{
+		Vector3 nextPosition = InterpolatePath(dashPositions, curvePosition);
+		if (Physics.SphereCast(body.position, agent.radius, Vector3.down, out RaycastHit groundHit, NavMesh.GetSettingsByID(agent.agentTypeID).agentClimb, groundLayerMask))
+		{
+			nextPosition.y = groundHit.point.y + HalfHeight;
+		}
+
+		return nextPosition;
+	}
+
+	private bool IsPathObstructed(Vector3 from, Vector3 to, out RaycastHit hit)
+	{
+		return Physics.Raycast(from, (to - from).normalized, out hit, Vector3.Distance(from, to));
+	}
+
+	private Vector3 SlideOnWall(Vector3 from, Vector3 to, RaycastHit hit)
+	{
+		// Vector3 slideDirection = Vector3.Cross(hit.normal, (to - from).normalized).normalized;
+		Vector3 slideDirection = Vector3.ProjectOnPlane(to - from, hit.normal);
+
+		return from + slideDirection * 0.1f;
 	}
 
 	private Vector3 InterpolatePath(List<Vector3> path, float t)
@@ -288,6 +387,17 @@ public class Movement : MonoBehaviour
 		float segmentFraction = segmentIndex - currentSegment;
 
 		return Vector3.Lerp(path[currentSegment], path[nextSegment], segmentFraction);
+	}
+
+	private List<Vector3> UpdateDashPath(List<Vector3> originalPath, Vector3 pos, Vector3 nextPos)
+	{
+		List<Vector3> updatedPath = new List<Vector3>(originalPath) { nextPos };
+
+		Vector3 temp = updatedPath[^1];
+		updatedPath[^1] = updatedPath[^2];
+		updatedPath[^2] = temp;
+
+		return updatedPath;
 	}
 	#endregion
 }
