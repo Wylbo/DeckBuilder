@@ -199,6 +199,7 @@ public class Movement : MonoBehaviour
 			out RaycastHit forwardHit, remaining.magnitude, dashData.blockingMask);
 
 		// calculate positions to slide on walls
+		// TODO : recursively look for the end of the wall 
 		// while (forwardCheck)
 		// {
 		// 	//Draw normal hit
@@ -319,21 +320,21 @@ public class Movement : MonoBehaviour
 					startObstrPos = agent.nextPosition;
 
 				nextPosition = SlideOnWall(agent.nextPosition, nextPosition, hit);
-				dashPositions = UpdateDashPath(dashPositions, agent.nextPosition, nextPosition);
+				// dashPositions = UpdateDashPath(dashPositions, agent.nextPosition, nextPosition);
 			}
-			else
-			{
-				isObstruted = false;
-			}
+			// else
+			// {
+			// 	isObstruted = false;
+			// }
 
-			if (wasObstruted && !isObstruted)
-			{
-				endObstrPos = agent.nextPosition;
-				float obstrutedTraveledDistance = Vector3.Distance(startObstrPos, endObstrPos);
+			// if (wasObstruted && !isObstruted)
+			// {
+			// 	endObstrPos = agent.nextPosition;
+			// 	float obstrutedTraveledDistance = Vector3.Distance(startObstrPos, endObstrPos);
 
-			}
+			// }
 
-			wasObstruted = isObstruted;
+			// wasObstruted = isObstruted;
 			agent.nextPosition = nextPosition;
 
 			yield return null;
