@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f400564edfc28642857fb9013f5cd7d, type: 3}
   m_Name: AbilityDash
   m_EditorClassIdentifier: 
-  rotateCasterToCastDirection: 1
+  rotatingCasterToCastDirection: 1
   stopMovementOnCast: 1
-  cooldown: 2
+  cooldown: 0
+  debuffsOnCast: []
+  debuffsOnEndCast: []
   dashData:
-    dashDistance: 3
-    dashSpeed: 6
+    dashDistance: 9
+    dashSpeed: 9
     slideOnWalls: 1
     dashCurve:
       serializedVersion: 2
