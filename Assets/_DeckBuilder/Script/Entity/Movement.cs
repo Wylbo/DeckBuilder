@@ -41,13 +41,15 @@ public class Movement : MonoBehaviour
 
 	[SerializeField]
 	private DashData defaultDashData = new DashData();
-
+	[SerializeField] private NavMeshQueryFilter navMeshQueryFilter;
 
 	private bool canMove = true;
 	private Coroutine dashRoutine;
 	private Vector3 wantedVelocity = Vector3.zero;
 	private float baseMaxSpeed = 0;
 
+	private float agentRadius => NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius;
+	private float stepHeight => NavMesh.GetSettingsByID(agent.agentTypeID).agentClimb;
 	private float HalfHeight => capsuleCollider.height / 2;
 	public bool CanMove => canMove;
 	public bool IsMoving => wantedVelocity.magnitude > 0;
@@ -120,7 +122,7 @@ public class Movement : MonoBehaviour
 		if (!agent.hasPath)
 			return;
 
-		Vector3 direction = agent.destination - transform.position;
+		Vector3 direction = agent.path.corners[1] - transform.position;
 		direction.y = 0;
 		direction = direction.normalized;
 
@@ -166,7 +168,7 @@ public class Movement : MonoBehaviour
 
 		Vector3 wantedDestination = transform.position + direction * dashData.dashDistance;
 
-		List<Vector3> dashPositions = CheckForWallAndSlopes(wantedDestination, dashData);
+		List<Vector3> dashPositions = CheckWalls(wantedDestination, dashData);
 
 		for (int i = 0; i < dashPositions.Count; i++)
 		{
@@ -177,7 +179,7 @@ public class Movement : MonoBehaviour
 
 	}
 
-	private List<Vector3> CheckForWallAndSlopes(Vector3 wantedPosition, DashData dashData)
+	private List<Vector3> CheckWalls(Vector3 wantedPosition, DashData dashData)
 	{
 		List<Vector3> dashPositions = new List<Vector3>() { transform.position };
 		Vector3 wantedDirection = wantedPosition - dashPositions[^1];
@@ -191,28 +193,17 @@ public class Movement : MonoBehaviour
 
 		Vector3 remaining = wantedPosition - dashPositions[^1];
 
-		float agentRadius = NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius + 0.1f;
-
-		Vector3 point1 = transform.position - Vector3.up * HalfHeight / 2;
-		Vector3 point2 = transform.position + Vector3.up * HalfHeight / 2;
-		Debug.DrawLine(point1, point2, Color.magenta, 3f);
-		bool forwardCheck = Physics.CapsuleCast(point1, point2, agent.radius, wantedDirection, out RaycastHit forwardHit, remaining.magnitude, dashData.blockingMask);
-
-		Debug.DrawLine(transform.position - Vector3.up * HalfHeight, transform.position - Vector3.up * HalfHeight + wantedDirection * remaining.magnitude, forwardCheck ? Color.magenta : Color.blue, 3f);
+		bool forwardCheck = NavMesh.Raycast(agent.nextPosition, wantedPosition, out NavMeshHit forwardHit, NavMesh.AllAreas);
 
 		while (forwardCheck)
 		{
-			float hitAngle = Vector3.Angle(Vector3.up, forwardHit.normal);
-			bool isSlope = hitAngle <= NavMesh.GetSettingsByID(agent.agentTypeID).agentSlope;
+			//Draw normal hit and position
+			Debug.DrawRay(forwardHit.position, forwardHit.normal * 2, Color.red, 3f);
+			DebugDrawer.DrawSphere(forwardHit.position, agentRadius, Color.cyan, 3f);
 
-			//Draw normal hit
-			Debug.DrawRay(forwardHit.point, forwardHit.normal * 2, Color.red, 3f);
+			dashPositions.Add(forwardHit.position);
 
-			DebugDrawer.DrawSphere(forwardHit.point + (isSlope ? Vector3.up * HalfHeight : forwardHit.normal * agentRadius), agentRadius, Color.cyan, 3f);
-
-			dashPositions.Add(forwardHit.point + (isSlope ? Vector3.up * HalfHeight : forwardHit.normal * agentRadius));
-
-			if (!isSlope && !dashData.slideOnWalls)
+			if (!dashData.slideOnWalls)
 			{
 				remaining = Vector3.zero;
 				break;
@@ -226,11 +217,7 @@ public class Movement : MonoBehaviour
 			wantedDirection = wantedPosition - dashPositions[^1];
 			wantedDirection = wantedDirection.normalized;
 
-			point1 = dashPositions[^1] - Vector3.up * HalfHeight / 2;
-			point2 = dashPositions[^1] + Vector3.up * HalfHeight / 2;
-
-			Debug.DrawLine(point1, point2, Color.magenta, 3f);
-			forwardCheck = Physics.CapsuleCast(point1, point2, agent.radius, wantedDirection, out forwardHit, remaining.magnitude, dashData.blockingMask);
+			forwardCheck = NavMesh.Raycast(agent.nextPosition, wantedPosition, out forwardHit, NavMesh.AllAreas);
 		}
 
 		dashPositions.Add(dashPositions[^1] + wantedDirection * remaining.magnitude);
@@ -242,8 +229,8 @@ public class Movement : MonoBehaviour
 	{
 		SetBodyDashRotation(dashPosition);
 
-		agent.enabled = false;
-		body.interpolation = RigidbodyInterpolation.Interpolate;
+		// agent.enabled = false;
+		// body.interpolation = RigidbodyInterpolation.Interpolate;
 
 		float dashDuration = dashData.dashDistance / dashData.dashSpeed;
 		float elapsedTime = 0;
@@ -260,13 +247,14 @@ public class Movement : MonoBehaviour
 			curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
 			nextPosition = InterpolatePath(dashPosition, curvePosition);
 			nextPosition = StickToGround(nextPosition);
-			body.MovePosition(nextPosition);
+			// body.MovePosition(nextPosition);
+			agent.nextPosition = nextPosition;
 
-			yield return new WaitForFixedUpdate();
+			yield return null;
 		}
 
 		agent.enabled = true;
-		body.interpolation = RigidbodyInterpolation.None;
+		// body.interpolation = RigidbodyInterpolation.None;
 		canMove = true;
 	}
 
