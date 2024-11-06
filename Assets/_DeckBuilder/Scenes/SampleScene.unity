@@ -1738,6 +1738,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movement: {fileID: 2420333800435810780}
   abilityCaster: {fileID: 5290788586111690421}
+  health: {fileID: 0}
+  hurtbox: {fileID: 0}
 --- !u!33 &8606630658405693358
 MeshFilter:
   m_ObjectHideFlags: 0

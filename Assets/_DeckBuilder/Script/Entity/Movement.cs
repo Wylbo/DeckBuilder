@@ -6,12 +6,12 @@ using UnityEngine.AI;
 using MG.Extend;
 using UnityEngine.UIElements;
 using Unity.Mathematics;
+using System.IO;
 
 /// <summary>
 /// Component allowing an entity to move
 /// </summary>
 
-[RequireComponent(typeof(Rigidbody))]
 public class Movement : MonoBehaviour
 {
 	[Serializable]
@@ -149,13 +149,13 @@ public class Movement : MonoBehaviour
 	public void Dash(DashData dashData, Vector3 toward)
 	{
 		StopMovement();
-		canMove = false;
 
 		if (dashRoutine != null)
 			StopCoroutine(dashRoutine);
 
 		List<Vector3> dashPositions = ComputeDashPositions(dashData, toward);
 
+		canMove = false;
 		dashRoutine = StartCoroutine(DashRoutine(dashPositions, dashData));
 	}
 
@@ -176,7 +176,6 @@ public class Movement : MonoBehaviour
 		}
 
 		return dashPositions;
-
 	}
 
 	private List<Vector3> CheckWalls(Vector3 wantedPosition, DashData dashData)
@@ -193,7 +192,7 @@ public class Movement : MonoBehaviour
 
 		Vector3 remaining = wantedPosition - dashPositions[^1];
 
-		bool forwardCheck = NavMesh.Raycast(agent.nextPosition, wantedPosition, out NavMeshHit forwardHit, NavMesh.AllAreas);
+		bool forwardCheck = agent.Raycast(wantedPosition, out NavMeshHit forwardHit);
 		int iterationCount = 0;
 		while (forwardCheck || iterationCount > 100)
 		{
@@ -230,9 +229,6 @@ public class Movement : MonoBehaviour
 	{
 		SetBodyDashRotation(dashPosition);
 
-		// agent.enabled = false;
-		// body.interpolation = RigidbodyInterpolation.Interpolate;
-
 		float dashDuration = dashData.dashDistance / dashData.dashSpeed;
 		float elapsedTime = 0;
 		float normalizedTime;
@@ -247,15 +243,12 @@ public class Movement : MonoBehaviour
 
 			curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
 			nextPosition = InterpolatePath(dashPosition, curvePosition);
-			// nextPosition = StickToGround(nextPosition);
-			// body.MovePosition(nextPosition);
 			agent.nextPosition = nextPosition;
 
 			yield return null;
 		}
 
 		agent.enabled = true;
-		// body.interpolation = RigidbodyInterpolation.None;
 		canMove = true;
 	}
 
@@ -280,15 +273,6 @@ public class Movement : MonoBehaviour
 		float segmentFraction = segmentIndex - currentSegment;
 
 		return Vector3.Lerp(path[currentSegment], path[nextSegment], segmentFraction);
-	}
-
-	private Vector3 StickToGround(Vector3 nextPosition)
-	{
-		if (Physics.SphereCast(nextPosition, agent.radius, Vector3.down, out RaycastHit hit, NavMesh.GetSettingsByID(agent.agentTypeID).agentClimb, groundLayerMask))
-		{
-			nextPosition = hit.point + HalfHeight * Vector3.up;
-		}
-		return nextPosition;
 	}
 	#endregion
 }
