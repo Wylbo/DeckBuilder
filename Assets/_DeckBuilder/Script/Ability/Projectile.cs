@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+public class Projectile : MonoBehaviour, IOwnable
 {
 	[SerializeField]
 	protected float lifeTime = 0.0f;
@@ -8,6 +8,9 @@ public class Projectile : MonoBehaviour
 	protected float elapsedLifeTime = 0.0f;
 
 	protected float TimeRatio => lifeTime > 0 ? Mathf.Clamp01(elapsedLifeTime / lifeTime) : 0;
+
+	private Character owner;
+	public Character Owner => owner;
 
 	protected virtual void OnEnable()
 	{
@@ -35,5 +38,10 @@ public class Projectile : MonoBehaviour
 	protected virtual void Kill()
 	{
 		PoolManager.Release(gameObject);
+	}
+
+	public void SetOwner(Character character)
+	{
+		owner = character;
 	}
 }

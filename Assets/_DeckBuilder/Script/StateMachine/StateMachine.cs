@@ -35,13 +35,15 @@ public class StateMachine : MonoBehaviour
 	public void SetState(State state)
 	{
 		rootState?.Exit();
-		rootState = state.Enter(this);
+		rootState = state?.Enter(this);
 		currentState = GetActualCurrentState();
 	}
 
 	private State GetActualCurrentState()
 	{
 		State evaluatedState = rootState;
+		if (evaluatedState == null)
+			return null;
 
 		while (evaluatedState.CurrentSubState != evaluatedState)
 		{

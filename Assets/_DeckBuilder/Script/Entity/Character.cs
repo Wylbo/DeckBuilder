@@ -18,6 +18,7 @@ public class Character : Entity
 	{
 		health.On_Empty += Health_On_Empty;
 		hurtbox.On_DamageReceived += Hurtbox_On_DamageReceived;
+		hurtbox.SetOwner(this);
 	}
 
 	private void OnDisable()
@@ -49,7 +50,7 @@ public class Character : Entity
 
 	private void Hurtbox_On_DamageReceived(DamageInstance damageInstance)
 	{
-		health.AddOrRemoveHealth(damageInstance.Damage);
+		health.AddOrRemoveHealth(-damageInstance.Damage);
 	}
 
 	private void Die()
