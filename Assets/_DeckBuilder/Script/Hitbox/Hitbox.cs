@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Hitbox : MonoBehaviour, IDamager, IOwnable
@@ -25,5 +26,10 @@ public class Hitbox : MonoBehaviour, IDamager, IOwnable
     public void SetOwner(Character character)
     {
         owner = character;
+    }
+
+    public void SetDamage(int damage)
+    {
+        damageInstance.Damage = damage;
     }
 }

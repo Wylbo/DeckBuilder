@@ -11,6 +11,8 @@ public class AbilityVarus : AbilityChanneled
 
     [SerializeField]
     private float maxDistance = 10;
+    [SerializeField] private int minDamage;
+    [SerializeField] private int maxDamage;
 
     protected LinearProjectile launchedProjectile;
 
@@ -25,5 +27,7 @@ public class AbilityVarus : AbilityChanneled
 
         float distanceToTravel = Mathf.Lerp(minDistance, maxDistance, channeledRatio);
         launchedProjectile.SetLifeTime(distanceToTravel / launchedProjectile.MaxSpeed);
+        Hitbox hitbox = launchedProjectile.GetComponent<Hitbox>();
+        hitbox.SetDamage(Mathf.FloorToInt(Mathf.Lerp(minDamage, maxDamage, channeledRatio)));
     }
 }
