@@ -194,9 +194,10 @@ public class Movement : MonoBehaviour
 		Vector3 remaining = wantedPosition - dashPositions[^1];
 
 		bool forwardCheck = NavMesh.Raycast(agent.nextPosition, wantedPosition, out NavMeshHit forwardHit, NavMesh.AllAreas);
-
-		while (forwardCheck)
+		int iterationCount = 0;
+		while (forwardCheck || iterationCount > 100)
 		{
+			iterationCount++;
 			//Draw normal hit and position
 			Debug.DrawRay(forwardHit.position, forwardHit.normal * 2, Color.red, 3f);
 			DebugDrawer.DrawSphere(forwardHit.position, agentRadius, Color.cyan, 3f);
@@ -246,7 +247,7 @@ public class Movement : MonoBehaviour
 
 			curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
 			nextPosition = InterpolatePath(dashPosition, curvePosition);
-			nextPosition = StickToGround(nextPosition);
+			// nextPosition = StickToGround(nextPosition);
 			// body.MovePosition(nextPosition);
 			agent.nextPosition = nextPosition;
 
