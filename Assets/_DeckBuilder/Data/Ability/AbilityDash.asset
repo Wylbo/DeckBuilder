@@ -18,7 +18,7 @@ MonoBehaviour:
   debuffsOnCast: []
   debuffsOnEndCast: []
   dashData:
-    dashDistance: 9
+    dashDistance: 10
     dashSpeed: 9
     slideOnWalls: 1
     dashCurve:
@@ -36,11 +36,11 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 1
         value: 1
-        inSlope: 0.00048190306
-        outSlope: 0.00048190306
+        inSlope: 0.16867892
+        outSlope: 0.16867892
         tangentMode: 0
         weightedMode: 3
-        inWeight: 0.5956716
+        inWeight: 0.32596153
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
