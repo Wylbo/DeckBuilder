@@ -45,7 +45,6 @@ public class LinearProjectile : MovingProjectile
 	{
 		endPos = transform.position;
 		traveledDistance = Vector3.Distance(startPos, endPos);
-		Debug.Log($"traveled distance {traveledDistance}");
 		base.Kill();
 	}
 }

@@ -9,6 +9,11 @@ public class Health : MonoBehaviour
 
     public event UnityAction On_Empty;
 
+    private void OnEnable()
+    {
+        Initialize();
+    }
+
     public void Initialize()
     {
         CurrentHealth = maxHealth;
@@ -18,7 +23,7 @@ public class Health : MonoBehaviour
     {
         CurrentHealth += damage;
         CurrentHealth = Mathf.Clamp(CurrentHealth, 0, maxHealth);
-
+        Debug.Log($"{name} new health:" + CurrentHealth);
         if (CurrentHealth <= 0)
             On_Empty?.Invoke();
     }

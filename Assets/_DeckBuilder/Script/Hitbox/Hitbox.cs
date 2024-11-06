@@ -1,9 +1,12 @@
 using UnityEngine;
 
-public class Hitbox : MonoBehaviour, IDamager
+public class Hitbox : MonoBehaviour, IDamager, IOwnable
 {
     [SerializeField]
     private DamageInstance damageInstance;
+
+    protected Character owner;
+    public Character Owner => owner;
 
     public DamageInstance CreateDamageInstance()
     {
@@ -12,7 +15,15 @@ public class Hitbox : MonoBehaviour, IDamager
 
     private void OnTriggerEnter(Collider other)
     {
-        IDamageable damageable = other.GetComponent<IDamageable>();
-        damageable?.TakeDamage(CreateDamageInstance());
+        if (other.TryGetComponent(out IDamageable damageable) && damageable.Owner != Owner)
+        {
+            Debug.Log($"[{nameof(Hitbox)}] Hit something");
+            damageable.TakeDamage(CreateDamageInstance());
+        }
+    }
+
+    public void SetOwner(Character character)
+    {
+        owner = character;
     }
 }

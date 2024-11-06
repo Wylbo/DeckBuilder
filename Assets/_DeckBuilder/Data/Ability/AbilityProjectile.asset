@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b056064913e3c204c95fcab0ff0f1668, type: 3}
   m_Name: AbilityProjectile
   m_EditorClassIdentifier: 
-  rotateCasterToCastDirection: 1
+  rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
-  cooldown: 1
+  cooldown: 0
+  debuffsOnCast: []
+  debuffsOnEndCast: []
   projectile: {fileID: 6428266943518908824, guid: b2c2ae026b1ceca4fb60273c6b4e4a17, type: 3}

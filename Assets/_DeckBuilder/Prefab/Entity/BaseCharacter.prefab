@@ -106,7 +106,7 @@ GameObject:
   - component: {fileID: 6938576570393643543}
   - component: {fileID: 1990842931319606216}
   m_Layer: 0
-  m_Name: Player
+  m_Name: BaseCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -214,7 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   character: {fileID: 4938447398858601016}
-  controlStrategy: {fileID: 11400000, guid: fc22f8e56684849469df58dbd548707d, type: 2}
+  controlStrategy: {fileID: 0}
 --- !u!114 &4938447398858601016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,19 +293,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spellSlots:
-  - Ability: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
+  - Ability: {fileID: 0}
     cooldown:
       duration: 0
       remaining: 0
-  - Ability: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
+  - Ability: {fileID: 0}
     cooldown:
       duration: 0
       remaining: 0
-  - Ability: {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
+  - Ability: {fileID: 0}
     cooldown:
       duration: 0
       remaining: 0
-  - Ability: {fileID: 11400000, guid: bb774449982bd2a4abe182bb32f4f29d, type: 2}
+  - Ability: {fileID: 0}
     cooldown:
       duration: 0
       remaining: 0
@@ -348,7 +348,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   owner: {fileID: 4938447398858601016}
-  rootState: {fileID: 11400000, guid: 320641f9a32f498479059716655564a5, type: 2}
+  rootState: {fileID: 0}
   currentState: {fileID: 0}
   newState: {fileID: 0}
 --- !u!1 &3695981659665789756
@@ -415,7 +415,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4b443cf16389c9246ba80da4ba0927b3, type: 2}
+  - {fileID: 2100000, guid: 3dfcdfebfce71094ea7ca2321f0b37c7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -446,10 +446,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6254904053806619409}
+  - component: {fileID: 3774780328192534194}
   - component: {fileID: 8917544956100770672}
   - component: {fileID: 5301469400233989028}
-  - component: {fileID: 3774780328192534194}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hurbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -471,6 +471,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 369680040252476415}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &3774780328192534194
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4144055507266724808}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.4
+  m_Height: 1.5
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &8917544956100770672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,29 +520,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hurtboxCollider: {fileID: 3774780328192534194}
---- !u!136 &3774780328192534194
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4144055507266724808}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.4
-  m_Height: 1.5
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5428223348689331162
 GameObject:
   m_ObjectHideFlags: 0
