@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using System.Linq;
+using System;
 
 public class StateGraphView : GraphView
 {
@@ -19,6 +20,7 @@ public class StateGraphView : GraphView
 		this.AddManipulator(new ContentDragger());
 		this.AddManipulator(new SelectionDragger());
 		this.AddManipulator(new RectangleSelector());
+		this.AddManipulator(CreateGroupContextualMenu());
 
 		this.StretchToParentSize();
 
@@ -29,6 +31,26 @@ public class StateGraphView : GraphView
 
 		AddBaseStateNode();
 
+	}
+
+	private IManipulator CreateGroupContextualMenu()
+	{
+		ContextualMenuManipulator contextualMenuManipulator = new ContextualMenuManipulator(
+		   menuEvent => menuEvent.menu.AppendAction("Add Group", actionEvent => AddElement(CreateGroup("group", actionEvent.eventInfo.localMousePosition)))
+		);
+
+		return contextualMenuManipulator;
+	}
+
+	private Group CreateGroup(string title, Vector2 eventInfo)
+	{
+		Group group = new Group()
+		{
+			title = title
+		};
+
+		group.SetPosition(new Rect(GetLocalMousePosition(eventInfo), Vector2.zero));
+		return group;
 	}
 
 	public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -46,7 +68,7 @@ public class StateGraphView : GraphView
 		if (DragAndDrop.objectReferences.Length > 0 && DragAndDrop.objectReferences[0] is State droppedState)
 		{
 			DragAndDrop.AcceptDrag();
-			AddStateNode(droppedState, mousePos);
+			AddStateNode(droppedState, GetLocalMousePosition(mousePos));
 		}
 	}
 
@@ -77,5 +99,13 @@ public class StateGraphView : GraphView
 		BaseStateNode = new BaseStateNode(state) { title = "Base State" };
 		AddElement(BaseStateNode);
 
+	}
+
+	public Vector2 GetLocalMousePosition(Vector2 mousePosition)
+	{
+		Vector2 worldMousePos = mousePosition;
+		Vector2 localMousepos = contentViewContainer.WorldToLocal(worldMousePos);
+
+		return localMousepos;
 	}
 }

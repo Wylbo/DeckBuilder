@@ -25,17 +25,8 @@ public class StateEditorWindow : EditorWindow
 			name = "State graph view",
 		};
 
-		//Button saveButton = new Button(SaveStates) { text = "Save" };
-		//saveButton.style.marginTop = 10;
-
-
-		VisualElement ui = new VisualElement();
-		ui.Add(graphView);
-
 		rootVisualElement.Add(graphView);
 		CreateToolbar();
-
-		//rootVisualElement.Add(saveButton);
 	}
 
 	private void CreateToolbar()
