@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = nameof(AbilityChanneled), menuName = FileName.Ability + nameof(AbilityChanneled))]
-public class AbilityChanneled : Ability
+public abstract class AbilityChanneled : Ability
 {
 	#region fields
 	[Space]
@@ -44,29 +44,25 @@ public class AbilityChanneled : Ability
 			movement.DisableMovement();
 
 		spawnedVFX = PoolManager.Provide(channelingVFX, Caster.transform.position, Caster.transform.rotation, Caster.transform, PoolManager.PoolType.VFX);
-		channelRoutine = Caster.StartCoroutine(UpdateChanneling(worldPos));
+		channelRoutine = Caster.StartCoroutine(ChannelRoutine(worldPos));
 	}
 
-	protected virtual IEnumerator UpdateChanneling(Vector3 worldPos)
+	protected virtual IEnumerator ChannelRoutine(Vector3 worldPos)
 	{
 		float elapsed = 0;
 		while (elapsed < channelDuration)
 		{
 			if (followCursorDuringChanneling)
-			{
 				LookAtCursorPosition();
-			}
+
 			// need to check elapsed > 0 because isHeld is not update at frame 0
 			if (holdToChannel && !isHeld && elapsed > 0)
-			{
 				break;
-			}
 
 			if (movingInterupChanneling && movement.IsMoving)
-			{
 				break;
-			}
 
+			UpdateChanneling();
 			elapsed += Time.deltaTime;
 
 			channeledRatio = Mathf.Clamp01(elapsed / channelDuration);
@@ -78,6 +74,8 @@ public class AbilityChanneled : Ability
 
 		EndCast(worldPos, elapsed >= channelDuration);
 	}
+
+	protected abstract void UpdateChanneling();
 
 	public override void EndCast(Vector3 worldPos, bool isSucessful = true)
 	{
