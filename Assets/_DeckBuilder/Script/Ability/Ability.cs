@@ -43,7 +43,7 @@ public abstract class Ability : ScriptableObject
 		this.isHeld = isHeld;
 	}
 
-	protected virtual void StartCast(Vector3 worldPos)
+	protected void StartCast(Vector3 worldPos)
 	{
 		On_StartCast?.Invoke();
 

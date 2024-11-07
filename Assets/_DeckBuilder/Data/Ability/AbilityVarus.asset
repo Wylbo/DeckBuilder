@@ -28,7 +28,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   projectile: {fileID: 6428266943518908824, guid: 4cd1cddf8287ff2418a3efffacd0adf9, type: 3}
-  minDistance: 5
-  maxDistance: 10
+  minDistance: 2
+  maxDistance: 5
   minDamage: 5
   maxDamage: 50
+  rangeIndicator: {fileID: 7172722905564688021, guid: aa684e0ff8d0e0342bb65a6ec2475b30, type: 3}
