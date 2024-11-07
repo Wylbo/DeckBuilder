@@ -50,14 +50,12 @@ public class AbilityVarus : AbilityChanneled, IAbilityRangeIndicator
 
     public void SpawnIndicator(RangeIndicator indicator)
     {
-        Debug.Log("Spawn");
-        spawnedRangedIndicator = PoolManager.Provide<RangeIndicator>(indicator.gameObject, Caster.transform.position, Quaternion.identity, Caster.transform);
+        spawnedRangedIndicator = PoolManager.Provide<RangeIndicator>(indicator.gameObject, Caster.transform.position + Vector3.up * -1, Quaternion.identity, Caster.transform);
         spawnedRangedIndicator.SetScale(minDistance * 2);
     }
 
     protected override void UpdateChanneling()
     {
-        Debug.Log("update");
         spawnedRangedIndicator.SetScale(Mathf.Lerp(minDistance, maxDistance, channeledRatio) * 2);
     }
 }

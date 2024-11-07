@@ -15,7 +15,7 @@ public class Controller : MonoBehaviour
 
 	protected virtual void Start()
 	{
-		controlStrategy?.Initialize(this);
+		controlStrategy?.Initialize(this, character);
 	}
 
 	protected virtual void Update()
