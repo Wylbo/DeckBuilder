@@ -29,6 +29,7 @@ public class HealthTracker : MonoBehaviour
 
     private void Increase(float newVal)
     {
+        DOTween.Kill(background);
         background.fillAmount = newVal / HealthToTrack.MaxHealth;
         background.color = increaseHealthColor;
         foreground.DOFillAmount(newVal / HealthToTrack.MaxHealth, increaseDuration).SetEase(fillCurve);
@@ -36,6 +37,7 @@ public class HealthTracker : MonoBehaviour
 
     private void Decrease(float newVal)
     {
+        DOTween.Kill(foreground);
         foreground.fillAmount = newVal / HealthToTrack.MaxHealth;
         background.color = decreaseHealthColor;
         background.DOFillAmount(newVal / HealthToTrack.MaxHealth, increaseDuration).SetEase(fillCurve);

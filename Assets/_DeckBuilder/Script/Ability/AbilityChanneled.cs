@@ -67,8 +67,6 @@ public abstract class AbilityChanneled : Ability
 
 			channeledRatio = Mathf.Clamp01(elapsed / channelDuration);
 
-			Debug.Log($"[{nameof(AbilityChanneled)}] channeling {channeledRatio * 100:F1}% | isHeld: {isHeld}");
-
 			yield return null;
 		}
 

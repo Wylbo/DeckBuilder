@@ -52,6 +52,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseEnemy
       objectReference: {fileID: 0}
+    - target: {fileID: 3774780328192534194, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: m_Height
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3774780328192534194, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: m_Radius
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -130,19 +138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4633727573512057486, guid: d9710328ebf64374ea602b01f34a8552, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 4633727573512057486, guid: d9710328ebf64374ea602b01f34a8552, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.07
-      objectReference: {fileID: 0}
-    - target: {fileID: 4633727573512057486, guid: d9710328ebf64374ea602b01f34a8552, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.07
-      objectReference: {fileID: 0}
-    - target: {fileID: 4633727573512057486, guid: d9710328ebf64374ea602b01f34a8552, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.07
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4633727573512057486, guid: d9710328ebf64374ea602b01f34a8552, type: 3}
       propertyPath: m_LocalPosition.x
@@ -178,7 +174,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4633727573512057486, guid: d9710328ebf64374ea602b01f34a8552, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.59
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 4633727573512057486, guid: d9710328ebf64374ea602b01f34a8552, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -194,7 +190,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4633727573512057486, guid: d9710328ebf64374ea602b01f34a8552, type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

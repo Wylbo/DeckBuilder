@@ -20,7 +20,7 @@ MonoBehaviour:
   debuffsOnEndCast: []
   followCursorDuringChanneling: 0
   holdToChannel: 1
-  channelDuration: 3
+  channelDuration: 2
   canMoveDuringChanneling: 1
   movingInterupChanneling: 0
   channelingVFX: {fileID: 8487423217531587600, guid: 189a50bcf955e804aba85665d622b92b, type: 3}

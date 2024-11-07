@@ -12,9 +12,9 @@ public class PlayerControlStrategy : ControlStrategy
 
 	private PlayerInputs playerInput;
 
-	public override void Initialize(Controller controller)
+	public override void Initialize(Controller controller, Character character)
 	{
-		base.Initialize(controller);
+		base.Initialize(controller, character);
 
 		playerInput = new PlayerInputs();
 

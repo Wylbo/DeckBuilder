@@ -8,6 +8,7 @@ public class Health : MonoBehaviour
     private int currentHealth;
 
     public int MaxHealth => maxHealth;
+    public int Value => currentHealth;
 
     public event UnityAction On_Empty;
 

@@ -140,7 +140,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.25
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6428266943518908824
 MonoBehaviour:
@@ -155,9 +155,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifeTime: 3
-  maxSpeed: 50
+  maxSpeed: 25
   hasAcceleration: 0
-  acceleration: 50
+  acceleration: 25
   accelerationProfile:
     serializedVersion: 2
     m_Curve:
