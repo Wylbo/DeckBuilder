@@ -34,9 +34,7 @@ public abstract class DebuffApplier
 
     private void Duration_On_Ended()
     {
-        On_Ended?.Invoke(this);
-        duration.On_Ended -= Duration_On_Ended;
-        End();
+        Remove();
     }
 
     public void Activate()
@@ -60,6 +58,14 @@ public abstract class DebuffApplier
             duration.Cancel();
             duration.Start();
         }
+    }
+
+    internal void Remove()
+    {
+        On_Ended?.Invoke(this);
+        duration.Stop();
+        duration.On_Ended -= Duration_On_Ended;
+        End();
     }
 
     private void RefreshEffect()

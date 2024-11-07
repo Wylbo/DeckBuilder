@@ -85,7 +85,6 @@ public class AbilityChanneled : Ability
 
 		PoolManager.Release(spawnedVFX);
 		movement.EnableMovement();
-		movement.ResetSpeed();
 	}
 
 
