@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: PlayerMoving
   m_EditorClassIdentifier: 
   subStates:
-  - {fileID: 11400000, guid: ce3faf0bb2b50d54e9751192387e8b1f, type: 2}
   - {fileID: 11400000, guid: 41dbb88302601f745a6f6c89733b6722, type: 2}
   NodePosition:
     serializedVersion: 2
-    x: 562
-    y: 275
+    x: 558
+    y: 120
     width: 290
     height: 93
   idleState: {fileID: 11400000, guid: 6de56855ad9f48b41abab81a03256ad8, type: 2}

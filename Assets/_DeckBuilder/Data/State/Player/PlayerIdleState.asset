@@ -15,8 +15,8 @@ MonoBehaviour:
   subStates: []
   NodePosition:
     serializedVersion: 2
-    x: 562
-    y: 534
+    x: 483
+    y: 489
     width: 309
     height: 93
   IdleAnimation: {fileID: 0}
