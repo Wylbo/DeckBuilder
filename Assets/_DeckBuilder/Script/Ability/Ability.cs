@@ -11,9 +11,9 @@ public abstract class Ability : ScriptableObject
 	[SerializeField]
 	private float cooldown;
 	[SerializeField]
-	private List<ScriptableDebuff> debuffsOnCast;
+	protected List<ScriptableDebuff> debuffsOnCast;
 	[SerializeField]
-	private List<ScriptableDebuff> debuffsOnEndCast;
+	protected List<ScriptableDebuff> debuffsOnEndCast;
 
 	public AbilityCaster Caster { get; private set; }
 	public bool RotatingCasterToCastDirection => rotatingCasterToCastDirection;

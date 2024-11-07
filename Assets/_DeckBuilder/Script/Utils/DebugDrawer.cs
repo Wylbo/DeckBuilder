@@ -56,8 +56,8 @@ namespace MG.Extend
 
 		public static void DrawCapusle(Vector4 pos, float radius, float height, Color color, float duration = dTime)
 		{
-			DrawSphere(pos - (Vector4)Vector3.up * height / 4, radius, color,duration);
-			DrawSphere(pos + (Vector4)Vector3.up * height / 4, radius, color,duration);
+			DrawSphere(pos - (Vector4)Vector3.up * height / 4, radius, color, duration);
+			DrawSphere(pos + (Vector4)Vector3.up * height / 4, radius, color, duration);
 		}
 
 		public static void DrawBox(Vector4 pos, Vector3 size, Color color, float duration = dTime)

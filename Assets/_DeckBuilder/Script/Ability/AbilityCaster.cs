@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 [RequireComponent(typeof(ProjectileLauncher))]
 public class AbilityCaster : MonoBehaviour
 {
@@ -34,6 +36,11 @@ public class AbilityCaster : MonoBehaviour
 	public void AddDebuff(ScriptableDebuff scriptableDebuff)
 	{
 		debuffUpdater.AddDebuff(scriptableDebuff.InitDebuff(debuffUpdater));
+	}
+
+	public void RemoveDebuff(ScriptableDebuff scriptableDebuff)
+	{
+		debuffUpdater.RemoveDebuff(scriptableDebuff);
 	}
 
 	private void InitializeAbilities()
@@ -80,4 +87,5 @@ public class AbilityCaster : MonoBehaviour
 	{
 		spellSlot.EndHold(this, worldPos);
 	}
+
 }

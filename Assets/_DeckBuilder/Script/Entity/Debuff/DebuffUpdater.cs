@@ -48,6 +48,14 @@ public class DebuffUpdater : MonoBehaviour
         }
     }
 
+    public void RemoveDebuff(ScriptableDebuff scriptableDebuff)
+    {
+        if (debuffs.ContainsKey(scriptableDebuff))
+        {
+            debuffs[scriptableDebuff].Remove();
+        }
+    }
+
     private void DebuffApplier_On_Ended(DebuffApplier applier)
     {
         applier.On_Ended -= DebuffApplier_On_Ended;

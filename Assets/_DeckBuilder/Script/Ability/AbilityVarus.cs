@@ -27,7 +27,13 @@ public class AbilityVarus : AbilityChanneled
 
         float distanceToTravel = Mathf.Lerp(minDistance, maxDistance, channeledRatio);
         launchedProjectile.SetLifeTime(distanceToTravel / launchedProjectile.MaxSpeed);
+
         Hitbox hitbox = launchedProjectile.GetComponent<Hitbox>();
         hitbox.SetDamage(Mathf.FloorToInt(Mathf.Lerp(minDamage, maxDamage, channeledRatio)));
+
+        foreach (ScriptableDebuff scriptableDebuff in debuffsOnCast)
+        {
+            Caster.RemoveDebuff(scriptableDebuff);
+        }
     }
 }
