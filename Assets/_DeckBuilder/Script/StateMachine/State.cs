@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
 
@@ -84,7 +83,6 @@ public class State : ScriptableObject
 
 	public virtual void Update()
 	{
-		Debug.Log($"[{name}] update");
 		if (currentSubState != this)
 			currentSubState.Update();
 	}

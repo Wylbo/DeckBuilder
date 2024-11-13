@@ -40,6 +40,5 @@ public class DebuffApplierMovementSpeed : DebuffApplier
 
     protected override void ApplyTick()
     {
-        Debug.Log("tick");
     }
 }
