@@ -18,7 +18,6 @@ public class Hitbox : MonoBehaviour, IDamager, IOwnable
     {
         if (other.TryGetComponent(out IDamageable damageable) && damageable.Owner != Owner)
         {
-            Debug.Log($"[{nameof(Hitbox)}] Hit something");
             damageable.TakeDamage(CreateDamageInstance());
         }
     }

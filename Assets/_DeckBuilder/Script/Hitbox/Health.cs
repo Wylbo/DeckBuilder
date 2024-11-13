@@ -36,7 +36,6 @@ public class Health : MonoBehaviour
 
         On_Change?.Invoke(previousValue, currentHealth);
 
-        Debug.Log($"{name} new health:" + currentHealth);
 
         if (currentHealth <= 0)
             On_Empty?.Invoke();

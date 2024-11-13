@@ -17,7 +17,6 @@ public class Hurtbox : MonoBehaviour, IDamageable
 
     public void TakeDamage(DamageInstance damageInstance)
     {
-        Debug.Log("Damage received:" + damageInstance.Damage);
         On_DamageReceived?.Invoke(damageInstance);
     }
 }
