@@ -30,6 +30,7 @@ public class AbilityVarus : AbilityChanneled, IAbilityRangeIndicator
         isSucessful = true;
         base.EndCast(worldPos, isSucessful);
 
+        spawnedRangedIndicator.SetScale(minDistance * 2);
         PoolManager.Release(spawnedRangedIndicator.gameObject);
         spawnedRangedIndicator = null;
 
