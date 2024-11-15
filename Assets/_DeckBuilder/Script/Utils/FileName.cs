@@ -11,4 +11,6 @@ public static class FileName
 	public const string Ability = Root + "Ability/";
 
 	public const string Debuff = Root + "Debuff/";
+
+	public const string BehaviourTree = Root + "BehaviourTree/";
 }

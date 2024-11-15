@@ -30,6 +30,7 @@ public class PlayerControlStrategy : ControlStrategy
 		playerInput.Gameplay.Ability2.canceled += Ability2_canceled;
 		playerInput.Gameplay.Ability3.canceled += Ability3_canceled;
 		playerInput.Gameplay.Ability4.canceled += Ability4_canceled;
+
 		Debug.Log("Player controller strategy initialized");
 	}
 
