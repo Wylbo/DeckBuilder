@@ -1,0 +1,64 @@
+using System;
+using UnityEditor;
+using UnityEngine;
+
+namespace BehaviourTree.Node
+{
+	public abstract class Node : ScriptableObject
+	{
+		public enum State
+		{
+			Running,
+			Failure,
+			Success,
+		}
+
+		[HideInInspector] public State CurrentState { get; protected set; } = State.Running;
+		[HideInInspector] public bool Started { get; private set; } = false;
+		[HideInInspector] public string GUID { get; private set; }
+		[HideInInspector] public Vector2 Position { get; set; }
+
+		public State Update()
+		{
+			if (!Started)
+			{
+				OnStart();
+				Started = true;
+			}
+
+			CurrentState = OnUpdate();
+
+			if (CurrentState == State.Failure || CurrentState == State.Success)
+			{
+				OnStop();
+				Started = false;
+			}
+
+			return CurrentState;
+		}
+
+		public virtual Node Clone()
+		{
+			return Instantiate(this);
+		}
+
+		public String GenerateGUID()
+		{
+			GUID = UnityEditor.GUID.Generate().ToString();
+			return GUID;
+		}
+
+		public void SetPosition(Rect rect)
+		{
+			SetPosition(new Vector2(rect.xMin, rect.yMin));
+		}
+
+		public void SetPosition(Vector2 position)
+		{
+			Position = position;
+		}
+		protected abstract void OnStart();
+		protected abstract void OnStop();
+		protected abstract State OnUpdate();
+	}
+}
