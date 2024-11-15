@@ -13,10 +13,10 @@ namespace BehaviourTree.Node
 			Success,
 		}
 
-		[HideInInspector] public State CurrentState { get; protected set; } = State.Running;
-		[HideInInspector] public bool Started { get; private set; } = false;
-		[HideInInspector] public string GUID { get; private set; }
-		[HideInInspector] public Vector2 Position { get; set; }
+		[field: SerializeField, HideInInspector] public State CurrentState { get; protected set; } = State.Running;
+		[field: SerializeField, HideInInspector] public bool Started { get; private set; } = false;
+		[field: SerializeField, HideInInspector] public string GUID { get; private set; }
+		[field: SerializeField, HideInInspector] public Vector2 Position { get; set; }
 
 		public State Update()
 		{
