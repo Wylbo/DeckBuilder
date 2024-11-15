@@ -1,0 +1,14 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Editor/BehaviourTreeEditor/BehaviourTreeEditor.uss?fileID=7433441132597879392&amp;guid=c0af6c228de081e408acf11afbb46a08&amp;type=3#BehaviourTreeEditor" />
+    <editor:Toolbar>
+        <editor:ToolbarMenu text="Assets&#10;" />
+    </editor:Toolbar>
+    <BehaviourTreeEditor.SplitView fixed-pane-initial-dimension="250" orientation="Horizontal">
+        <engine:VisualElement name="left" style="flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
+            <BehaviourTreeEditor.InspectorView style="flex-grow: 1; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="right" style="flex-grow: 1;">
+            <BehaviourTreeEditor.GraphView style="flex-grow: 1;" />
+        </engine:VisualElement>
+    </BehaviourTreeEditor.SplitView>
+</engine:UXML>
