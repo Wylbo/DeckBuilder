@@ -113,8 +113,6 @@
 }
 
 .port {
-    min-width: 30px;
-    min-height: 30px;
 }
 
 #node-state {
@@ -151,4 +149,11 @@
 
 .failure #node-state {
     background-color: rgba(255, 0, 0, 0.5);
+}
+
+:hover > #connector {
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
 }

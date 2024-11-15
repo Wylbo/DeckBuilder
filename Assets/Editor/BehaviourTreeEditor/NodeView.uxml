@@ -1,5 +1,5 @@
 <UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
-    <Style src="project://database/Assets/Editor/NodeViewStyle.uss?fileID=7433441132597879392&amp;guid=a38f9309bf29ab041ab307b134a253af&amp;type=3#NodeViewStyle" />
+    <Style src="project://database/Assets/Editor/BehaviourTreeEditor/NodeViewStyle.uss?fileID=7433441132597879392&amp;guid=a38f9309bf29ab041ab307b134a253af&amp;type=3#NodeViewStyle" />
     <ui:VisualElement name="node-state" style="flex-grow: 1;" />
     <ui:VisualElement name="node-border">
         <ui:VisualElement name="contents">
@@ -15,7 +15,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="divider" class="vertical" />
-                <ui:Label text="This is a description" name="description" />
+                <ui:Label name="description" enabled="false" text=" T" />
                 <ui:VisualElement name="divider" class="horizontal" />
                 <ui:VisualElement name="output" />
             </ui:VisualElement>

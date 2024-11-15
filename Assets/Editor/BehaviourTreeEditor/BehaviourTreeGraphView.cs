@@ -45,7 +45,7 @@ namespace BehaviourTreeEditor
 			return GetNodeByGuid(node.GUID) as NodeView;
 		}
 
-		public void PopulateView(global::BehaviourTree.BehaviourTree tree)
+		public void PopulateView(BehaviourTree.BehaviourTree tree)
 		{
 			this.tree = tree;
 
