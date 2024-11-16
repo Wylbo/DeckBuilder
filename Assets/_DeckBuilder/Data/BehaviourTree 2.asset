@@ -253,7 +253,7 @@ MonoBehaviour:
   <CurrentState>k__BackingField: 0
   <Started>k__BackingField: 0
   <GUID>k__BackingField: f28c250a35670994fa7536bf01de1123
-  <Position>k__BackingField: {x: 374, y: 677}
+  <Position>k__BackingField: {x: 373.99997, y: 676.99994}
   <Blackboard>k__BackingField: {fileID: 0}
   <Character>k__BackingField: {fileID: 0}
   duration: 1

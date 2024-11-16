@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BehaviourTree.Node;
 using BehaviourTree.Node.CompositeNode;
 using BehaviourTree.Node.DecoratorNode;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,6 +21,9 @@ namespace BehaviourTree
 		public BehaviourTree Clone()
 		{
 			BehaviourTree tree = Instantiate(this);
+
+			tree.blackboard = Instantiate(blackboard);
+
 			tree.rootNode = tree.rootNode.Clone();
 			tree.nodes = new List<Node.Node>();
 
