@@ -1,4 +1,4 @@
-namespace BehaviourTree.Node.CompositeNode
+namespace BehaviourTree.Nodes.CompositeNode
 {
 	public class Sequence : CompositeNode
 	{

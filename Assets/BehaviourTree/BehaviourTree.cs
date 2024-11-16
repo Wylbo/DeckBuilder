@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using BehaviourTree.Node;
-using BehaviourTree.Node.CompositeNode;
-using BehaviourTree.Node.DecoratorNode;
+using BehaviourTree.Nodes;
+using BehaviourTree.Nodes.CompositeNode;
+using BehaviourTree.Nodes.DecoratorNode;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -12,9 +12,9 @@ namespace BehaviourTree
 	[CreateAssetMenu(fileName = nameof(BehaviourTree), menuName = FileName.BehaviourTree + nameof(BehaviourTree))]
 	public class BehaviourTree : ScriptableObject
 	{
-		[HideInInspector] public Node.Node rootNode;
-		[HideInInspector] public Node.Node.State treeState = Node.Node.State.Running;
-		[HideInInspector] public List<Node.Node> nodes = new List<Node.Node>();
+		[HideInInspector] public Nodes.Node rootNode;
+		[HideInInspector] public Nodes.Node.State treeState = Nodes.Node.State.Running;
+		[HideInInspector] public List<Nodes.Node> nodes = new List<Nodes.Node>();
 
 		[SerializeField, InlineEditor] public Blackboard blackboard = null;
 
@@ -25,7 +25,7 @@ namespace BehaviourTree
 			tree.blackboard = Instantiate(blackboard);
 
 			tree.rootNode = tree.rootNode.Clone();
-			tree.nodes = new List<Node.Node>();
+			tree.nodes = new List<Nodes.Node>();
 
 			Traverse(tree.rootNode, (n) =>
 			{
@@ -45,19 +45,19 @@ namespace BehaviourTree
 			});
 		}
 
-		private void Traverse(Node.Node node, Action<Node.Node> visiter)
+		private void Traverse(Nodes.Node node, Action<Nodes.Node> visiter)
 		{
 			if (node)
 			{
 				visiter.Invoke(node);
-				List<Node.Node> children = GetChildren(node);
+				List<Nodes.Node> children = GetChildren(node);
 				children.ForEach((n) => Traverse(n, visiter));
 			}
 		}
 
-		public Node.Node.State Update()
+		public Nodes.Node.State Update()
 		{
-			if (rootNode.CurrentState == Node.Node.State.Running)
+			if (rootNode.CurrentState == Nodes.Node.State.Running)
 			{
 				treeState = rootNode.Update();
 			}
@@ -65,9 +65,9 @@ namespace BehaviourTree
 			return treeState;
 		}
 
-		public Node.Node CreateNode(Type type)
+		public Nodes.Node CreateNode(Type type)
 		{
-			Node.Node node = CreateInstance(type) as Node.Node;
+			Nodes.Node node = CreateInstance(type) as Nodes.Node;
 			node.name = type.Name;
 			node.GenerateGUID();
 
@@ -84,7 +84,7 @@ namespace BehaviourTree
 			return node;
 		}
 
-		public void DeleteNode(Node.Node node)
+		public void DeleteNode(Nodes.Node node)
 		{
 			Undo.RecordObject(this, "Behaviour Tree (Delete Node)");
 			nodes.Remove(node);
@@ -94,7 +94,7 @@ namespace BehaviourTree
 		}
 
 
-		public void AddChild(Node.Node parent, Node.Node child)
+		public void AddChild(Nodes.Node parent, Nodes.Node child)
 		{
 
 			RootNode node = parent as RootNode;
@@ -123,7 +123,7 @@ namespace BehaviourTree
 		}
 
 
-		public void RemoveChild(Node.Node parent, Node.Node child)
+		public void RemoveChild(Nodes.Node parent, Nodes.Node child)
 		{
 			RootNode rootNode = parent as RootNode;
 			if (rootNode)
@@ -151,9 +151,9 @@ namespace BehaviourTree
 
 		}
 
-		public List<Node.Node> GetChildren(Node.Node parent)
+		public List<Nodes.Node> GetChildren(Nodes.Node parent)
 		{
-			List<Node.Node> children = new List<Node.Node>();
+			List<Nodes.Node> children = new List<Nodes.Node>();
 
 			RootNode rootNode = parent as RootNode;
 			if (rootNode && rootNode.child != null)

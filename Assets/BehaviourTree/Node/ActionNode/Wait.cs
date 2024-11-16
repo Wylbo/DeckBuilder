@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BehaviourTree.Node.ActionNode
+namespace BehaviourTree.Nodes.ActionNode
 {
 	public class Wait : ActionNode
 	{

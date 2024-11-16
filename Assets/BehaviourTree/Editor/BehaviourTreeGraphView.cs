@@ -1,23 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BehaviourTree;
-using BehaviourTree.Node;
-using BehaviourTree.Node.ActionNode;
-using BehaviourTree.Node.CompositeNode;
-using BehaviourTree.Node.DecoratorNode;
+using BehaviourTree.Nodes;
+using BehaviourTree.Nodes.ActionNode;
+using BehaviourTree.Nodes.CompositeNode;
+using BehaviourTree.Nodes.DecoratorNode;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Node = BehaviourTree.Node.Node;
+using Node = BehaviourTree.Nodes.Node;
 
-namespace BehaviourTreeEditor
+namespace BehaviourTree.Editor
 {
 	[UxmlElement("GraphView")]
 	public partial class BehaviourTreeGraphView : GraphView
 	{
-		private BehaviourTree.BehaviourTree tree;
+		private BehaviourTree tree;
 		public event Action<NodeView> OnNodeSelected;
 
 		public EditorWindow EditorWindow { get; set; }
@@ -32,7 +31,7 @@ namespace BehaviourTreeEditor
 			this.AddManipulator(new SelectionDragger());
 			this.AddManipulator(new RectangleSelector());
 
-			StyleSheet styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Editor/BehaviourTreeEditor/BehaviourTreeEditor.uss");
+			StyleSheet styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/BehaviourTree/Editor/BehaviourTreeEditor.uss");
 			styleSheets.Add(styleSheet);
 
 			Undo.undoRedoPerformed += OnUndoRedo;
@@ -66,7 +65,7 @@ namespace BehaviourTreeEditor
 			return GetNodeByGuid(node.GUID) as NodeView;
 		}
 
-		public void PopulateView(BehaviourTree.BehaviourTree tree)
+		public void PopulateView(BehaviourTree tree)
 		{
 			this.tree = tree;
 

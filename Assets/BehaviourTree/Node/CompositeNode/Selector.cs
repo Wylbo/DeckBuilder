@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BehaviourTree.Node.CompositeNode
+namespace BehaviourTree.Nodes.CompositeNode
 {
     public class Selector : CompositeNode
     {
