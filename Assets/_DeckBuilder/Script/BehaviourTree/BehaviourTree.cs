@@ -15,6 +15,7 @@ namespace BehaviourTree
 		[HideInInspector] public Node.Node.State treeState = Node.Node.State.Running;
 		[HideInInspector] public List<Node.Node> nodes = new List<Node.Node>();
 
+		[SerializeField, InlineEditor] public Blackboard blackboard = null;
 
 		public BehaviourTree Clone()
 		{
@@ -28,6 +29,16 @@ namespace BehaviourTree
 			});
 
 			return tree;
+		}
+
+		public void Bind(Character character)
+		{
+			Blackboard sharedBb = Instantiate(blackboard);
+			Traverse(rootNode, node =>
+			{
+				node.Character = character;
+				node.Blackboard = sharedBb;
+			});
 		}
 
 		private void Traverse(Node.Node node, Action<Node.Node> visiter)
@@ -50,7 +61,7 @@ namespace BehaviourTree
 			return treeState;
 		}
 
-		public Node.Node CreateNode(System.Type type)
+		public Node.Node CreateNode(Type type)
 		{
 			Node.Node node = CreateInstance(type) as Node.Node;
 			node.name = type.Name;

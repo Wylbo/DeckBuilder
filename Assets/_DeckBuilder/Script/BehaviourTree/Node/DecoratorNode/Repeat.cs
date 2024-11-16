@@ -5,6 +5,7 @@ namespace BehaviourTree.Node.DecoratorNode
 	public class Repeat : DecoratorNode
 	{
 		[SerializeField] private int loops;
+		[SerializeField] private bool stopOnFail;
 
 		private int elapsedLoops = 0;
 		protected override void OnStart()
@@ -29,6 +30,10 @@ namespace BehaviourTree.Node.DecoratorNode
 				return State.Success;
 			}
 			child.Update();
+
+			if (stopOnFail && child.CurrentState == State.Failure)
+				return State.Failure;
+
 			return State.Running;
 		}
 	}

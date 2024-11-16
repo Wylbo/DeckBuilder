@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BehaviourTree;
 using BehaviourTree.Node;
 using BehaviourTree.Node.ActionNode;
 using BehaviourTree.Node.CompositeNode;
@@ -16,8 +17,11 @@ namespace BehaviourTreeEditor
 	[UxmlElement("GraphView")]
 	public partial class BehaviourTreeGraphView : GraphView
 	{
-		private global::BehaviourTree.BehaviourTree tree;
+		private BehaviourTree.BehaviourTree tree;
 		public event Action<NodeView> OnNodeSelected;
+
+		public EditorWindow EditorWindow { get; set; }
+		public BTSearchWindow searchWindow;
 
 		public BehaviourTreeGraphView()
 		{
@@ -32,6 +36,23 @@ namespace BehaviourTreeEditor
 			styleSheets.Add(styleSheet);
 
 			Undo.undoRedoPerformed += OnUndoRedo;
+
+			AddSearchWindow();
+		}
+
+		private void AddSearchWindow()
+		{
+			if (searchWindow == null)
+			{
+				searchWindow = ScriptableObject.CreateInstance<BTSearchWindow>();
+				searchWindow.Initialize(this, EditorWindow);
+			}
+
+			nodeCreationRequest = context =>
+			{
+				Vector2 position = context.screenMousePosition;
+				SearchWindow.Open(new SearchWindowContext(position), searchWindow);
+			};
 		}
 
 		private void OnUndoRedo()
@@ -122,32 +143,57 @@ namespace BehaviourTreeEditor
 
 		public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
 		{
-			base.BuildContextualMenu(evt);
+			// base.BuildContextualMenu(evt);
 			Vector2 localPos = evt.mousePosition;
 
+			localPos = contentViewContainer.WorldToLocal(localPos);
+
+			CreateContextualMenuGroup(evt, localPos);
+			CreateContextualMenuNode(evt, localPos);
+		}
+
+		private void CreateContextualMenuNode(ContextualMenuPopulateEvent evt, Vector2 localPos)
+		{
 			TypeCache.TypeCollection actionTypes = TypeCache.GetTypesDerivedFrom<ActionNode>();
 			foreach (Type type in actionTypes)
 			{
-				evt.menu.AppendAction($"[{type.BaseType.Name}] {type.Name}", (a) => CreateNode(type, localPos));
+				evt.menu.AppendAction($"[{type.BaseType.Name}]/{type.Name}", (a) => CreateNode(type, localPos));
 			}
 
 			TypeCache.TypeCollection compositeTypes = TypeCache.GetTypesDerivedFrom<CompositeNode>();
 			foreach (Type type in compositeTypes)
 			{
-				evt.menu.AppendAction($"[{type.BaseType.Name}] {type.Name}", (a) => CreateNode(type, localPos));
+				evt.menu.AppendAction($"[{type.BaseType.Name}]/{type.Name}", (a) => CreateNode(type, localPos));
 			}
 
 			TypeCache.TypeCollection DecoratorTypes = TypeCache.GetTypesDerivedFrom<DecoratorNode>();
 			foreach (Type type in DecoratorTypes)
 			{
-				evt.menu.AppendAction($"[{type.BaseType.Name}] {type.Name}", (a) => CreateNode(type, localPos));
+				evt.menu.AppendAction($"[{type.BaseType.Name}]/{type.Name}", (a) => CreateNode(type, localPos));
 			}
 		}
 
-		private void CreateNode(Type type, Vector2 position)
+		private void CreateContextualMenuGroup(ContextualMenuPopulateEvent evt, Vector2 localPos)
+		{
+			evt.menu.AppendAction("Add Group", (a) => CreateGroup("Group", localPos));
+		}
+
+		private void CreateGroup(string title, Vector2 localPos)
+		{
+			Group group = new Group()
+			{
+				title = title
+			};
+
+			group.SetPosition(new Rect(localPos, Vector2.zero));
+
+			AddElement(group);
+		}
+
+		public void CreateNode(Type type, Vector2 position)
 		{
 			Node node = tree.CreateNode(type);
-			node.Position = contentViewContainer.WorldToLocal(position);
+			node.Position = position;
 			CreateNodeView(node);
 		}
 
