@@ -17,6 +17,8 @@ namespace BehaviourTree.Node
 		[field: SerializeField, HideInInspector] public bool Started { get; private set; } = false;
 		[field: SerializeField, HideInInspector] public string GUID { get; private set; }
 		[field: SerializeField, HideInInspector] public Vector2 Position { get; set; }
+		[field: SerializeField, HideInInspector] public Blackboard Blackboard { get; set; }
+		[field: SerializeField, HideInInspector] public Character Character { get; set; }
 
 		public State Update()
 		{

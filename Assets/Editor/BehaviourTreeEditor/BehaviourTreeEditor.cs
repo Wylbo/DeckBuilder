@@ -3,13 +3,18 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System;
 
 namespace BehaviourTreeEditor
 {
 	public class BehaviourTreeEditor : EditorWindow
 	{
-		BehaviourTreeGraphView treeView;
-		InspectorView inspectorView;
+		private BehaviourTreeGraphView treeView;
+		private InspectorView inspectorView;
+		private IMGUIContainer blackboardView;
+
+		private SerializedObject treeObject;
+		private SerializedProperty blackboardProp;
 
 		[MenuItem("DeckBuilder/BehaviourTreeEditor")]
 		public static void OpenWindow()
@@ -45,11 +50,27 @@ namespace BehaviourTreeEditor
 			root.styleSheets.Add(styleSheet);
 
 			treeView = root.Q<BehaviourTreeGraphView>();
+			treeView.EditorWindow = this;
+			treeView.searchWindow.editorWindow = this;
 			inspectorView = root.Q<InspectorView>();
-
-			treeView.OnNodeSelected += OnNodeSelectionChanged;
+			blackboardView = root.Q<IMGUIContainer>();
 
 			OnSelectionChange();
+
+			if (treeObject != null && treeObject.targetObject != null)
+			{
+				blackboardView.onGUIHandler = () =>
+				{
+					if (treeObject.targetObject == null)
+						return;
+
+					treeObject.Update();
+					EditorGUILayout.PropertyField(blackboardProp, true);
+					treeObject.ApplyModifiedProperties();
+				};
+			}
+
+			treeView.OnNodeSelected += OnNodeSelectionChanged;
 		}
 
 		private void OnEnable()
@@ -83,8 +104,10 @@ namespace BehaviourTreeEditor
 
 		private void OnSelectionChange()
 		{
+			// get selected BT SO
 			BehaviourTree.BehaviourTree tree = Selection.activeObject as BehaviourTree.BehaviourTree;
 
+			// or get BT on selected GO
 			if (!tree && Selection.activeGameObject)
 			{
 				BehaviourTreeRunner runner = Selection.activeGameObject.GetComponent<BehaviourTreeRunner>();
@@ -100,10 +123,17 @@ namespace BehaviourTreeEditor
 			}
 			else
 			{
-				if (tree && tree != null && AssetDatabase.CanOpenAssetInEditor(tree.GetInstanceID()))
+				if (tree && AssetDatabase.CanOpenAssetInEditor(tree.GetInstanceID()))
 				{
 					treeView.PopulateView(tree);
 				}
+			}
+
+			if (tree != null)
+			{
+				treeObject = new SerializedObject(tree);
+				blackboardProp = treeObject.FindProperty(nameof(tree.blackboard));
+				Repaint();
 			}
 		}
 
