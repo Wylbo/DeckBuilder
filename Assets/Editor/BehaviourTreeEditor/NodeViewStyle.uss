@@ -109,7 +109,7 @@
 
 .root #input {
     background-color: rgb(255, 81, 84);
-    min-height: 30px;
+    min-height: 24px;
 }
 
 .port {
@@ -156,4 +156,8 @@
     border-right-width: 5px;
     border-bottom-width: 5px;
     border-left-width: 5px;
+}
+
+.action #output {
+    min-height: 24px;
 }
