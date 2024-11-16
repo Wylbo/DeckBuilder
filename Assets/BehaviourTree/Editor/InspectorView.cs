@@ -1,6 +1,6 @@
 using UnityEngine.UIElements;
 
-namespace BehaviourTreeEditor
+namespace BehaviourTree.Editor
 {
 	[UxmlElement("InspectorView")]
 	public partial class InspectorView : VisualElement

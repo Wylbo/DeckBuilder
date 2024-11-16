@@ -1,6 +1,6 @@
 using UnityEngine.UIElements;
 
-namespace BehaviourTreeEditor
+namespace BehaviourTree.Editor
 {
 	[UxmlElement("SplitView")]
 	public partial class SplitView : TwoPaneSplitView

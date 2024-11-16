@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BehaviourTree.Node.DecoratorNode
+namespace BehaviourTree.Nodes.DecoratorNode
 {
 	public abstract class DecoratorNode : Node
 	{

@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace BehaviourTree.Node
+namespace BehaviourTree.Nodes
 {
 	public abstract class Node : ScriptableObject
 	{

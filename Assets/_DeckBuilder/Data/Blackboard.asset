@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3d494b6d49ec9043b84582bb1fe9514, type: 3}
   m_Name: Blackboard
   m_EditorClassIdentifier: 
-  moveToPosition: {x: 0, y: 0, z: 0}
+  moveToPosition: {x: 2, y: 0, z: 0}

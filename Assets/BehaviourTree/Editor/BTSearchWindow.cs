@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
-using BehaviourTree.Node.ActionNode;
-using BehaviourTree.Node.CompositeNode;
-using BehaviourTree.Node.DecoratorNode;
-using BehaviourTreeEditor;
+using BehaviourTree.Nodes.ActionNode;
+using BehaviourTree.Nodes.CompositeNode;
+using BehaviourTree.Nodes.DecoratorNode;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace BehaviourTree
+namespace BehaviourTree.Editor
 {
     public class BTSearchWindow : ScriptableObject, ISearchWindowProvider
     {

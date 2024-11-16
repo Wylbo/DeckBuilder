@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BehaviourTree.Node.DecoratorNode
+namespace BehaviourTree.Nodes.DecoratorNode
 {
 	public class Repeat : DecoratorNode
 	{

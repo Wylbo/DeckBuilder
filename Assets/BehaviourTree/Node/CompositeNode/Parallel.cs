@@ -1,6 +1,6 @@
 using System.Linq;
-using BehaviourTree.Node;
-using BehaviourTree.Node.CompositeNode;
+using BehaviourTree.Nodes;
+using BehaviourTree.Nodes.CompositeNode;
 using UnityEngine;
 
 public class Parallel : CompositeNode

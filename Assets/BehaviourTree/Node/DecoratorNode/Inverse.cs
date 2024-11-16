@@ -1,5 +1,5 @@
 
-namespace BehaviourTree.Node.DecoratorNode
+namespace BehaviourTree.Nodes.DecoratorNode
 {
 	public class Inverse : DecoratorNode
 	{

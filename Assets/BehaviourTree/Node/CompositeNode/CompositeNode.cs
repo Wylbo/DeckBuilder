@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BehaviourTree.Node.CompositeNode
+namespace BehaviourTree.Nodes.CompositeNode
 {
 	public abstract class CompositeNode : Node
 	{

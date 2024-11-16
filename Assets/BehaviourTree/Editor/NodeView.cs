@@ -1,15 +1,15 @@
 using System;
-using BehaviourTree.Node;
-using BehaviourTree.Node.ActionNode;
-using BehaviourTree.Node.CompositeNode;
-using BehaviourTree.Node.DecoratorNode;
+using BehaviourTree.Nodes;
+using BehaviourTree.Nodes.ActionNode;
+using BehaviourTree.Nodes.CompositeNode;
+using BehaviourTree.Nodes.DecoratorNode;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Node = BehaviourTree.Node.Node;
+using Node = BehaviourTree.Nodes.Node;
 
-namespace BehaviourTreeEditor
+namespace BehaviourTree.Editor
 {
 	public class NodeView : UnityEditor.Experimental.GraphView.Node
 	{
@@ -18,7 +18,7 @@ namespace BehaviourTreeEditor
 		public Port output;
 
 		public event Action<NodeView> OnNodeSelected;
-		public NodeView(Node node) : base("Assets/Editor/BehaviourTreeEditor/NodeView.uxml")
+		public NodeView(Node node) : base("Assets/BehaviourTree/Editor/NodeView.uxml")
 		{
 			this.node = node;
 			title = node.name;

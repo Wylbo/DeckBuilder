@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System;
 
-namespace BehaviourTreeEditor
+namespace BehaviourTree.Editor
 {
 	public class BehaviourTreeEditor : EditorWindow
 	{
@@ -26,7 +26,7 @@ namespace BehaviourTreeEditor
 		[OnOpenAsset]
 		public static bool OnOpenAsset(int instanceId, int line)
 		{
-			if (Selection.activeObject is BehaviourTree.BehaviourTree)
+			if (Selection.activeObject is BehaviourTree)
 			{
 				OpenWindow();
 				return true;
@@ -43,10 +43,10 @@ namespace BehaviourTreeEditor
 		{
 			VisualElement root = rootVisualElement;
 
-			VisualTreeAsset visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/BehaviourTreeEditor/BehaviourTreeEditor.uxml");
+			VisualTreeAsset visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/BehaviourTree/Editor/BehaviourTreeEditor.uxml");
 			visualTree.CloneTree(root);
 
-			StyleSheet styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Editor/BehaviourTreeEditor/BehaviourTreeEditor.uss");
+			StyleSheet styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/BehaviourTree/Editor/BehaviourTreeEditor.uss");
 			root.styleSheets.Add(styleSheet);
 
 			treeView = root.Q<BehaviourTreeGraphView>();
@@ -105,7 +105,7 @@ namespace BehaviourTreeEditor
 		private void OnSelectionChange()
 		{
 			// get selected BT SO
-			BehaviourTree.BehaviourTree tree = Selection.activeObject as BehaviourTree.BehaviourTree;
+			BehaviourTree tree = Selection.activeObject as BehaviourTree;
 
 			// or get BT on selected GO
 			if (!tree && Selection.activeGameObject)
