@@ -15,8 +15,6 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="divider" class="vertical" />
-                <ui:Label name="description" enabled="false" text=" T" />
-                <ui:VisualElement name="divider" class="horizontal" />
                 <ui:VisualElement name="output" />
             </ui:VisualElement>
         </ui:VisualElement>

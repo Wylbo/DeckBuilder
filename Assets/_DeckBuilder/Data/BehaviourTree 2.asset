@@ -15,7 +15,7 @@ MonoBehaviour:
   <CurrentState>k__BackingField: 0
   <Started>k__BackingField: 0
   <GUID>k__BackingField: d9fb39a7d53a4904394a3188bdd7150a
-  <Position>k__BackingField: {x: 74, y: 47}
+  <Position>k__BackingField: {x: 74, y: 65}
   <Blackboard>k__BackingField: {fileID: 0}
   <Character>k__BackingField: {fileID: 0}
   child: {fileID: -6164720687080263601}
@@ -138,7 +138,7 @@ MonoBehaviour:
   <CurrentState>k__BackingField: 0
   <Started>k__BackingField: 0
   <GUID>k__BackingField: eaa2e23f26e10684d8dd37fc1d0b0db3
-  <Position>k__BackingField: {x: -225.99991, y: 509}
+  <Position>k__BackingField: {x: -226, y: 509}
   <Blackboard>k__BackingField: {fileID: 0}
   <Character>k__BackingField: {fileID: 0}
   children:
@@ -369,7 +369,7 @@ MonoBehaviour:
   <CurrentState>k__BackingField: 0
   <Started>k__BackingField: 0
   <GUID>k__BackingField: e11a92179e5291240958b6d7e3a1b395
-  <Position>k__BackingField: {x: -0.9999161, y: 677}
+  <Position>k__BackingField: {x: -1, y: 677}
   <Blackboard>k__BackingField: {fileID: 0}
   <Character>k__BackingField: {fileID: 0}
   duration: 1
