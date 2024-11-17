@@ -13,16 +13,15 @@ MonoBehaviour:
   m_Name: BehaviourTreeProjectSettings
   m_EditorClassIdentifier: 
   newTreePath: Assets/
-  newNodePath: Assets/
+  newNodePath: Assets/_DeckBuilder/Script/BT/Node
   scriptTemplateActionNode: {fileID: 0}
   scriptTemplateConditionNode: {fileID: 0}
   scriptTemplateCompositeNode: {fileID: 0}
   scriptTemplateDecoratorNode: {fileID: 0}
-  gridSnapSizeX: 1
-  gridSnapSizeY: 1
+  gridSnapSizeX: 10
+  gridSnapSizeY: 10
   autoSelectNodeHierarchy: 0
   windowState:
     activeTabs:
     - {fileID: 11400000, guid: 474cb969685971b43bde8d41f8e6b364, type: 2}
-    - {fileID: 11400000, guid: 766fb4a3a4ef5e642a7595834cc5946e, type: 2}
     activeTabIndex: 0

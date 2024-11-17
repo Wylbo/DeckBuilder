@@ -16,10 +16,13 @@ public class SpellSlot
 
 	private AbilityCaster caster = null;
 
-	public void Initialize(AbilityCaster caster)
+	public bool Initialize(AbilityCaster caster)
 	{
-		Ability = ScriptableObject.Instantiate(Ability);
+		if (!Ability)
+			return false;
+		Ability = UnityEngine.Object.Instantiate(Ability);
 		Ability.Initialize(caster);
+		return true;
 	}
 	public void Cast(AbilityCaster caster, Vector3 worldPos)
 	{
