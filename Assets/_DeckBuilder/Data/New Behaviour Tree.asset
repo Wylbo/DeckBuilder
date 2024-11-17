@@ -16,16 +16,13 @@ MonoBehaviour:
     rid: 4034034895233745088
   nodes:
   - rid: 4034034895233745088
-  - rid: 4034034895233745092
-  - rid: 4034034895233745094
-  - rid: 4034034895233745101
-  - rid: 4034034895233745111
-  - rid: 4034034895233745116
+  - rid: 4034034896503570695
+  - rid: 4034034896503570706
   blackboard:
     keys:
-    - rid: 4034034895233745102
-    - rid: 4034034895233745112
-  viewPosition: {x: 337, y: -85, z: 0}
+    - rid: 4034034896503570505
+    - rid: 4034034896503570700
+  viewPosition: {x: 463, y: -137, z: 0}
   viewScale: {x: 1, y: 1, z: 1}
   references:
     version: 2
@@ -41,91 +38,46 @@ MonoBehaviour:
         description: 
         drawGizmos: 0
         child:
-          rid: 4034034895233745094
-    - rid: 4034034895233745092
-      type: {class: Wait, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
+          rid: 4034034896503570706
+    - rid: 4034034896503570505
+      type: {class: FloatKey, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
-        started: 0
-        guid: 1508cfdd1f6abc647a8887bc67508569
-        position: {x: 150, y: 520}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        duration: 1
-    - rid: 4034034895233745094
-      type: {class: Repeat, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
-      data:
-        started: 0
-        guid: ed5a9bd47501e0047973549d5abacfec
-        position: {x: 0, y: 260}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        child:
-          rid: 4034034895233745116
-        restartOnSuccess: 0
-        restartOnFailure: 0
-        maxRepeats: 0
-    - rid: 4034034895233745101
-      type: {class: RandomPosition, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
-      data:
-        started: 0
-        guid: de2e2ba54ef48b44eaeb3e322c8f2c92
-        position: {x: -160, y: 520}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        min: {x: -10, y: 0, z: -10}
-        max: {x: 10, y: 0, z: 10}
-        result:
-          reference:
-            rid: 4034034895233745102
-          defaultValue: {x: 0, y: 0, z: 0}
-    - rid: 4034034895233745102
-      type: {class: Vector3Key, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
-      data:
-        name: RandomPos
-        typeName: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        value: {x: 0, y: 0, z: 0}
-    - rid: 4034034895233745111
-      type: {class: UseAbility, ns: , asm: Assembly-CSharp}
-      data:
-        started: 0
-        guid: 37025d5f3629d6a4b882388f31bf9b73
-        position: {x: 0, y: 520}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        abilityIndex:
-          reference:
-            rid: 4034034895233745112
-          defaultValue: 0
-        targetPosition:
-          reference:
-            rid: 4034034895233745102
-          defaultValue: {x: 0, y: 0, z: 0}
-    - rid: 4034034895233745112
-      type: {class: IntKey, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
-      data:
-        name: AbilityIndex
-        typeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        name: test
+        typeName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         value: 0
-    - rid: 4034034895233745116
-      type: {class: Sequence, ns: , asm: Assembly-CSharp}
+    - rid: 4034034896503570695
+      type: {class: Patrol, ns: , asm: Assembly-CSharp}
       data:
         started: 0
-        guid: c64aec149a469f848aefef685e7e2d45
-        position: {x: 0, y: 380}
+        guid: 5f97a132088d47d4995c6cd8c2192e2f
+        position: {x: -220, y: 530}
+        blackboard:
+          keys: []
+        description: 
+        drawGizmos: 0
+        patrolPoints:
+          reference:
+            rid: 4034034896503570700
+          defaultValue: []
+    - rid: 4034034896503570700
+      type: {class: GameObjectList, ns: , asm: Assembly-CSharp}
+      data:
+        name: patrolPoints
+        typeName: System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule,
+          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+          Culture=neutral, PublicKeyToken=b77a5c561934e089
+        value:
+        - {fileID: 0}
+    - rid: 4034034896503570706
+      type: {class: Parallel, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
+      data:
+        started: 0
+        guid: fcd49e8b294620f4dbffc0f644c767ac
+        position: {x: 0, y: 350}
         blackboard:
           keys: []
         description: 
         drawGizmos: 0
         children:
-        - rid: 4034034895233745101
-        - rid: 4034034895233745111
-        - rid: 4034034895233745092
+        - rid: 4034034896503570695
+        successThreshold: 1
