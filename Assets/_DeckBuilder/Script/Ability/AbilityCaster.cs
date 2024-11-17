@@ -47,7 +47,7 @@ public class AbilityCaster : MonoBehaviour
 	{
 		foreach (SpellSlot spellSlot in spellSlots)
 		{
-			spellSlot.Ability?.Initialize(this);
+			spellSlot.Initialize(this);
 		}
 	}
 
