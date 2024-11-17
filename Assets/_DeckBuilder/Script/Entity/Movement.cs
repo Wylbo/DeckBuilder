@@ -48,6 +48,7 @@ public class Movement : MonoBehaviour
 	private Vector3 wantedVelocity = Vector3.zero;
 	private float baseMaxSpeed = 0;
 
+	public NavMeshAgent Agent => agent;
 	private float agentRadius => NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius;
 	private float stepHeight => NavMesh.GetSettingsByID(agent.agentTypeID).agentClimb;
 	private float HalfHeight => capsuleCollider.height / 2;
