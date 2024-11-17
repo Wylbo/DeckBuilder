@@ -7,13 +7,6 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
-    "com.thekiwicoder.behaviourtreeditor": {
-      "version": "https://github.com/thekiwicoder0/UnityBehaviourTreeEditor.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "1172313b414adcf4cb1c55735588a619edcf6441"
-    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -317,6 +310,13 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "com.wylbo.behaviourtreeditor": {
+      "version": "https://github.com/Wylbo/UnityBehaviourTreeEditor.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "6d202328daa328531fe2e47cb652096c9f9dc8ee"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
