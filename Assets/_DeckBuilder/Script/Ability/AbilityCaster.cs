@@ -67,15 +67,20 @@ public class AbilityCaster : MonoBehaviour
 		}
 	}
 
-	public void Cast(int index, Vector3 worldPos)
+	public bool Cast(int index, Vector3 worldPos)
 	{
-		Cast(spellSlots[index], worldPos);
+		return Cast(spellSlots[index], worldPos);
 	}
 
-	private void Cast(SpellSlot spellSlot, Vector3 worldPos)
+	private bool Cast(SpellSlot spellSlot, Vector3 worldPos)
 	{
 		if (spellSlot.CanCast)
+		{
 			spellSlot.Cast(this, worldPos);
+			return true;
+		}
+
+		return false;
 	}
 
 	public void EndHold(int index, Vector3 worldPos)

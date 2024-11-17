@@ -21,7 +21,7 @@ public class UseAbility : ActionNode
 
     protected override State OnUpdate()
     {
-        caster.Cast(abilityIndex.Value, targetPosition.Value);
-        return State.Success;
+        bool casted = caster.Cast(abilityIndex.Value, targetPosition.Value);
+        return casted ? State.Success : State.Failure;
     }
 }
