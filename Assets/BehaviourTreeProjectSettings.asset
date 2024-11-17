@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32dcde829cc493549a6e405cd4fc8179, type: 3}
+  m_Name: BehaviourTreeProjectSettings
+  m_EditorClassIdentifier: 
+  newTreePath: Assets/
+  newNodePath: Assets/
+  scriptTemplateActionNode: {fileID: 0}
+  scriptTemplateConditionNode: {fileID: 0}
+  scriptTemplateCompositeNode: {fileID: 0}
+  scriptTemplateDecoratorNode: {fileID: 0}
+  gridSnapSizeX: 1
+  gridSnapSizeY: 1
+  autoSelectNodeHierarchy: 0
+  windowState:
+    activeTabs:
+    - {fileID: 11400000, guid: 474cb969685971b43bde8d41f8e6b364, type: 2}
+    - {fileID: 11400000, guid: 766fb4a3a4ef5e642a7595834cc5946e, type: 2}
+    activeTabIndex: 0
