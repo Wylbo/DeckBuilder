@@ -1701,6 +1701,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseCharacter
       objectReference: {fileID: 0}
+    - target: {fileID: 7162189599941437326, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: spellSlots.Array.data[0].Ability
+      value: 
+      objectReference: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
+    - target: {fileID: 7162189599941437326, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: spellSlots.Array.data[1].Ability
+      value: 
+      objectReference: {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
     - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
       propertyPath: fillCurve.m_Curve.Array.size
       value: 2

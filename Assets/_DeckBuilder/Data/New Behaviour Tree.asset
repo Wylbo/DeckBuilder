@@ -16,94 +16,64 @@ MonoBehaviour:
     rid: 4034034895233745088
   nodes:
   - rid: 4034034895233745088
-  - rid: 4034034895233745091
   - rid: 4034034895233745092
   - rid: 4034034895233745094
   - rid: 4034034895233745101
-  - rid: 4034034895233745103
+  - rid: 4034034895233745111
+  - rid: 4034034895233745116
   blackboard:
     keys:
-    - rid: 4034034895233745093
-    - rid: 4034034895233745099
     - rid: 4034034895233745102
-  viewPosition: {x: 354, y: 63, z: 0}
-  viewScale: {x: 0.8695652, y: 0.8695652, z: 1}
+    - rid: 4034034895233745112
+  viewPosition: {x: 337, y: -85, z: 0}
+  viewScale: {x: 1, y: 1, z: 1}
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
     - rid: 4034034895233745088
       type: {class: RootNode, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
         started: 0
         guid: 270aef2b-b082-463e-9d74-99e1bd667d83
-        position: {x: 0, y: 0}
+        position: {x: 0, y: 150}
         blackboard:
           keys: []
         description: 
         drawGizmos: 0
         child:
           rid: 4034034895233745094
-    - rid: 4034034895233745091
-      type: {class: Sequencer, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
-      data:
-        started: 0
-        guid: 23058345996b7364d8ff43cb719b4c49
-        position: {x: 0, y: 0}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        children:
-        - rid: 4034034895233745092
-        - rid: 4034034895233745101
-        - rid: 4034034895233745103
     - rid: 4034034895233745092
       type: {class: Wait, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
         started: 0
         guid: 1508cfdd1f6abc647a8887bc67508569
-        position: {x: -150, y: 675}
+        position: {x: 150, y: 520}
         blackboard:
           keys: []
         description: 
         drawGizmos: 0
         duration: 1
-    - rid: 4034034895233745093
-      type: {class: StringKey, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
-      data:
-        name: test
-        typeName: System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        value: Bonjour
     - rid: 4034034895233745094
       type: {class: Repeat, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
         started: 0
         guid: ed5a9bd47501e0047973549d5abacfec
-        position: {x: 0, y: 0}
+        position: {x: 0, y: 260}
         blackboard:
           keys: []
         description: 
         drawGizmos: 0
         child:
-          rid: 4034034895233745091
+          rid: 4034034895233745116
         restartOnSuccess: 0
         restartOnFailure: 0
         maxRepeats: 0
-    - rid: 4034034895233745099
-      type: {class: GameObjectKey, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
-      data:
-        name: test2
-        typeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        value: {fileID: 0}
     - rid: 4034034895233745101
       type: {class: RandomPosition, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
         started: 0
         guid: de2e2ba54ef48b44eaeb3e322c8f2c92
-        position: {x: 0, y: 675}
+        position: {x: -160, y: 520}
         blackboard:
           keys: []
         description: 
@@ -121,37 +91,41 @@ MonoBehaviour:
         typeName: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
         value: {x: 0, y: 0, z: 0}
-    - rid: 4034034895233745103
-      type: {class: MoveToPosition, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
+    - rid: 4034034895233745111
+      type: {class: UseAbility, ns: , asm: Assembly-CSharp}
       data:
         started: 0
-        guid: 48b5ffe705692f54e878c692abce3ba8
-        position: {x: 165, y: 675}
+        guid: 37025d5f3629d6a4b882388f31bf9b73
+        position: {x: 0, y: 520}
         blackboard:
           keys: []
         description: 
-        drawGizmos: 1
-        speed:
+        drawGizmos: 0
+        abilityIndex:
           reference:
-            rid: -2
-          defaultValue: 5
-        stoppingDistance:
-          reference:
-            rid: -2
-          defaultValue: 0.1
-        updateRotation:
-          reference:
-            rid: -2
-          defaultValue: 1
-        acceleration:
-          reference:
-            rid: -2
-          defaultValue: 40
-        tolerance:
-          reference:
-            rid: -2
-          defaultValue: 1
+            rid: 4034034895233745112
+          defaultValue: 0
         targetPosition:
           reference:
             rid: 4034034895233745102
           defaultValue: {x: 0, y: 0, z: 0}
+    - rid: 4034034895233745112
+      type: {class: IntKey, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
+      data:
+        name: AbilityIndex
+        typeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        value: 0
+    - rid: 4034034895233745116
+      type: {class: Sequence, ns: , asm: Assembly-CSharp}
+      data:
+        started: 0
+        guid: c64aec149a469f848aefef685e7e2d45
+        position: {x: 0, y: 380}
+        blackboard:
+          keys: []
+        description: 
+        drawGizmos: 0
+        children:
+        - rid: 4034034895233745101
+        - rid: 4034034895233745111
+        - rid: 4034034895233745092
