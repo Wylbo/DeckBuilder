@@ -16,6 +16,11 @@ public class SpellSlot
 
 	private AbilityCaster caster = null;
 
+	public void Initialize(AbilityCaster caster)
+	{
+		Ability = ScriptableObject.Instantiate(Ability);
+		Ability.Initialize(caster);
+	}
 	public void Cast(AbilityCaster caster, Vector3 worldPos)
 	{
 		this.caster = caster;
@@ -40,7 +45,7 @@ public class SpellSlot
 	{
 		Ability.On_EndCast -= Ability_OnEndCast;
 
-		if(!isSucessful)
+		if (!isSucessful)
 			return;
 
 		cooldown = new Timer(Ability.Cooldown);
