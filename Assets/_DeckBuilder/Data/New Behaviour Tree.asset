@@ -22,7 +22,7 @@ MonoBehaviour:
     keys:
     - rid: 4034034896503570505
     - rid: 4034034896503570700
-  viewPosition: {x: 463, y: -137, z: 0}
+  viewPosition: {x: 497, y: -11, z: 0}
   viewScale: {x: 1, y: 1, z: 1}
   references:
     version: 2
@@ -50,7 +50,7 @@ MonoBehaviour:
       data:
         started: 0
         guid: 5f97a132088d47d4995c6cd8c2192e2f
-        position: {x: -220, y: 530}
+        position: {x: 0, y: 530}
         blackboard:
           keys: []
         description: 
@@ -58,7 +58,11 @@ MonoBehaviour:
         patrolPoints:
           reference:
             rid: 4034034896503570700
-          defaultValue: []
+          defaultValue:
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
     - rid: 4034034896503570700
       type: {class: GameObjectList, ns: , asm: Assembly-CSharp}
       data:

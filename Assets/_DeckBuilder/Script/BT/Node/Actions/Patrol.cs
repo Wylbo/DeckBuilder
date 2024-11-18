@@ -31,14 +31,11 @@ public class Patrol : ActionNode
 
         movement.MoveTo(patrolPoints.Value[currentPatrolPoint].transform.position);
 
-        Debug.Log($"move to {currentPatrolPoint}, {patrolPoints.Value[currentPatrolPoint].name}");
-
         if (agent.remainingDistance < 0.01)
         {
             if (agent.pathPending)
                 return State.Running;
 
-            Debug.Log($"increase patrol point");
             currentPatrolPoint++;
 
             if (currentPatrolPoint >= patrolPoints.Value.Count)
