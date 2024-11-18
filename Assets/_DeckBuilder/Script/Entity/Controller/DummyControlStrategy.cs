@@ -15,7 +15,7 @@ public class DummyControlStrategy : ControlStrategy
         character.TakeDamage(-character.Health.MaxHealth);
     }
 
-    public override void Control()
+    public override void Control(float deltaTime)
     {
 
     }

@@ -51,7 +51,7 @@ public class PlayerControlStrategy : ControlStrategy
 	}
 
 	// called each frame by the controller
-	public override void Control()
+	public override void Control(float deltaTime)
 	{
 
 	}

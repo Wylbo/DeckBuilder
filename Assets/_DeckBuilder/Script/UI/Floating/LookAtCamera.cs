@@ -8,7 +8,7 @@ public class LookAtCamera : MonoBehaviour
         mainCam = Camera.main;
     }
 
-    void Update()
+    void LateUpdate()
     {
         transform.forward = mainCam.transform.forward;
     }
