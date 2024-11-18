@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TheKiwiCoder;
+using System.IO;
+using UnityEngine.AI;
 
 [System.Serializable]
 public class Chase : ActionNode
@@ -33,8 +35,14 @@ public class Chase : ActionNode
         movement.Agent.stoppingDistance = stopDistance.Value;
         movement.MoveTo(toChase.Value.transform.position);
 
-        if (movement.Agent.remainingDistance < stopDistance.Value)
+        if (movement.Agent.pathPending)
+            return State.Running;
+
+        if (movement.Agent.remainingDistance <= stopDistance.Value)
+        {
+            movement.Agent.path = new NavMeshPath();
             return State.Success;
+        }
 
         if (movement.Agent.remainingDistance >= maxDistanceFromTarget.Value)
             return State.Failure;
