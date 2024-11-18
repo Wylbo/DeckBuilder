@@ -1,24 +1,25 @@
-using System;
 using System.Collections.Generic;
 using TheKiwiCoder;
 using UnityEngine;
 
-[System.Serializable]
 public class ListKey<T> : BlackboardKey<List<T>>
 {
 
 }
 
+[System.Serializable]
 public class BoolList : ListKey<bool>
 {
 
 }
 
+[System.Serializable]
 public class IntList : ListKey<int>
 {
 
 }
 
+[System.Serializable]
 public class FloatList : ListKey<float>
 {
 
