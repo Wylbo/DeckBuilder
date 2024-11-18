@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 public class SensorManager : MonoBehaviour
 {
-    private enum TickMode
+    public enum TickMode
     {
         Update,
         FixedUpdate,
@@ -12,7 +13,7 @@ public class SensorManager : MonoBehaviour
     }
 
     [SerializeField] private List<Sensor> sensors = new List<Sensor>();
-    [SerializeField] private TickMode tickMode;
+    [SerializeField] public TickMode tickMode;
 
     private void Awake()
     {
@@ -40,11 +41,27 @@ public class SensorManager : MonoBehaviour
             Tick();
     }
 
-    private void Tick()
+    public void Tick()
     {
         foreach (Sensor sensor in sensors)
         {
             sensor.Scan();
         }
+    }
+
+    public bool HasSensedTarget(out GameObject target)
+    {
+        target = null;
+
+        foreach (Sensor sensor in sensors)
+        {
+            if (sensor.HasTarget())
+            {
+                target = sensor.Target;
+                return true;
+            }
+        }
+
+        return false;
     }
 }

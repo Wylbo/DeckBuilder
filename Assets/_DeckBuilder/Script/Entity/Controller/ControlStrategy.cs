@@ -13,6 +13,6 @@ public abstract class ControlStrategy : ScriptableObject
 
 	public abstract void Disable();
 
-	public abstract void Control();
+	public abstract void Control(float deltaTime);
 
 }

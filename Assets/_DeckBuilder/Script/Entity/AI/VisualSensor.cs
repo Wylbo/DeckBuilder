@@ -7,14 +7,16 @@ public class VisualSensor : Sensor
 
     public override void Scan()
     {
-        Collider[] targetInRange = new Collider[10];
-        int foundTargets = Physics.OverlapSphereNonAlloc(config.Origin.transform.position, config.Radius, targetInRange, config.TargetLayer);
+        base.Scan();
+
+        Collider[] targetsInRange = new Collider[1];
+        int foundTargets = Physics.OverlapSphereNonAlloc(config.Origin.transform.position, config.Radius, targetsInRange, config.TargetLayer);
 
         for (int i = 0; i < foundTargets; i++)
         {
-            GameObject target = targetInRange[i].gameObject;
+            GameObject potentialTarget = targetsInRange[i].gameObject;
 
-            Vector3 dirToTarget = (target.transform.position - config.Origin.position).normalized;
+            Vector3 dirToTarget = (potentialTarget.transform.position - config.Origin.position).normalized;
             float angleToTarget = Vector3.Angle(config.Origin.forward, dirToTarget);
 
             if (angleToTarget > fieldOfView / 2)
@@ -22,6 +24,7 @@ public class VisualSensor : Sensor
 
             if (Physics.Raycast(config.Origin.position, dirToTarget, out RaycastHit hit, config.Radius, config.TargetLayer))
             {
+                target = potentialTarget;
                 Debug.Log($"[{nameof(VisualSensor)}] target detected: {target.name}");
             }
         }

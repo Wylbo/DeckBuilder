@@ -1,8 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Sensor : MonoBehaviour, ISensor
 {
     [SerializeField] protected SensorConfig config;
+
+    protected GameObject target;
+    public GameObject Target => target;
 
     public void Configure()
     {
@@ -14,14 +18,13 @@ public abstract class Sensor : MonoBehaviour, ISensor
         this.config = config;
     }
 
-    public abstract void Scan();
-
-    public bool IsTargetInRange(GameObject target)
+    public virtual void Scan()
     {
-        if (target == null)
-            return false;
+        target = null;
+    }
 
-        float distance = Vector3.Distance(config.Origin.transform.position, target.transform.position);
-        return distance < config.Radius && ((1 << target.layer) & config.TargetLayer) != 0;
+    public bool HasTarget()
+    {
+        return target != null;
     }
 }

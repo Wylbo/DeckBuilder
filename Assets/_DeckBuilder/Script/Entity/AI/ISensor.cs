@@ -6,5 +6,5 @@ public interface ISensor
 
     public void Scan();
 
-    public bool IsTargetInRange(GameObject target);
+    public bool HasTarget();
 }

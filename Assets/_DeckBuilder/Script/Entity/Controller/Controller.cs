@@ -20,7 +20,7 @@ public class Controller : MonoBehaviour
 
 	protected virtual void Update()
 	{
-		controlStrategy?.Control();
+		controlStrategy?.Control(Time.deltaTime);
 	}
 
 	private void Reset()
