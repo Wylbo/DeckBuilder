@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1c34bada66e36ce42803c975ef3ccb6e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Crystal01/Scenes/Crystal01Settings.lighting
+  uploadId: 694150

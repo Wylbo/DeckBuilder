@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e21c170dcf736d54d9bb16c4d75ca3c8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Sand02/Materials/Ground 3.mat
+  uploadId: 694150

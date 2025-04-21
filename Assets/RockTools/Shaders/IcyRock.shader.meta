@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7479bf1470f780f47b2153f07484913c
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Shaders/IcyRock.shader
+  uploadId: 694150

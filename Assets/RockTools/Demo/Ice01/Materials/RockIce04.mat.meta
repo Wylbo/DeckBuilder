@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8425752e2d2d0c345a9753af2571d34f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Ice01/Materials/RockIce04.mat
+  uploadId: 694150

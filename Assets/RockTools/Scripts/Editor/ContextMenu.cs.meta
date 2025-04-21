@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4905d3c613cb17148b273d1c5fb539c5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Scripts/Editor/ContextMenu.cs
+  uploadId: 694150

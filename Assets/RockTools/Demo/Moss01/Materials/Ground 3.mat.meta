@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 24c0b8278adf21f499effef9717e8f57
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Moss01/Materials/Ground 3.mat
+  uploadId: 694150

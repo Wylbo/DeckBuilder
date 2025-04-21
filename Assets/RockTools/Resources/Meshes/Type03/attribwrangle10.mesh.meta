@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 657c25db0c4c91f4195113f106222b45
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Resources/Meshes/Type03/attribwrangle10.mesh
+  uploadId: 694150

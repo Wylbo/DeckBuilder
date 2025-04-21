@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a2a6617bed7bf2648ad2b6f208f5614d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4300000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Sand03/Meshes/Baked-Rock 086.asset
+  uploadId: 694150
