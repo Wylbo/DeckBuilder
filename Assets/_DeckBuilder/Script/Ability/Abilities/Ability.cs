@@ -45,7 +45,7 @@ public abstract class Ability : ScriptableObject, IHasCooldown
 		percetCooldownOffset += percent;
 	}
 
-	public void ResetCooldownModifiers()
+	public virtual void ResetModifiers()
 	{
 		flatCooldownOffset = 0;
 		percetCooldownOffset = 0;
@@ -121,7 +121,7 @@ public abstract class Ability : ScriptableObject, IHasCooldown
 	{
 		ApplyDebuffs(debuffsOnEndCast);
 		On_EndCast?.Invoke(isSucessful);
-		ResetCooldownModifiers();
+		ResetModifiers();
 	}
 
 	public virtual void EndHold(Vector3 worldPos)
