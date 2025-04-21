@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 8ee8dc792d36562439f10b78440509fb, type: 3}
   m_Name: CooldownModifier
   m_EditorClassIdentifier: Assembly-CSharp::CooldownModifier
-  targetTag: {fileID: 0}
-  cooldownOffset: 0
+  targetTag: {fileID: 11400000, guid: 4b9fb0c4753970949834925ec33023d0, type: 2}
+  flatOffset: -0.5
+  percentReduction: 0

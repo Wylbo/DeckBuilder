@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebc06309dffe37a4a8d9622b19166dc7, type: 3}
   m_Name: AreaOfEffect
   m_EditorClassIdentifier: 
-  displayName: 
+  displayName: Area of Effect

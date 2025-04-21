@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5e675658f38da64fbb7a79ebda5ab53, type: 3}
   m_Name: AOEModifier
   m_EditorClassIdentifier: 
-  targetTag: {fileID: 0}
-  AOEScalePercent: 0
+  targetTag: {fileID: 11400000, guid: 56a32818ac7194442993e4c4f5236d87, type: 2}
+  AOEScalePercent: 1

@@ -9,14 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea677477db32f4f43ab2856a052cc80e, type: 3}
-  m_Name: AbilityTargetedAOE
+  m_Script: {fileID: 11500000, guid: 30f4f09ba7f98df4782ba1948da6ef68, type: 3}
+  m_Name: AbilityEldrichBlast
   m_EditorClassIdentifier: 
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
-  baseCooldown: 1
+  baseCooldown: 0.1
   debuffsOnCast: []
   debuffsOnEndCast: []
-  tags:
-  - {fileID: 11400000, guid: 56a32818ac7194442993e4c4f5236d87, type: 2}
-  projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
+  tags: []
+  autoTargetingRange: 0.5
+  targetableLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  damage: 10

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 1
-  baseCooldown: 0
+  baseCooldown: 1
   debuffsOnCast: []
   debuffsOnEndCast: []
   tags:
