@@ -10,12 +10,15 @@ public class AbilityCaster : MonoBehaviour
 	private ProjectileLauncher projectileLauncher = null;
 	[SerializeField]
 	private DebuffUpdater debuffUpdater = null;
+	[SerializeField] private AbilityModifierManager modifierManager;
 
+	public SpellSlot[] SpellSlots => spellSlots;
 	public ProjectileLauncher ProjectileLauncher => projectileLauncher;
 
 	private void OnEnable()
 	{
 		InitializeAbilities();
+		modifierManager.Initialize();
 	}
 
 	private void OnDisable()
@@ -76,6 +79,7 @@ public class AbilityCaster : MonoBehaviour
 	{
 		if (spellSlot.CanCast)
 		{
+			modifierManager.ApplyModifiers(spellSlot.Ability);
 			spellSlot.Cast(this, worldPos);
 			return true;
 		}

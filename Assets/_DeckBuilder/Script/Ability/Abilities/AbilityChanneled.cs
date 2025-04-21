@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = nameof(AbilityChanneled), menuName = FileName.Ability + nameof(AbilityChanneled))]
+[CreateAssetMenu(fileName = nameof(AbilityChanneled), menuName = FileName.Abilities + nameof(AbilityChanneled))]
 public abstract class AbilityChanneled : Ability
 {
 	#region fields

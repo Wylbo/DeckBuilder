@@ -101,6 +101,7 @@ GameObject:
   - component: {fileID: 1894128029507834091}
   - component: {fileID: 4938447398858601016}
   - component: {fileID: 7480439906567705019}
+  - component: {fileID: 1904220953553573043}
   - component: {fileID: 9176447491751950743}
   - component: {fileID: 6244960309705328274}
   - component: {fileID: 6938576570393643543}
@@ -279,6 +280,19 @@ MonoBehaviour:
     blockingMask:
       serializedVersion: 2
       m_Bits: 64
+--- !u!114 &1904220953553573043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2949185825831420414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea0ae8e9041e7be45bcaaa1d753690ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allModifiers: []
 --- !u!114 &9176447491751950743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -310,6 +324,7 @@ MonoBehaviour:
       remaining: 0
   projectileLauncher: {fileID: 6938576570393643543}
   debuffUpdater: {fileID: 6244960309705328274}
+  modifierManager: {fileID: 1904220953553573043}
 --- !u!114 &6244960309705328274
 MonoBehaviour:
   m_ObjectHideFlags: 0
