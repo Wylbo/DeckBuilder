@@ -15,7 +15,7 @@ TagManager:
   - Damageable
   - Damager
   - Sensable
-  - 
+  - Targetable
   - 
   - 
   - 
