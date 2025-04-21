@@ -12,6 +12,12 @@ public class Projectile : MonoBehaviour, IOwnable
 	private Character owner;
 	public Character Owner => owner;
 
+	private Vector3 baseScale;
+
+	private void Awake()
+	{
+		baseScale = transform.localScale;
+	}
 	protected virtual void OnEnable()
 	{
 		elapsedLifeTime = 0;
@@ -43,5 +49,10 @@ public class Projectile : MonoBehaviour, IOwnable
 	public void SetOwner(Character character)
 	{
 		owner = character;
+	}
+
+	public void SetScale(float scaleFactor)
+	{
+		transform.localScale = baseScale * scaleFactor;
 	}
 }
