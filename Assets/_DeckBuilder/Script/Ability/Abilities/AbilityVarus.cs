@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AbilityVarus", menuName = FileName.Ability + "AbilityVarus", order = 0)]
+[CreateAssetMenu(fileName = "AbilityVarus", menuName = FileName.Abilities + "AbilityVarus", order = 0)]
 public class AbilityVarus : AbilityChanneled, IAbilityRangeIndicator
 {
     [SerializeField]

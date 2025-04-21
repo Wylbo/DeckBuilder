@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = nameof(AbilityDash), menuName = FileName.Ability + nameof(AbilityDash))]
+[CreateAssetMenu(fileName = nameof(AbilityDash), menuName = FileName.Abilities + nameof(AbilityDash))]
 public class AbilityDash : Ability
 {
 	[SerializeField]
@@ -12,7 +12,7 @@ public class AbilityDash : Ability
 		base.DoCast(worldPos);
 	}
 
-	protected  void DoCast()
+	protected void DoCast()
 	{
 		movement.Dash(dashData);
 	}

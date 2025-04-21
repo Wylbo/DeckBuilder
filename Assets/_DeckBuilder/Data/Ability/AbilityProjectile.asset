@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
-  cooldown: 0
+  cooldown: 2
   debuffsOnCast: []
   debuffsOnEndCast: []
   projectile: {fileID: 6428266943518908824, guid: b2c2ae026b1ceca4fb60273c6b4e4a17, type: 3}

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = nameof(AbilityTargetedAOE), menuName = FileName.Ability + nameof(AbilityTargetedAOE))]
+[CreateAssetMenu(fileName = nameof(AbilityTargetedAOE), menuName = FileName.Abilities + nameof(AbilityTargetedAOE))]
 public class AbilityTargetedAOE : Ability
 {
 	[SerializeField]
