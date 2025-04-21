@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 69cdc047a9de6b84e8dfe17bfdad0f52
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Ice02/Scenes/Ice02Settings.lighting
+  uploadId: 694150

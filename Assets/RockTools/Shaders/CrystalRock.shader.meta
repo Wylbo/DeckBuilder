@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ca0cabd8e1e29224184615ae2b2ca6bf
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Shaders/CrystalRock.shader
+  uploadId: 694150

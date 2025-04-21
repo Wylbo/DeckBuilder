@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e1fb2fbe357760241ad00d41ece62139
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Shaders/SnowyRock01.shader
+  uploadId: 694150

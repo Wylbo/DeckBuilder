@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 34f22ae64e0626c48a4d10d268367284
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4300000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Resources/Meshes/Type01/Rock 20.mesh
+  uploadId: 694150

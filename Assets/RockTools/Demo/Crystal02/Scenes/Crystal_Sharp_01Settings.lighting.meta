@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9d3b0200a230b2247aaf1249619ca4e3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Crystal02/Scenes/Crystal_Sharp_01Settings.lighting
+  uploadId: 694150

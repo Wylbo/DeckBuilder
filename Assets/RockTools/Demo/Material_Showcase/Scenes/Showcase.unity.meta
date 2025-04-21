@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 6e65049203e551e43b982c8a1c350216
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Material_Showcase/Scenes/Showcase.unity
+  uploadId: 694150

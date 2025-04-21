@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4fb685861f665024fbca97bbe65cc9ca
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Moss01/Scenes/MossSettings.lighting
+  uploadId: 694150

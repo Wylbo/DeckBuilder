@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4f96f8ba5ff1591468b53af34de18860
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Sand03/Scenes/Sand03Settings.lighting
+  uploadId: 694150

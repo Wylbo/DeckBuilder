@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c33eb388ad772a649bd04981c972b6b7
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Shaders/SandyRock.shader
+  uploadId: 694150

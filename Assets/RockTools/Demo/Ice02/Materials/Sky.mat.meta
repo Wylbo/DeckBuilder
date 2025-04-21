@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 69b9aaeffcaa13843bb05038ec9367c1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Ice02/Materials/Sky.mat
+  uploadId: 694150

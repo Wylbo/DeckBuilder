@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c99fce72a38a73b429ba8e7186bd7353
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 223628
+  packageName: Titan Rock Generator - Procedural
+  packageVersion: 1.2.1
+  assetPath: Assets/RockTools/Demo/Crystal_Type_01/Materials/Ground 1.mat
+  uploadId: 694150
