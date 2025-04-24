@@ -20,7 +20,7 @@ MonoBehaviour:
   tags:
   - {fileID: 11400000, guid: 4b9fb0c4753970949834925ec33023d0, type: 2}
   dashData:
-    dashDistance: 6
+    dashDistance: 3
     dashSpeed: 9
     slideOnWalls: 1
     dashCurve:
@@ -29,20 +29,20 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 0
         value: 0
-        inSlope: -0.000050481292
-        outSlope: -0.000050481292
+        inSlope: 2
+        outSlope: 2
         tangentMode: 0
-        weightedMode: 3
+        weightedMode: 0
         inWeight: 0
-        outWeight: 0.5992335
+        outWeight: 0
       - serializedVersion: 3
         time: 1
         value: 1
-        inSlope: 0.16867892
-        outSlope: 0.16867892
+        inSlope: 0
+        outSlope: 0
         tangentMode: 0
-        weightedMode: 3
-        inWeight: 0.32596153
+        weightedMode: 0
+        inWeight: 0
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2

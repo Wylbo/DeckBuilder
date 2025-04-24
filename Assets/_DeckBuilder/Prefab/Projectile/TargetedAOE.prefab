@@ -48,7 +48,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8035608569581366623}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -98,6 +98,7 @@ GameObject:
   - component: {fileID: 4655161579880916051}
   - component: {fileID: 2481008720800236832}
   - component: {fileID: -5140343662910467569}
+  - component: {fileID: 7163560388175238843}
   m_Layer: 8
   m_Name: TargetedAOE
   m_TagString: Untagged
@@ -119,6 +120,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6816065473279587590}
+  - {fileID: 3377498184873900693}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &4655161579880916051
@@ -154,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 644f495121011f74ab80049fccbdc8fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifeTime: 2
+  lifeTime: 4
 --- !u!114 &-5140343662910467569
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,3 +184,129 @@ MonoBehaviour:
       blockingMask:
         serializedVersion: 2
         m_Bits: 0
+--- !u!114 &7163560388175238843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8303810631946278044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b388e58c6f6950649a88c4d82e90dee9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timer:
+    duration: 3
+    remaining: 0
+  OnTimerStart:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4655161579880916051}
+        m_TargetAssemblyTypeName: UnityEngine.Collider, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnTimerEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4655161579880916051}
+        m_TargetAssemblyTypeName: UnityEngine.Collider, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  OnTimerCanceled:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!1001 &714263551928151877
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5814432844929887711}
+    m_Modifications:
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5701244101175954452, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_Name
+      value: FireBallSky
+      objectReference: {fileID: 0}
+    - target: {fileID: 7132647785124897785, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_PropertySheet.m_Float.m_Array.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7132647785124897785, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_PropertySheet.m_Float.m_Array.Array.data[0].m_Name
+      value: Radius
+      objectReference: {fileID: 0}
+    - target: {fileID: 7132647785124897785, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_PropertySheet.m_Float.m_Array.Array.data[0].m_Value
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7132647785124897785, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+      propertyPath: m_PropertySheet.m_Float.m_Array.Array.data[0].m_Overridden
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+--- !u!4 &3377498184873900693 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2825685917145028048, guid: 311b6abd68355944884a31c3590e9674, type: 3}
+  m_PrefabInstance: {fileID: 714263551928151877}
+  m_PrefabAsset: {fileID: 0}

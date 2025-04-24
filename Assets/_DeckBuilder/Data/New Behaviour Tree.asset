@@ -29,17 +29,23 @@ MonoBehaviour:
   - rid: 4034034914912633116
   blackboard:
     keys:
-    - rid: 4034034896503570505
     - rid: 4034034896503570700
     - rid: 4034034914912633109
     - rid: 4034034914912633111
-  viewPosition: {x: 386, y: -19, z: 0}
-  viewScale: {x: 0.65751624, y: 0.65751624, z: 1}
+    - rid: 1553831495248904311
+  viewPosition: {x: 141, y: 37, z: 0}
+  viewScale: {x: 0.49717674, y: 0.49717674, z: 1}
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 1553831495248904311
+      type: {class: IntKey, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
+      data:
+        name: AbilityIndex
+        typeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        value: 0
     - rid: 4034034895233745088
       type: {class: RootNode, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
@@ -52,12 +58,6 @@ MonoBehaviour:
         drawGizmos: 0
         child:
           rid: 4034034914912632912
-    - rid: 4034034896503570505
-      type: {class: FloatKey, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
-      data:
-        name: test
-        typeName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        value: 0
     - rid: 4034034896503570695
       type: {class: Patrol, ns: , asm: Assembly-CSharp}
       data:
@@ -172,7 +172,7 @@ MonoBehaviour:
         stopDistance:
           reference:
             rid: -2
-          defaultValue: 2
+          defaultValue: 5
         toChase:
           reference:
             rid: 4034034914912633109
@@ -203,8 +203,8 @@ MonoBehaviour:
         drawGizmos: 0
         abilityIndex:
           reference:
-            rid: -2
-          defaultValue: 1
+            rid: 1553831495248904311
+          defaultValue: 0
         targetPosition:
           reference:
             rid: 4034034914912633111
