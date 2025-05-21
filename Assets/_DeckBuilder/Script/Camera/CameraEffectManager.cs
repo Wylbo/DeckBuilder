@@ -1,13 +1,12 @@
 using UnityEngine;
-using Cinemachine;
 using System;
 using System.Collections;
+using Unity.Cinemachine;
 
 [Serializable]
 public struct CameraShakeData
 {
     [SerializeField] private float duration;
-    [NoiseSettingsProperty]
     [SerializeField] private NoiseSettings noiseSettings;
     [SerializeField] private Vector3 pivotOffset;
     [SerializeField] private float amplitudeGain;
@@ -29,8 +28,8 @@ public class CameraEffectManager : MonoBehaviour
     [SerializeField] private CinemachineBrain cineBrain;
     [SerializeField] private CameraShakeData defaultShakeData;
 
-    public CinemachineVirtualCamera ActiveCam => cineBrain.ActiveVirtualCamera as CinemachineVirtualCamera;
-    public CinemachineBasicMultiChannelPerlin noise => ActiveCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+    public CinemachineCamera ActiveCam => cineBrain.ActiveVirtualCamera as CinemachineCamera;
+    public CinemachineBasicMultiChannelPerlin noise => ActiveCam.GetComponent<CinemachineBasicMultiChannelPerlin>();
 
     public void ScreenShake()
     {
@@ -49,10 +48,10 @@ public class CameraEffectManager : MonoBehaviour
         float curveValueFreq;
         float curveValueAmp;
 
-        noise.m_NoiseProfile = shakeData.NoiseSettings;
-        noise.m_PivotOffset = shakeData.PivotOffset;
-        noise.m_AmplitudeGain = 0;
-        noise.m_FrequencyGain = 0;
+        noise.NoiseProfile = shakeData.NoiseSettings;
+        noise.PivotOffset = shakeData.PivotOffset;
+        noise.AmplitudeGain = 0;
+        noise.FrequencyGain = 0;
 
         while (elapsed < shakeData.Duration)
         {
@@ -62,13 +61,13 @@ public class CameraEffectManager : MonoBehaviour
             curveValueAmp = shakeData.AmplitudeOverTime.Evaluate(normalizedTime);
             curveValueFreq = shakeData.FrequencyOverTime.Evaluate(normalizedTime);
 
-            noise.m_AmplitudeGain = shakeData.AmplitudeGain * curveValueAmp;
-            noise.m_FrequencyGain = shakeData.FrequencyGain * curveValueFreq;
+            noise.AmplitudeGain = shakeData.AmplitudeGain * curveValueAmp;
+            noise.FrequencyGain = shakeData.FrequencyGain * curveValueFreq;
 
             yield return null;
         }
 
-        noise.m_AmplitudeGain = 0;
-        noise.m_FrequencyGain = 0;
+        noise.AmplitudeGain = 0;
+        noise.FrequencyGain = 0;
     }
 }
