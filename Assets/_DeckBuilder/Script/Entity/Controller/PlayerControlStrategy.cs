@@ -1,4 +1,5 @@
-﻿using MG.Extend;
+﻿using System;
+using MG.Extend;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +13,7 @@ public class PlayerControlStrategy : ControlStrategy
 
 	private PlayerInputs playerInput;
 
+	private bool isMoving;
 	public override void Initialize(Controller controller, Character character)
 	{
 		base.Initialize(controller, character);
@@ -21,15 +23,18 @@ public class PlayerControlStrategy : ControlStrategy
 		playerInput.Gameplay.Enable();
 
 		playerInput.Gameplay.Move.performed += Move_performed;
+		playerInput.Gameplay.Dodge.performed += Dodge_performed;
 		playerInput.Gameplay.Ability1.performed += Ability1_performed;
 		playerInput.Gameplay.Ability2.performed += Ability2_performed;
 		playerInput.Gameplay.Ability3.performed += Ability3_performed;
 		playerInput.Gameplay.Ability4.performed += Ability4_performed;
 
+		playerInput.Gameplay.Move.canceled += Move_canceled;
 		playerInput.Gameplay.Ability1.canceled += Ability1_canceled;
 		playerInput.Gameplay.Ability2.canceled += Ability2_canceled;
 		playerInput.Gameplay.Ability3.canceled += Ability3_canceled;
 		playerInput.Gameplay.Ability4.canceled += Ability4_canceled;
+		playerInput.Gameplay.Dodge.canceled += Dodge_canceled;
 
 		Debug.Log("Player controller strategy initialized");
 	}
@@ -37,15 +42,18 @@ public class PlayerControlStrategy : ControlStrategy
 	public override void Disable()
 	{
 		playerInput.Gameplay.Move.performed -= Move_performed;
+		playerInput.Gameplay.Dodge.performed -= Dodge_performed;
 		playerInput.Gameplay.Ability1.performed -= Ability1_performed;
 		playerInput.Gameplay.Ability2.performed -= Ability2_performed;
 		playerInput.Gameplay.Ability3.performed -= Ability3_performed;
 		playerInput.Gameplay.Ability4.performed -= Ability4_performed;
 
+		playerInput.Gameplay.Move.canceled -= Move_canceled;
 		playerInput.Gameplay.Ability1.canceled -= Ability1_canceled;
 		playerInput.Gameplay.Ability2.canceled -= Ability2_canceled;
 		playerInput.Gameplay.Ability3.canceled -= Ability3_canceled;
 		playerInput.Gameplay.Ability4.canceled -= Ability4_canceled;
+		playerInput.Gameplay.Dodge.canceled -= Dodge_canceled;
 
 		playerInput.Gameplay.Disable();
 	}
@@ -53,16 +61,25 @@ public class PlayerControlStrategy : ControlStrategy
 	// called each frame by the controller
 	public override void Control(float deltaTime)
 	{
-
+		if (isMoving && GetMousePositionInWorld(out Vector3 worldPos))
+		{
+			controller.TryMove(worldPos);
+		}
 	}
 
 	private void Move_performed(InputAction.CallbackContext ctx)
 	{
+		isMoving = true;
 		if (GetMousePositionInWorld(out Vector3 worldPos))
 		{
 			PoolManager.Provide(moveClickVFX, worldPos, Quaternion.identity, null, PoolManager.PoolType.VFX);
 			controller.TryMove(worldPos);
 		}
+	}
+
+	private void Move_canceled(InputAction.CallbackContext context)
+	{
+		isMoving = false;
 	}
 
 	private Vector3 GetMousePositionInWorld()
@@ -87,6 +104,15 @@ public class PlayerControlStrategy : ControlStrategy
 		}
 
 		return false;
+	}
+
+	private void Dodge_canceled(InputAction.CallbackContext context)
+	{
+	}
+
+	private void Dodge_performed(InputAction.CallbackContext context)
+	{
+		controller.PerformDodge(GetMousePositionInWorld());
 	}
 
 	private void Ability4_performed(InputAction.CallbackContext obj)

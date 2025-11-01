@@ -107,6 +107,14 @@ PrefabInstance:
       propertyPath: controlStrategy
       value: 
       objectReference: {fileID: 11400000, guid: fc22f8e56684849469df58dbd548707d, type: 2}
+    - target: {fileID: 1904220953553573043, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: allModifiers.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1904220953553573043, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: 'allModifiers.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 596bf9f09696834478d3f52fe8a17609, type: 2}
     - target: {fileID: 1990842931319606216, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: rootState
       value: 
@@ -120,13 +128,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 4b443cf16389c9246ba80da4ba0927b3, type: 2}
     - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: dodgeAbility
+      value: 
+      objectReference: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
+    - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: spellSlots.Array.data[0].Ability
       value: 
       objectReference: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
     - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: spellSlots.Array.data[1].Ability
       value: 
-      objectReference: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
+      objectReference: {fileID: 11400000, guid: bb774449982bd2a4abe182bb32f4f29d, type: 2}
     - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: spellSlots.Array.data[2].Ability
       value: 
@@ -134,7 +146,7 @@ PrefabInstance:
     - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: spellSlots.Array.data[3].Ability
       value: 
-      objectReference: {fileID: 11400000, guid: bb774449982bd2a4abe182bb32f4f29d, type: 2}
+      objectReference: {fileID: 11400000, guid: a7e922be0370557448e9f82aef2c303c, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

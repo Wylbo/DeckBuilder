@@ -42,4 +42,9 @@ public class Controller : MonoBehaviour
 	{
 		character.EndHold(index, worldPos);
 	}
+
+	public void PerformDodge(Vector3 worldPos)
+	{
+		character.PerformDodge(worldPos);
+	}
 }
