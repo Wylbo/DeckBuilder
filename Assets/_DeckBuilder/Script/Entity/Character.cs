@@ -4,14 +4,10 @@ using UnityEngine.Events;
 
 public class Character : Entity
 {
-	[SerializeField]
-	private Movement movement;
-	[SerializeField]
-	private AbilityCaster abilityCaster;
-	[SerializeField]
-	private Health health;
-	[SerializeField]
-	private Hurtbox hurtbox;
+	[SerializeField] Movement movement;
+	[SerializeField] AbilityCaster abilityCaster;
+	[SerializeField] Health health;
+	[SerializeField] Hurtbox hurtbox;
 
 	public Movement Movement => movement;
 	public Health Health => health;
@@ -40,6 +36,11 @@ public class Character : Entity
 	public void CastAbility(int index, Vector3 worldPos)
 	{
 		abilityCaster.Cast(index, worldPos);
+	}
+
+	public void PerformDodge(Vector3 worldPos)
+	{
+		abilityCaster.CastDodge(worldPos);
 	}
 
 	public void EndHold(int index, Vector3 worldPos)

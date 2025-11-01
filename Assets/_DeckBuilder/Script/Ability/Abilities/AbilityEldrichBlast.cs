@@ -6,7 +6,7 @@ public class AbilityEldrichBlast : AbilityTargeted
     [SerializeField] private int damage;
     protected override void DoTargetAbilityAtCursorPos(Vector3 worldPos)
     {
-        throw new System.NotImplementedException();
+
     }
 
     protected override void DoTargetedAbility(Targetable target)

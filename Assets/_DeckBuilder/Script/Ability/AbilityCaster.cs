@@ -4,6 +4,7 @@ using UnityEngine.Rendering.Universal;
 [RequireComponent(typeof(ProjectileLauncher))]
 public class AbilityCaster : MonoBehaviour
 {
+	[SerializeField] private Ability dodgeAbility;
 	[SerializeField]
 	private SpellSlot[] spellSlots = new SpellSlot[4];
 	[SerializeField]
@@ -48,6 +49,7 @@ public class AbilityCaster : MonoBehaviour
 
 	private void InitializeAbilities()
 	{
+		dodgeAbility.Initialize(this);
 		foreach (SpellSlot spellSlot in spellSlots)
 		{
 			spellSlot.Initialize(this);
@@ -73,6 +75,17 @@ public class AbilityCaster : MonoBehaviour
 	public bool Cast(int index, Vector3 worldPos)
 	{
 		return Cast(spellSlots[index], worldPos);
+	}
+
+	public bool CastDodge(Vector3 worldPos)
+	{
+		if (dodgeAbility != null)
+		{
+			modifierManager.ApplyModifiers(dodgeAbility);
+			dodgeAbility.Cast(worldPos, false);
+			return true;
+		}
+		return false;
 	}
 
 	private bool Cast(SpellSlot spellSlot, Vector3 worldPos)
