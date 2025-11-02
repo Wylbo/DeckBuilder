@@ -208,7 +208,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876137, y: 0, z: 0, w: 0.7933534}
-  m_LocalPosition: {x: 0.06744522, y: 9.678389, z: -2.3851407}
+  m_LocalPosition: {x: 0.06743648, y: 9.67839, z: -2.385141}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1351,7 +1351,7 @@ Transform:
   m_GameObject: {fileID: 846753124}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876137, y: 0, z: 0, w: 0.7933534}
-  m_LocalPosition: {x: 0.06735705, y: 9.67839, z: -2.385141}
+  m_LocalPosition: {x: 0.06743648, y: 9.67839, z: -2.385141}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2081,6 +2081,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1514324686}
     - target: {fileID: 7162189599941437326, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: dodgeAbility.Ability
+      value: 
+      objectReference: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
+    - target: {fileID: 7162189599941437326, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
       propertyPath: spellSlots.Array.data[0].Ability
       value: 
       objectReference: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
@@ -2322,32 +2326,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4284705883021781481, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
-      propertyPath: allModifiers.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4284705883021781481, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
-      propertyPath: 'allModifiers.Array.data[0]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 596bf9f09696834478d3f52fe8a17609, type: 2}
     - target: {fileID: 6792054741448164557, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
-      propertyPath: dodgeAbility
+      propertyPath: dodgeAbility.Ability
       value: 
       objectReference: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
     - target: {fileID: 6792054741448164557, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
-      propertyPath: spellSlots.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6792054741448164557, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
-      propertyPath: spellSlots.Array.data[1].Ability
-      value: 
-      objectReference: {fileID: 11400000, guid: bb774449982bd2a4abe182bb32f4f29d, type: 2}
-    - target: {fileID: 6792054741448164557, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
-      propertyPath: spellSlots.Array.data[3].Ability
-      value: 
-      objectReference: {fileID: 11400000, guid: a7e922be0370557448e9f82aef2c303c, type: 2}
-    - target: {fileID: 7319352339604410210, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
-      propertyPath: dodgeAbility
+      propertyPath: dodgeSpellSlot.Ability
       value: 
       objectReference: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
     m_RemovedComponents: []
