@@ -208,7 +208,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876137, y: 0, z: 0, w: 0.7933534}
-  m_LocalPosition: {x: 0.06743648, y: 9.67839, z: -2.385141}
+  m_LocalPosition: {x: -6.842563, y: 9.67839, z: -0.8051409}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1351,7 +1351,7 @@ Transform:
   m_GameObject: {fileID: 846753124}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876137, y: 0, z: 0, w: 0.7933534}
-  m_LocalPosition: {x: 0.06743648, y: 9.67839, z: -2.385141}
+  m_LocalPosition: {x: -6.842563, y: 9.67839, z: -0.8051409}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2016,6 +2016,10 @@ PrefabInstance:
       propertyPath: controlStrategy
       value: 
       objectReference: {fileID: 11400000, guid: ffc5ab99c6d5d2a498be3510e022a01d, type: 2}
+    - target: {fileID: 1474439962340354294, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1543182081612239441, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
       propertyPath: m_BlockingMask.m_Bits
       value: 1023
@@ -2062,7 +2066,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3806073588477009895, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
       propertyPath: m_Name
-      value: BaseCharacter
+      value: BaseEnemy
       objectReference: {fileID: 0}
     - target: {fileID: 7032619519830792550, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
       propertyPath: 'managedReferences[4034034896503570705].value.Array.data[0]'
@@ -2092,74 +2096,6 @@ PrefabInstance:
       propertyPath: spellSlots.Array.data[1].Ability
       value: 
       objectReference: {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[1].time
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[2].time
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[1].value
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[2].value
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[0].inSlope
-      value: 0.030948225
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[1].inSlope
-      value: 3.1124628
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[2].inSlope
-      value: 13.754665
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[0].outSlope
-      value: 0.030948225
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[1].inWeight
-      value: 0.028575182
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[1].outSlope
-      value: 3.1124628
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[2].inWeight
-      value: 0.030263029
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[2].outSlope
-      value: 13.754665
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[0].outWeight
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[1].outWeight
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[1].tangentMode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001037159334837874, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
-      propertyPath: fillCurve.m_Curve.Array.data[0].weightedMode
-      value: 2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2288,7 +2224,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2610449079589516965, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -6.91
       objectReference: {fileID: 0}
     - target: {fileID: 2610449079589516965, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2296,7 +2232,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2610449079589516965, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 1.58
       objectReference: {fileID: 0}
     - target: {fileID: 2610449079589516965, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
       propertyPath: m_LocalRotation.w
