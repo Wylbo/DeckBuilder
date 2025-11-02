@@ -8,7 +8,9 @@ public class AbilityProjectile : Ability
 
 	protected override void DoCast(Vector3 worldPos)
 	{
-		Caster.ProjectileLauncher.LaunchProjectile(projectile);
+		Caster.ProjectileLauncher.SetProjectile(projectile)
+		 	.AtCasterPosition()
+			.Launch<Projectile>();
 
 		base.DoCast(worldPos);
 	}

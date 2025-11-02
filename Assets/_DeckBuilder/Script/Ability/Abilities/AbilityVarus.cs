@@ -3,14 +3,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "AbilityVarus", menuName = FileName.Abilities + "AbilityVarus", order = 0)]
 public class AbilityVarus : AbilityChanneled, IAbilityRangeIndicator
 {
-    [SerializeField]
-    private LinearProjectile projectile = null;
-
-    [SerializeField]
-    private float minDistance = 5;
-
-    [SerializeField]
-    private float maxDistance = 10;
+    [SerializeField] private LinearProjectile projectile = null;
+    [SerializeField] private float minDistance = 5;
+    [SerializeField] private float maxDistance = 10;
     [SerializeField] private int minDamage;
     [SerializeField] private int maxDamage;
     [SerializeField] private RangeIndicator rangeIndicator;
@@ -35,7 +30,9 @@ public class AbilityVarus : AbilityChanneled, IAbilityRangeIndicator
         spawnedRangedIndicator = null;
 
         LookAtCursorPosition();
-        launchedProjectile = Caster.ProjectileLauncher.LaunchProjectile<LinearProjectile>(projectile);
+        launchedProjectile = Caster.ProjectileLauncher.SetProjectile(projectile)
+            .AtCasterPosition()
+            .Launch<LinearProjectile>();
 
         float distanceToTravel = Mathf.Lerp(minDistance, maxDistance, channeledRatio);
         launchedProjectile.SetLifeTime(distanceToTravel / launchedProjectile.MaxSpeed);
@@ -51,7 +48,9 @@ public class AbilityVarus : AbilityChanneled, IAbilityRangeIndicator
 
     public void SpawnIndicator(RangeIndicator indicator)
     {
-        spawnedRangedIndicator = PoolManager.Provide<RangeIndicator>(indicator.gameObject, Caster.transform.position + Vector3.up * -1, Quaternion.identity, Caster.transform);
+        spawnedRangedIndicator = PoolManager.Provide<RangeIndicator>(indicator.gameObject,
+            Caster.transform.position + Vector3.up * -1, Quaternion.identity, Caster.transform);
+
         spawnedRangedIndicator.SetScale(minDistance * 2);
     }
 
