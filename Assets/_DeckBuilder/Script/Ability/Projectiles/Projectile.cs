@@ -46,6 +46,7 @@ public class Projectile : MonoBehaviour, IOwnable
 
 	protected virtual void Kill()
 	{
+		ClearTrails();
 		PoolManager.Release(gameObject);
 	}
 

@@ -702,6 +702,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &596133188 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 5655293960213793224, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+  m_PrefabInstance: {fileID: 2697699696741287303}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &607756932
 GameObject:
   m_ObjectHideFlags: 0
@@ -1361,6 +1366,11 @@ Transform:
 --- !u!1 &1013173931 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3806073588477009895, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+  m_PrefabInstance: {fileID: 2697699696741287303}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1231375655 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8537084705999079443, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
   m_PrefabInstance: {fileID: 2697699696741287303}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1249296822 stripped
@@ -2096,6 +2106,126 @@ PrefabInstance:
       propertyPath: spellSlots.Array.data[1].Ability
       value: 
       objectReference: {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperty.kind
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperty.renderer
+      value: 
+      objectReference: {fileID: 1231375655}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperty.floatValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperty.propertyName
+      value: _Dissolve
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].kind
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].kind
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[2].kind
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].renderer
+      value: 
+      objectReference: {fileID: 1231375655}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].renderer
+      value: 
+      objectReference: {fileID: 596133188}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[2].renderer
+      value: 
+      objectReference: {fileID: 596133188}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].autoApply
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].autoApply
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[2].autoApply
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].floatValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].colorValue.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].colorValue.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].colorValue.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].colorValue.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].propertyName
+      value: _Dissolve
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].colorValue.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].colorValue.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].colorValue.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].colorValue.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].propertyName
+      value: _Dissolve
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[2].colorValue.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[2].colorValue.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[2].colorValue.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[2].colorValue.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607652218954380255, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: DissolveProperties.Array.data[2].propertyName
+      value: _TintColor
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
