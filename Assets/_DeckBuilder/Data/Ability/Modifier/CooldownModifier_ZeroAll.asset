@@ -9,9 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ee8dc792d36562439f10b78440509fb, type: 3}
-  m_Name: CooldownModifier
+  m_Script: {fileID: 11500000, guid: 540488d2bd639df469fa6d4c2ddce4c8, type: 3}
+  m_Name: CooldownModifier_ZeroAll
   m_EditorClassIdentifier: Assembly-CSharp::CooldownModifier
-  targetTag: {fileID: 11400000, guid: 4b9fb0c4753970949834925ec33023d0, type: 2}
-  flatOffset: -0.5
-  percentReduction: 0
+  querry:
+    all: []
+    any: []
+    none: []
+  operations:
+  - Key: 0
+    OpType: 2
+    Value: 0
+  order: 0
+  stackGroup: 
+  maxStacks: 1

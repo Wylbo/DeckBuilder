@@ -20,7 +20,6 @@ public class AbilityCaster : MonoBehaviour
 	private void OnEnable()
 	{
 		InitializeAbilities();
-		modifierManager.Initialize();
 	}
 
 	private void OnDisable()
@@ -88,7 +87,6 @@ public class AbilityCaster : MonoBehaviour
 	{
 		if (spellSlot.CanCast)
 		{
-			modifierManager.ApplyModifiers(spellSlot.Ability);
 			spellSlot.Cast(this, worldPos);
 			return true;
 		}

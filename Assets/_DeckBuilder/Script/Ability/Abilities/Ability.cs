@@ -3,26 +3,20 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using Sirenix.OdinInspector;
 
 public abstract class Ability : ScriptableObject
 {
-	[SerializeField]
-	private bool rotatingCasterToCastDirection = true;
-	[SerializeField]
-	protected bool stopMovementOnCast = false;
-	[SerializeField, FormerlySerializedAs("cooldown")]
-	private float baseCooldown;
-
-	[SerializeField]
-	protected List<ScriptableDebuff> debuffsOnCast;
-	[SerializeField]
-	protected List<ScriptableDebuff> debuffsOnEndCast;
+	[SerializeField] private bool rotatingCasterToCastDirection = true;
+	[SerializeField] protected bool stopMovementOnCast = false;
+	[SerializeField] protected List<ScriptableDebuff> debuffsOnCast;
+	[SerializeField] protected List<ScriptableDebuff> debuffsOnEndCast;
 	[SerializeField] private List<AbilityTagSO> tags;
 	[SerializeField] private List<AbilityStatEntry> baseStats;
+	[SerializeField, Sirenix.OdinInspector.InlineEditor] private AbilitySharedStats sharedStats;
 
 	public AbilityCaster Caster { get; private set; }
 	public bool RotatingCasterToCastDirection => rotatingCasterToCastDirection;
-	public float BaseCooldown => baseCooldown;
 	public IReadOnlyList<AbilityTagSO> Tags => tags;
 	public IReadOnlyList<AbilityStatEntry> BaseStats => baseStats;
 
@@ -37,10 +31,9 @@ public abstract class Ability : ScriptableObject
 		get
 		{
 			var stats = EvaluateStats(Caster.ModifierManager.ActiveModifiers);
-			return StatOr(stats, AbilityStatKey.Cooldown, baseCooldown);
+			return StatOr(stats, AbilityStatKey.Cooldown, GetBaseStatValue(AbilityStatKey.Cooldown));
 		}
 	}
-
 
 	public virtual void Initialize(AbilityCaster caster)
 	{
@@ -111,15 +104,34 @@ public abstract class Ability : ScriptableObject
 	#region Modifier Application
 	protected virtual IEnumerable<AbilityStatEntry> GetBaseStats()
 	{
-		yield return new AbilityStatEntry
-		{
-			Key = AbilityStatKey.Cooldown,
-			Value = baseCooldown
-		};
+		var merged = new List<AbilityStatEntry>();
+		merged.AddRange(baseStats);
+		if (sharedStats != null)
+			merged.AddRange(sharedStats.Stats);
+
+		foreach (var stat in merged)
+			yield return stat;
 	}
+
+	protected float GetBaseStatValue(AbilityStatKey key)
+	{
+		foreach (var stat in GetBaseStats())
+		{
+			if (stat.Key == key)
+				return stat.Value;
+		}
+		return 0f;
+	}
+
 	protected Dictionary<AbilityStatKey, float> EvaluateStats(IEnumerable<AbilityModifier> activeModifiers)
 	{
 		return AbilityModifierRuntime.Evaluate(Tags, GetBaseStats(), activeModifiers);
+	}
+
+	protected float GetEvaluatedStatValue(AbilityStatKey key)
+	{
+		var stats = EvaluateStats(Caster.ModifierManager.ActiveModifiers);
+		return StatOr(stats, key, GetBaseStatValue(key));
 	}
 
 	protected static float StatOr(Dictionary<AbilityStatKey, float> dict, AbilityStatKey key, float defVal)

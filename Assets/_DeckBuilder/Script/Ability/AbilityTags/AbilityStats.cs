@@ -6,7 +6,11 @@ public enum AbilityStatKey
     Cooldown,
     Damage,
     AOEScale,
-    ProjectileSpeed
+
+    ProjectileCount,
+    ProjectileSpeed,
+    ProjectileSpreadAngle,
+    ProjectileMaxSpreadAngle
 }
 
 [Serializable]

@@ -10,6 +10,10 @@ public class AbilityProjectile : Ability
 	{
 		Caster.ProjectileLauncher.SetProjectile(projectile)
 		 	.AtCasterPosition()
+			.SetProjectileCount((int)GetEvaluatedStatValue(AbilityStatKey.ProjectileCount))
+			.SetMultipleProjectileFireMode(ProjectileLauncher.MultipleProjectileFireMode.Fan)
+			.SetSpreadAngle(GetEvaluatedStatValue(AbilityStatKey.ProjectileSpreadAngle))
+			.SetMaxSpreadAngle(GetEvaluatedStatValue(AbilityStatKey.ProjectileMaxSpreadAngle))
 			.Launch<Projectile>();
 
 		base.DoCast(worldPos);

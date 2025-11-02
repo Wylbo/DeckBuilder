@@ -7,24 +7,16 @@ public class AbilityTargetedAOE : Ability//, IHasAOE
 	[SerializeField]
 	private Projectile projectile;
 
-	protected float baseScale = 1;
+	// protected float baseScale = 1;
 
-	protected override IEnumerable<AbilityStatEntry> GetBaseStats()
-	{
-		foreach (var stat in base.GetBaseStats())
-			yield return stat;
 
-		yield return new AbilityStatEntry { Key = AbilityStatKey.AOEScale, Value = baseScale };
-
-	}
 
 	protected override void DoCast(Vector3 worldPos)
 	{
 		var stats = EvaluateStats(Caster.ModifierManager.ActiveModifiers);
-		// Caster.ProjectileLauncher.LaunchProjectile(projectile, worldPos, StatOr(stats, AbilityStatKey.AOEScale, baseScale));
 		Caster.ProjectileLauncher.SetProjectile(projectile)
 			.SetPosition(worldPos)
-			.SetScale(StatOr(stats, AbilityStatKey.AOEScale, baseScale))
+			.SetScale(GetEvaluatedStatValue(AbilityStatKey.AOEScale))
 			.Launch<Projectile>();
 
 		base.DoCast(worldPos);

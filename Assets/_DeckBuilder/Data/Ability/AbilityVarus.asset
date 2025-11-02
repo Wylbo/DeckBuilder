@@ -14,11 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
-  cooldown: 1
   debuffsOnCast:
   - {fileID: 11400000, guid: 8f7af324beb2e5146881368dbca0bf65, type: 2}
   debuffsOnEndCast: []
-  followCursorDuringChanneling: 0
+  tags:
+  - {fileID: 11400000, guid: 71f72daac274dbf418997a4ec204d7aa, type: 2}
+  baseStats: []
+  sharedStats: {fileID: 11400000, guid: b71f1d85aa1a7fc47aee3ab1abd2823c, type: 2}
+  followCursorDuringChanneling: 1
   holdToChannel: 1
   channelDuration: 2
   canMoveDuringChanneling: 1
