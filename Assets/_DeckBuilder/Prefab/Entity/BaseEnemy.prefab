@@ -56,6 +56,10 @@ PrefabInstance:
       propertyPath: controlStrategy
       value: 
       objectReference: {fileID: 11400000, guid: ffc5ab99c6d5d2a498be3510e022a01d, type: 2}
+    - target: {fileID: 2146085546668492043, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: character
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2949185825831420414, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: m_Name
       value: BaseEnemy
@@ -84,7 +88,8 @@ PrefabInstance:
       propertyPath: spellSlots.Array.data[1].Ability
       value: 
       objectReference: {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4938447398858601016, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 369680040252476415, guid: f534bcd483e19f148988e322285f8bc8, type: 3}

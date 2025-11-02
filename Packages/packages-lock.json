@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.improck.jumpto": {
+      "version": "file:com.improck.jumpto",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.singularitygroup.hotreload": {
       "version": "file:com.singularitygroup.hotreload",
       "depth": 0,

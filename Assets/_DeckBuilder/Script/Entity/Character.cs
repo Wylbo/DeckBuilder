@@ -4,6 +4,7 @@ using UnityEngine.Events;
 
 public class Character : Entity
 {
+	[SerializeField] CharacterVisual characterVisual;
 	[SerializeField] Movement movement;
 	[SerializeField] AbilityCaster abilityCaster;
 	[SerializeField] Health health;
@@ -63,11 +64,12 @@ public class Character : Entity
 		Die();
 
 	}
-	private void Die()
+	protected virtual void Die()
 	{
 		if (IsDead) return;
 
 		Debug.Log($"[{nameof(Character)}] {name} died");
 		On_Died?.Invoke();
+		characterVisual.Dissolve();
 	}
 }
