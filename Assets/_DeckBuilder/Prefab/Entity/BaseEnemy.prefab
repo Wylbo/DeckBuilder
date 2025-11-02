@@ -80,6 +80,86 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 930c6e6e7d71ced4bbefe6eb0a12bb5d, type: 2}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: dissolveDuration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].kind
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].kind
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].renderer
+      value: 
+      objectReference: {fileID: 8537084705999079443}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].renderer
+      value: 
+      objectReference: {fileID: 5655293960213793224}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].autoApply
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].autoApply
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: dissolveCurve.m_Curve.Array.data[0].inSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: dissolveCurve.m_Curve.Array.data[0].outSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].colorValue.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].colorValue.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].colorValue.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].colorValue.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[0].propertyName
+      value: _Dissolve
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].colorValue.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].colorValue.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].colorValue.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].colorValue.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730702775260507590, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: DissolveProperties.Array.data[1].propertyName
+      value: _Dissolve
+      objectReference: {fileID: 0}
     - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: spellSlots.Array.data[0].Ability
       value: 
@@ -211,6 +291,11 @@ MonoBehaviour:
       m_Bits: 512
     Origin: {fileID: 1809639084254729702}
   fieldOfView: 90
+--- !u!23 &5655293960213793224 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 5928950176303749073, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+  m_PrefabInstance: {fileID: 2034640913311440409}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &7493150588491916649 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8917544956100770672, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
@@ -222,6 +307,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b2ac9f09bff67d48a4c1aeb90c0d29d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!23 &8537084705999079443 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7657718530847626762, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+  m_PrefabInstance: {fileID: 2034640913311440409}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6495394124277050479
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -208,7 +208,6 @@ public class MaterialPropertyRef
         propertyName = _selectionProxy.Name;
         kind = _selectionProxy.Kind;
         _propId = -1;
-        // Optional: initialize the inline editor from material
         PullFromMaterial();
     }
 

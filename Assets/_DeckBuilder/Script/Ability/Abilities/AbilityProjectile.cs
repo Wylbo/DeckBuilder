@@ -10,6 +10,7 @@ public class AbilityProjectile : Ability
 	{
 		Caster.ProjectileLauncher.SetProjectile(projectile)
 		 	.AtCasterPosition()
+			.SetRotation(Caster.transform.rotation)
 			.SetProjectileCount((int)GetEvaluatedStatValue(AbilityStatKey.ProjectileCount))
 			.SetMultipleProjectileFireMode(ProjectileLauncher.MultipleProjectileFireMode.Fan)
 			.SetSpreadAngle(GetEvaluatedStatValue(AbilityStatKey.ProjectileSpreadAngle))
