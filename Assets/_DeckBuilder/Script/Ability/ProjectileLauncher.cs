@@ -2,35 +2,82 @@ using UnityEngine;
 
 public class ProjectileLauncher : MonoBehaviour
 {
+	private Projectile projectile;
+	private Vector3 worldPosition;
+	private Quaternion rotation;
+	private float scaleFactor = 1;
+	private Character owner;
 
-	public Projectile LaunchProjectile(Projectile projectile, float scaleFactor = 1)
+	public ProjectileLauncher SetProjectile(Projectile projectile)
 	{
-		return LaunchProjectile<Projectile>(projectile, transform.position, scaleFactor);
+		this.projectile = projectile;
+		return this;
 	}
 
-	public Projectile LaunchProjectile(Projectile projectile, Vector3 worldPos, float scaleFactor = 1)
+	public ProjectileLauncher SetPosition(Vector3 position)
 	{
-		return LaunchProjectile<Projectile>(projectile, worldPos, scaleFactor);
+		this.worldPosition = position;
+		return this;
 	}
 
-	public T LaunchProjectile<T>(Projectile projectile, float scaleFactor = 1) where T : Projectile
+	public ProjectileLauncher AtCasterPosition()
 	{
-		return LaunchProjectile<T>(projectile, transform.position, scaleFactor);
+		this.worldPosition = transform.position;
+		return this;
 	}
 
-	public T LaunchProjectile<T>(Projectile projectile, Vector3 worldPosition, float scaleFactor = 1) where T : Projectile
+	public ProjectileLauncher SetRotation(Quaternion rotation)
 	{
-		T proj = PoolManager.Provide<T>(projectile.gameObject, worldPosition, transform.rotation);
+		this.rotation = rotation;
+		return this;
+	}
+
+	public ProjectileLauncher SetScale(float scaleFactor)
+	{
+		this.scaleFactor = scaleFactor;
+		return this;
+	}
+
+	public ProjectileLauncher SetOwner(Character owner)
+	{
+		this.owner = owner;
+		return this;
+	}
+
+	public T Launch<T>() where T : Projectile
+	{
+		if (projectile == null)
+		{
+			Debug.LogError("Projectile is not set!");
+			return null;
+		}
+
+		T proj = PoolManager.Provide<T>(projectile.gameObject, worldPosition, rotation);
 
 		IOwnable[] ownables = proj.GetComponentsInChildren<IOwnable>();
-
 		foreach (IOwnable ownable in ownables)
 		{
-			ownable.SetOwner(GetComponent<Character>());
+			ownable.SetOwner(owner);
 		}
 
 		proj.SetScale(scaleFactor);
 
+		Reset();
+
 		return proj;
+	}
+
+	private void Reset()
+	{
+		projectile = null;
+		worldPosition = transform.position;
+		rotation = transform.rotation;
+		scaleFactor = 1;
+		owner = GetComponent<Character>();
+	}
+
+	private void Awake()
+	{
+		Reset();
 	}
 }

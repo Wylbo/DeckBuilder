@@ -21,7 +21,12 @@ public class AbilityTargetedAOE : Ability//, IHasAOE
 	protected override void DoCast(Vector3 worldPos)
 	{
 		var stats = EvaluateStats(Caster.ModifierManager.ActiveModifiers);
-		Caster.ProjectileLauncher.LaunchProjectile(projectile, worldPos, StatOr(stats, AbilityStatKey.AOEScale, baseScale));
+		// Caster.ProjectileLauncher.LaunchProjectile(projectile, worldPos, StatOr(stats, AbilityStatKey.AOEScale, baseScale));
+		Caster.ProjectileLauncher.SetProjectile(projectile)
+			.SetPosition(worldPos)
+			.SetScale(StatOr(stats, AbilityStatKey.AOEScale, baseScale))
+			.Launch<Projectile>();
+
 		base.DoCast(worldPos);
 	}
 
