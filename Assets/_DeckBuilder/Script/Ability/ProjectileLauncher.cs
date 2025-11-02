@@ -6,6 +6,7 @@ public class ProjectileLauncher : MonoBehaviour
 	public enum MultipleProjectileFireMode
 	{
 		Fan,
+		Scatter
 	}
 
 	private Projectile projectile;
@@ -72,6 +73,8 @@ public class ProjectileLauncher : MonoBehaviour
 		return this;
 	}
 
+
+
 	public ProjectileLauncher SetMultipleProjectileFireMode(MultipleProjectileFireMode mode)
 	{
 		multipleProjectileFireMode = mode;
@@ -87,47 +90,123 @@ public class ProjectileLauncher : MonoBehaviour
 			return null;
 		}
 
-		int count = Mathf.Max(0, projectileCount);
+		int count = Mathf.Max(1, projectileCount);
 		if (count == 0)
 			return new T[0];
 
 		var results = new T[count];
 
-		var prefab = projectile.gameObject;
-		var baseRot = rotation;
-		var position = worldPosition;
-		var scale = scaleFactor;
-
-		bool isFan = count > 1 && multipleProjectileFireMode == MultipleProjectileFireMode.Fan;
-
-		float adjustedSpreadAngle = spreadAngle;
-		float totalSpread = spreadAngle * (count - 1);
-		if (isFan && totalSpread > maxSpreadAngle)
-		{
-			totalSpread = maxSpreadAngle;
-			adjustedSpreadAngle = totalSpread / count;
-		}
-
-		float startAngle = isFan ? -totalSpread * 0.5f : 0f;
-
+		// float adjustedSpreadAngle = CalculateAdjustedSpreadAngle(count);
+		// float startAngle = CalculateStartAngle(count, adjustedSpreadAngle);
+		float startAngle, stepAngle;
+		GetFanStartAndStep(count, out startAngle, out stepAngle);
 		for (int i = 0; i < count; i++)
 		{
-			Quaternion shotRot = isFan
-				? Quaternion.Euler(0f, startAngle + adjustedSpreadAngle * i, 0f) * baseRot
-				: baseRot;
-
-			var proj = PoolManager.Provide<T>(prefab, position, shotRot);
-			results[i] = proj;
-
-			var ownables = proj.GetComponentsInChildren<IOwnable>();
-			for (int j = 0; j < ownables.Length; j++)
-				ownables[j].SetOwner(owner);
-
-			proj.SetScale(scale);
+			results[i] = LaunchProjectile<T>(i, startAngle, stepAngle);
 		}
 
 		Reset();
 		return results;
+	}
+
+	private float CalculateAdjustedSpreadAngle(int count)
+	{
+		if (count <= 1 || multipleProjectileFireMode != MultipleProjectileFireMode.Fan)
+			return 0f;
+
+		float desiredSpread = spreadAngle * (count - 1);
+		if (desiredSpread > maxSpreadAngle)
+		{
+			return maxSpreadAngle / count;
+		}
+
+		return spreadAngle;
+	}
+
+	private float CalculateStartAngle(int count, float adjustedSpreadAngle)
+	{
+		if (count <= 1 || multipleProjectileFireMode != MultipleProjectileFireMode.Fan)
+			return 0f;
+
+		bool isRing = Mathf.Approximately(adjustedSpreadAngle * count, maxSpreadAngle);
+		if (isRing)
+		{
+			return 0f;
+		}
+
+		float totalSpread = adjustedSpreadAngle * (count - 1);
+		return -totalSpread * 0.5f;
+	}
+	private void GetFanStartAndStep(int count, out float startAngle, out float stepAngle)
+	{
+		startAngle = 0f;
+		stepAngle = 0f;
+
+		if (multipleProjectileFireMode != MultipleProjectileFireMode.Fan || count <= 1)
+			return;
+
+		float desiredTotal = spreadAngle * (count - 1);
+		float cap = (maxSpreadAngle > 0f) ? Mathf.Min(desiredTotal, maxSpreadAngle) : desiredTotal;
+
+		// Full circle? -> ring distribution
+		const float EPS = 0.001f;
+		if (cap >= 360f - EPS)
+		{
+			stepAngle = 360f / count;
+			startAngle = 0f;
+			return;
+		}
+
+
+		stepAngle = (cap > 0f) ? cap / (count - 1) : 0f;
+		startAngle = -0.5f * cap;
+	}
+	private T LaunchProjectile<T>(int index, float startAngle, float adjustedSpreadAngle) where T : Projectile
+	{
+		Quaternion shotRot = CalculateProjectileRotation(index, startAngle, adjustedSpreadAngle);
+		Vector3 shotPosition = CalculateProjectilePosition(index);
+
+		var proj = PoolManager.Provide<T>(projectile.gameObject, shotPosition, shotRot);
+
+		AssignOwner(proj);
+		proj.SetScale(scaleFactor);
+
+		return proj;
+	}
+
+	private Quaternion CalculateProjectileRotation(int index, float startAngle, float adjustedSpreadAngle)
+	{
+		if (multipleProjectileFireMode == MultipleProjectileFireMode.Fan)
+		{
+			float angle = startAngle + adjustedSpreadAngle * index;
+			return Quaternion.Euler(0f, angle, 0f) * rotation;
+		}
+
+		return rotation;
+	}
+
+	private Vector3 CalculateProjectilePosition(int index)
+	{
+		if (multipleProjectileFireMode == MultipleProjectileFireMode.Scatter && projectileCount > 1)
+		{
+			float radius = Random.Range(0f, maxSpreadAngle);
+			float angle = Random.Range(0f, 360f);
+			float x = worldPosition.x + radius * Mathf.Cos(angle * Mathf.Deg2Rad);
+			float z = worldPosition.z + radius * Mathf.Sin(angle * Mathf.Deg2Rad);
+			return new Vector3(x, worldPosition.y, z);
+		}
+
+		// For Fan mode, use the world position
+		return worldPosition;
+	}
+
+	private void AssignOwner(Projectile proj)
+	{
+		var ownables = proj.GetComponentsInChildren<IOwnable>();
+		foreach (var ownable in ownables)
+		{
+			ownable.SetOwner(owner);
+		}
 	}
 
 	private void Reset()
@@ -137,6 +216,10 @@ public class ProjectileLauncher : MonoBehaviour
 		rotation = transform.rotation;
 		scaleFactor = 1;
 		owner = GetComponent<Character>();
+		projectileCount = 1;
+		multipleProjectileFireMode = MultipleProjectileFireMode.Fan;
+		spreadAngle = 0f;
+		maxSpreadAngle = 0f;
 	}
 
 	private void Awake()

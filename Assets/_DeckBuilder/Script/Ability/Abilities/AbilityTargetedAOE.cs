@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = nameof(AbilityTargetedAOE), menuName = FileName.Abilities + nameof(AbilityTargetedAOE))]
-public class AbilityTargetedAOE : Ability//, IHasAOE
+public class AbilityTargetedAOE : Ability
 {
 	[SerializeField]
 	private Projectile projectile;
@@ -17,6 +17,10 @@ public class AbilityTargetedAOE : Ability//, IHasAOE
 		Caster.ProjectileLauncher.SetProjectile(projectile)
 			.SetPosition(worldPos)
 			.SetScale(GetEvaluatedStatValue(AbilityStatKey.AOEScale))
+			.SetProjectileCount((int)GetEvaluatedStatValue(AbilityStatKey.ProjectileCount))
+			.SetMultipleProjectileFireMode(ProjectileLauncher.MultipleProjectileFireMode.Scatter)
+			.SetSpreadAngle(GetEvaluatedStatValue(AbilityStatKey.ProjectileSpreadAngle))
+			.SetMaxSpreadAngle(GetEvaluatedStatValue(AbilityStatKey.ProjectileMaxSpreadAngle))
 			.Launch<Projectile>();
 
 		base.DoCast(worldPos);

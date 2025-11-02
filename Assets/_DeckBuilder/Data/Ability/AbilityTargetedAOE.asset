@@ -18,8 +18,14 @@ MonoBehaviour:
   debuffsOnEndCast: []
   tags:
   - {fileID: 11400000, guid: 56a32818ac7194442993e4c4f5236d87, type: 2}
+  - {fileID: 11400000, guid: 71f72daac274dbf418997a4ec204d7aa, type: 2}
+  - {fileID: 11400000, guid: 98def8821af511040aa92f13e377b4dc, type: 2}
   baseStats:
   - Key: 2
     Value: 1
+  - Key: 3
+    Value: 1
+  - Key: 6
+    Value: 3
   sharedStats: {fileID: 0}
   projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}

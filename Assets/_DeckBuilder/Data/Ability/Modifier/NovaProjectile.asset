@@ -14,9 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   querry:
     all: []
-    any: []
-    none: []
-  operations: []
+    any:
+    - {fileID: 11400000, guid: 71f72daac274dbf418997a4ec204d7aa, type: 2}
+    none:
+    - {fileID: 11400000, guid: 98def8821af511040aa92f13e377b4dc, type: 2}
+  operations:
+  - Key: 6
+    OpType: 2
+    Value: 360
+  - Key: 3
+    OpType: 0
+    Value: 5
+  - Key: 5
+    OpType: 0
+    Value: 10000
   order: 0
   stackGroup: 
   maxStacks: 1
