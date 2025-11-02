@@ -1,37 +1,27 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = nameof(AbilityTargetedAOE), menuName = FileName.Abilities + nameof(AbilityTargetedAOE))]
-public class AbilityTargetedAOE : Ability, IHasAOE
+public class AbilityTargetedAOE : Ability//, IHasAOE
 {
 	[SerializeField]
 	private Projectile projectile;
 
-	#region IBaseAbilityModifier
-	public override void ResetModifiers()
-	{
-		base.ResetModifiers();
-		modifiedScale = 0;
-	}
-	#endregion
-
-	#region IHasAOE
 	protected float baseScale = 1;
-	protected float modifiedScale = 0;
-	public void AddAOEScale(float percent)
-	{
-		modifiedScale += percent;
-	}
 
-	public float GetModifiedScale()
+	protected override IEnumerable<AbilityStatEntry> GetBaseStats()
 	{
-		float mult = 1 + modifiedScale;
-		return baseScale * mult;
+		foreach (var stat in base.GetBaseStats())
+			yield return stat;
+
+		yield return new AbilityStatEntry { Key = AbilityStatKey.AOEScale, Value = baseScale };
+
 	}
-	#endregion
 
 	protected override void DoCast(Vector3 worldPos)
 	{
-		Caster.ProjectileLauncher.LaunchProjectile(projectile, worldPos, GetModifiedScale());
+		var stats = EvaluateStats(Caster.ModifierManager.ActiveModifiers);
+		Caster.ProjectileLauncher.LaunchProjectile(projectile, worldPos, StatOr(stats, AbilityStatKey.AOEScale, baseScale));
 		base.DoCast(worldPos);
 	}
 

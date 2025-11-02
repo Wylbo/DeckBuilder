@@ -1,15 +1,21 @@
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public abstract class AbilityModifier : ScriptableObject
+public class AbilityModifier : ScriptableObject
 {
-    [SerializeField] private AbilityTagSO targetTag;
-    public AbilityTagSO TargetTag => targetTag;
+    [SerializeField] private TagQuery querry;
+    [SerializeField] private List<AbilityStatOp> operations = new List<AbilityStatOp>();
 
-    public bool AppliesTo(Ability ability)
-    {
-        return ability.HasTag(targetTag);
-    }
+    [Tooltip("Lower order modifiers are applied first.")]
+    [SerializeField] private int order = 0;
 
-    public abstract void Apply(Ability ability);
+    [SerializeField] private string stackGroup = "";
+    [SerializeField] private int maxStacks = 1;
+
+    public TagQuery Querry => querry;
+    public IReadOnlyList<AbilityStatOp> Operations => operations;
+    public int Order => order;
+    public string StackGroup => stackGroup;
+    public int MaxStacks => maxStacks;
 }

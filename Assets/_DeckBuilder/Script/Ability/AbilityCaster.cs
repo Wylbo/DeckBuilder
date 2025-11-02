@@ -15,6 +15,7 @@ public class AbilityCaster : MonoBehaviour
 
 	public SpellSlot[] SpellSlots => spellSlots;
 	public ProjectileLauncher ProjectileLauncher => projectileLauncher;
+	public AbilityModifierManager ModifierManager => modifierManager;
 
 	private void OnEnable()
 	{

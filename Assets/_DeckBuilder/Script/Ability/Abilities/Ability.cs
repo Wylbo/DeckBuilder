@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
-public abstract class Ability : ScriptableObject, IHasCooldown
+public abstract class Ability : ScriptableObject
 {
 	[SerializeField]
 	private bool rotatingCasterToCastDirection = true;
@@ -17,11 +18,13 @@ public abstract class Ability : ScriptableObject, IHasCooldown
 	[SerializeField]
 	protected List<ScriptableDebuff> debuffsOnEndCast;
 	[SerializeField] private List<AbilityTagSO> tags;
+	[SerializeField] private List<AbilityStatEntry> baseStats;
 
 	public AbilityCaster Caster { get; private set; }
 	public bool RotatingCasterToCastDirection => rotatingCasterToCastDirection;
 	public float BaseCooldown => baseCooldown;
 	public IReadOnlyList<AbilityTagSO> Tags => tags;
+	public IReadOnlyList<AbilityStatEntry> BaseStats => baseStats;
 
 	public event UnityAction<Ability> On_StartCast;
 	public event UnityAction<bool> On_EndCast;
@@ -29,36 +32,15 @@ public abstract class Ability : ScriptableObject, IHasCooldown
 	protected Movement movement;
 	protected bool isHeld = false;
 
-
-	#region IHasCooldown
-	private float flatCooldownOffset;
-	private float percetCooldownOffset;
-	public float Cooldown => GetModifiedCooldown();
-
-	public void AddCooldownFlatOffset(float offset)
+	public float Cooldown
 	{
-		flatCooldownOffset += offset;
+		get
+		{
+			var stats = EvaluateStats(Caster.ModifierManager.ActiveModifiers);
+			return StatOr(stats, AbilityStatKey.Cooldown, baseCooldown);
+		}
 	}
 
-	public void AddCooldownPercentOffet(float percent)
-	{
-		percetCooldownOffset += percent;
-	}
-
-	public virtual void ResetModifiers()
-	{
-		flatCooldownOffset = 0;
-		percetCooldownOffset = 0;
-	}
-
-	public float GetModifiedCooldown()
-	{
-		float afterFlat = baseCooldown + flatCooldownOffset;
-		float percent = Mathf.Clamp01(percetCooldownOffset);
-		float mult = 1 - percent;
-		return Mathf.Max(0f, afterFlat * mult);
-	}
-	#endregion
 
 	public virtual void Initialize(AbilityCaster caster)
 	{
@@ -78,27 +60,7 @@ public abstract class Ability : ScriptableObject, IHasCooldown
 		this.isHeld = isHeld;
 	}
 
-	public bool HasTag(AbilityTagSO tag)
-	{
-		return tags.Contains(tag);
-	}
-
-	public bool HasAnyTag(params AbilityTagSO[] queryTags)
-	{
-		foreach (AbilityTagSO tag in queryTags)
-			if (tags.Contains(tag))
-				return true;
-		return false;
-	}
-
-	public bool HasAllTag(params AbilityTagSO[] queryTags)
-	{
-		foreach (AbilityTagSO tag in queryTags)
-			if (!tags.Contains(tag))
-				return false;
-		return true;
-	}
-
+	#region  Casting
 	protected void StartCast(Vector3 worldPos)
 	{
 		On_StartCast?.Invoke(this);
@@ -121,7 +83,6 @@ public abstract class Ability : ScriptableObject, IHasCooldown
 	{
 		ApplyDebuffs(debuffsOnEndCast);
 		On_EndCast?.Invoke(isSucessful);
-		ResetModifiers();
 	}
 
 	public virtual void EndHold(Vector3 worldPos)
@@ -135,7 +96,9 @@ public abstract class Ability : ScriptableObject, IHasCooldown
 		Debug.DrawRay(Caster.transform.position, castDirection, Color.yellow, 1f);
 		Caster.transform.LookAt(Caster.transform.position + castDirection);
 	}
+	#endregion
 
+	#region Buff Application
 	protected void ApplyDebuffs(List<ScriptableDebuff> scriptableDebuffs)
 	{
 		foreach (ScriptableDebuff debuff in scriptableDebuffs)
@@ -143,5 +106,26 @@ public abstract class Ability : ScriptableObject, IHasCooldown
 			Caster.AddDebuff(debuff);
 		}
 	}
+	#endregion
+
+	#region Modifier Application
+	protected virtual IEnumerable<AbilityStatEntry> GetBaseStats()
+	{
+		yield return new AbilityStatEntry
+		{
+			Key = AbilityStatKey.Cooldown,
+			Value = baseCooldown
+		};
+	}
+	protected Dictionary<AbilityStatKey, float> EvaluateStats(IEnumerable<AbilityModifier> activeModifiers)
+	{
+		return AbilityModifierRuntime.Evaluate(Tags, GetBaseStats(), activeModifiers);
+	}
+
+	protected static float StatOr(Dictionary<AbilityStatKey, float> dict, AbilityStatKey key, float defVal)
+	{
+		return dict != null && dict.TryGetValue(key, out float val) ? val : defVal;
+	}
+	#endregion
 
 }
