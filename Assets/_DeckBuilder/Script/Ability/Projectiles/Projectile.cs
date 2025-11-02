@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour, IOwnable
 {
 	[SerializeField]
 	protected float lifeTime = 0.0f;
+	[SerializeField] private List<TrailRenderer> trailRenderers = new List<TrailRenderer>();
 
 	protected float elapsedLifeTime = 0.0f;
 
@@ -21,6 +23,7 @@ public class Projectile : MonoBehaviour, IOwnable
 	protected virtual void OnEnable()
 	{
 		elapsedLifeTime = 0;
+		ClearTrails();
 	}
 
 	protected virtual void Update()
@@ -44,6 +47,14 @@ public class Projectile : MonoBehaviour, IOwnable
 	protected virtual void Kill()
 	{
 		PoolManager.Release(gameObject);
+	}
+
+	protected void ClearTrails()
+	{
+		foreach (var trail in trailRenderers)
+		{
+			trail.Clear();
+		}
 	}
 
 	public void SetOwner(Character character)
