@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
+// [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
 public class ReadOnlyDrawer : PropertyDrawer
 {
 	public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -55,7 +55,7 @@ public class TimerDrawer : PropertyDrawer
 	}
 }
 
-[CustomPropertyDrawer(typeof(InlineEditorAttribute))]
+// [CustomPropertyDrawer(typeof(InlineEditorAttribute))]
 public class InlineEditorDrawer : PropertyDrawer
 {
 	private static Dictionary<Object, bool> foldoutStates = new Dictionary<Object, bool>();

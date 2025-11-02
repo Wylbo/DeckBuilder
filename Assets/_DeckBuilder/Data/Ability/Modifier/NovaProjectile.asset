@@ -10,17 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 540488d2bd639df469fa6d4c2ddce4c8, type: 3}
-  m_Name: AOEModifier
+  m_Name: NovaProjectile
   m_EditorClassIdentifier: 
   querry:
     all: []
-    any:
-    - {fileID: 11400000, guid: 56a32818ac7194442993e4c4f5236d87, type: 2}
+    any: []
     none: []
-  operations:
-  - Key: 2
-    OpType: 1
-    Value: 1
+  operations: []
   order: 0
   stackGroup: 
   maxStacks: 1

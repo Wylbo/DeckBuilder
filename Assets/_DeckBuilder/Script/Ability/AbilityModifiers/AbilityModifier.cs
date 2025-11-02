@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = nameof(AbilityModifier), menuName = FileName.AbilityFolder + nameof(AbilityModifier), order = 0)]
 public class AbilityModifier : ScriptableObject
 {
     [SerializeField] private TagQuery querry;

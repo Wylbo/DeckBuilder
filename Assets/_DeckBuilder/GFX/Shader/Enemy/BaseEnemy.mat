@@ -44,9 +44,10 @@ Material:
     m_Floats:
     - _Dissolve: 0
     - _EdgeWidth: 0.02
-    - _NoiseScale: 40
+    - _NoiseScale: 20
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _TimeScale: 0.3
     m_Colors:
     - _Color: {r: 85.445015, g: 0.69465035, b: 0, a: 1}
     - _MinMaxY: {r: -1, g: 1.5, b: 0, a: 0}

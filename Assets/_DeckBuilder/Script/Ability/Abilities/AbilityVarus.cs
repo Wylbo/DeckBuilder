@@ -10,7 +10,7 @@ public class AbilityVarus : AbilityChanneled, IAbilityRangeIndicator
     [SerializeField] private int maxDamage;
     [SerializeField] private RangeIndicator rangeIndicator;
 
-    protected LinearProjectile launchedProjectile;
+    protected LinearProjectile[] launchedProjectiles;
     private RangeIndicator spawnedRangedIndicator;
 
     protected override void DoCast(Vector3 worldPos)
@@ -30,15 +30,22 @@ public class AbilityVarus : AbilityChanneled, IAbilityRangeIndicator
         spawnedRangedIndicator = null;
 
         LookAtCursorPosition();
-        launchedProjectile = Caster.ProjectileLauncher.SetProjectile(projectile)
+        launchedProjectiles = Caster.ProjectileLauncher.SetProjectile(projectile)
             .AtCasterPosition()
+            .SetProjectileCount((int)GetEvaluatedStatValue(AbilityStatKey.ProjectileCount))
+            .SetMultipleProjectileFireMode(ProjectileLauncher.MultipleProjectileFireMode.Fan)
+            .SetSpreadAngle(GetEvaluatedStatValue(AbilityStatKey.ProjectileSpreadAngle))
+            .SetMaxSpreadAngle(GetEvaluatedStatValue(AbilityStatKey.ProjectileMaxSpreadAngle))
             .Launch<LinearProjectile>();
 
         float distanceToTravel = Mathf.Lerp(minDistance, maxDistance, channeledRatio);
-        launchedProjectile.SetLifeTime(distanceToTravel / launchedProjectile.MaxSpeed);
+        foreach (var launchedProjectile in launchedProjectiles)
+        {
+            launchedProjectile.SetLifeTime(distanceToTravel / launchedProjectile.MaxSpeed);
 
-        Hitbox hitbox = launchedProjectile.GetComponent<Hitbox>();
-        hitbox.SetDamage(Mathf.FloorToInt(Mathf.Lerp(minDamage, maxDamage, channeledRatio)));
+            Hitbox hitbox = launchedProjectile.GetComponent<Hitbox>();
+            hitbox.SetDamage(Mathf.FloorToInt(Mathf.Lerp(minDamage, maxDamage, channeledRatio)));
+        }
 
         foreach (ScriptableDebuff scriptableDebuff in debuffsOnCast)
         {

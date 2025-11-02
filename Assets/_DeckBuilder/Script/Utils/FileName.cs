@@ -10,7 +10,7 @@ public static class FileName
 
 	public const string AbilityFolder = Root + "Ability/";
 	public const string Abilities = AbilityFolder + "Abilities/";
-	public const string AbilityModifier = AbilityFolder + "Modifiers/";
+	public const string AbilityTag = AbilityFolder + "Tags/";
 
 	public const string Debuff = Root + "Debuff/";
 

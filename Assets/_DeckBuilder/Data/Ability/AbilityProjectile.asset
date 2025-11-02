@@ -14,7 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
-  cooldown: 2
   debuffsOnCast: []
   debuffsOnEndCast: []
+  tags:
+  - {fileID: 11400000, guid: 71f72daac274dbf418997a4ec204d7aa, type: 2}
+  baseStats:
+  - Key: 0
+    Value: 2
+  sharedStats: {fileID: 11400000, guid: b71f1d85aa1a7fc47aee3ab1abd2823c, type: 2}
   projectile: {fileID: 6428266943518908824, guid: b2c2ae026b1ceca4fb60273c6b4e4a17, type: 3}

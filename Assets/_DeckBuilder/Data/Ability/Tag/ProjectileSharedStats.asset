@@ -9,18 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 540488d2bd639df469fa6d4c2ddce4c8, type: 3}
-  m_Name: AOEModifier
+  m_Script: {fileID: 11500000, guid: 516a24486feaf044babce79ed7877933, type: 3}
+  m_Name: ProjectileSharedStats
   m_EditorClassIdentifier: 
-  querry:
-    all: []
-    any:
-    - {fileID: 11400000, guid: 56a32818ac7194442993e4c4f5236d87, type: 2}
-    none: []
-  operations:
-  - Key: 2
-    OpType: 1
+  stats:
+  - Key: 3
     Value: 1
-  order: 0
-  stackGroup: 
-  maxStacks: 1
+  - Key: 4
+    Value: 0
+  - Key: 5
+    Value: 15
+  - Key: 6
+    Value: 45
