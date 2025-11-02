@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class AbilityModifierManager : MonoBehaviour
 {
-    [SerializeField] private List<AbilityModifier> allModifiers = new List<AbilityModifier>();
+    [SerializeField] private List<AbilityModifier> activeModifiers = new List<AbilityModifier>();
+    public IReadOnlyList<AbilityModifier> ActiveModifiers => activeModifiers;
 
     public void Initialize()
     {
@@ -28,12 +29,8 @@ public class AbilityModifierManager : MonoBehaviour
 
     public void ApplyModifiers(Ability ability)
     {
-        foreach (AbilityModifier mod in allModifiers)
+        foreach (AbilityModifier mod in activeModifiers)
         {
-            if (!mod.AppliesTo(ability))
-                continue;
-
-            mod.Apply(ability);
         }
     }
 }
