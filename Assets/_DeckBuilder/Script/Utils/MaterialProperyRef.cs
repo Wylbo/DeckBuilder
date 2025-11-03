@@ -246,14 +246,14 @@ public class MaterialPropertyRef
         if (mat == null || mat.shader == null) return list;
 
         var shader = mat.shader;
-        int count = UnityEditor.ShaderUtil.GetPropertyCount(shader);
+        int count = shader.GetPropertyCount();
 
         for (int i = 0; i < count; i++)
         {
-            var type = UnityEditor.ShaderUtil.GetPropertyType(shader, i);
+            var type = shader.GetPropertyType(i);
             if (!TryMap(type, out Kind k)) continue;
 
-            string name = UnityEditor.ShaderUtil.GetPropertyName(shader, i);
+            string name = shader.GetPropertyName(i);
             var sel = new PropertySelection { Name = name, Kind = k };
             list.Add(new ValueDropdownItem<PropertySelection>($"{name}  ({k})", sel));
         }
@@ -264,15 +264,15 @@ public class MaterialPropertyRef
 
         return list;
 
-        static bool TryMap(UnityEditor.ShaderUtil.ShaderPropertyType t, out Kind k)
+        static bool TryMap(UnityEngine.Rendering.ShaderPropertyType t, out Kind k)
         {
             switch (t)
             {
-                case UnityEditor.ShaderUtil.ShaderPropertyType.Float: k = Kind.Float; return true;
-                case UnityEditor.ShaderUtil.ShaderPropertyType.Range: k = Kind.Range; return true;
-                case UnityEditor.ShaderUtil.ShaderPropertyType.Color: k = Kind.Color; return true;
-                case UnityEditor.ShaderUtil.ShaderPropertyType.Vector: k = Kind.Vector; return true;
-                case UnityEditor.ShaderUtil.ShaderPropertyType.TexEnv: k = Kind.Texture; return true;
+                case UnityEngine.Rendering.ShaderPropertyType.Float: k = Kind.Float; return true;
+                case UnityEngine.Rendering.ShaderPropertyType.Range: k = Kind.Range; return true;
+                case UnityEngine.Rendering.ShaderPropertyType.Color: k = Kind.Color; return true;
+                case UnityEngine.Rendering.ShaderPropertyType.Vector: k = Kind.Vector; return true;
+                case UnityEngine.Rendering.ShaderPropertyType.Texture: k = Kind.Texture; return true;
                 default: k = Kind.Float; return false;
             }
         }
@@ -301,14 +301,14 @@ public class MaterialPropertyRef
         if (!mat || !mat.shader) return false;
 
         var shader = mat.shader;
-        int count = UnityEditor.ShaderUtil.GetPropertyCount(shader);
+        int count = shader.GetPropertyCount();
         for (int i = 0; i < count; i++)
         {
-            if (UnityEditor.ShaderUtil.GetPropertyName(shader, i) == propertyName &&
-                UnityEditor.ShaderUtil.GetPropertyType(shader, i) == UnityEditor.ShaderUtil.ShaderPropertyType.Range)
+            if (shader.GetPropertyName(i) == propertyName &&
+                shader.GetPropertyType(i) == UnityEngine.Rendering.ShaderPropertyType.Range)
             {
-                min = UnityEditor.ShaderUtil.GetRangeLimits(shader, i, 1);
-                max = UnityEditor.ShaderUtil.GetRangeLimits(shader, i, 2);
+                min = shader.GetPropertyRangeLimits(i).x;
+                max = shader.GetPropertyRangeLimits(i).y;
                 return true;
             }
         }

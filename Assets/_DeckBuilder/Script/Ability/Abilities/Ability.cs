@@ -11,13 +11,14 @@ public abstract class Ability : ScriptableObject
 	[SerializeField] protected bool stopMovementOnCast = false;
 	[SerializeField] protected List<ScriptableDebuff> debuffsOnCast;
 	[SerializeField] protected List<ScriptableDebuff> debuffsOnEndCast;
-	[SerializeField] private List<AbilityTagSO> tags;
+	[SerializeField] private GTagSet tagSet = new GTagSet();
 	[SerializeField] private List<AbilityStatEntry> baseStats;
-	[SerializeField, Sirenix.OdinInspector.InlineEditor] private AbilitySharedStats sharedStats;
+
+	// [SerializeField, InlineEditor] private AbilitySharedStats sharedStats;
 
 	public AbilityCaster Caster { get; private set; }
 	public bool RotatingCasterToCastDirection => rotatingCasterToCastDirection;
-	public IReadOnlyList<AbilityTagSO> Tags => tags;
+	public GTagSet TagSet => tagSet;
 	public IReadOnlyList<AbilityStatEntry> BaseStats => baseStats;
 
 	public event UnityAction<Ability> On_StartCast;
@@ -106,8 +107,8 @@ public abstract class Ability : ScriptableObject
 	{
 		var merged = new List<AbilityStatEntry>();
 		merged.AddRange(baseStats);
-		if (sharedStats != null)
-			merged.AddRange(sharedStats.Stats);
+		// if (sharedStats != null)
+		// 	merged.AddRange(sharedStats.Stats);
 
 		foreach (var stat in merged)
 			yield return stat;
@@ -125,7 +126,7 @@ public abstract class Ability : ScriptableObject
 
 	protected Dictionary<AbilityStatKey, float> EvaluateStats(IEnumerable<AbilityModifier> activeModifiers)
 	{
-		return AbilityModifierRuntime.Evaluate(Tags, GetBaseStats(), activeModifiers);
+		return AbilityModifierRuntime.Evaluate(TagSet, GetBaseStats(), activeModifiers);
 	}
 
 	protected float GetEvaluatedStatValue(AbilityStatKey key)

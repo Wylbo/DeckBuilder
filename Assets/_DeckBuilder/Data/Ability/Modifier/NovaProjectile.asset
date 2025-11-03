@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 540488d2bd639df469fa6d4c2ddce4c8, type: 3}
   m_Name: NovaProjectile
   m_EditorClassIdentifier: 
-  querry:
-    all: []
-    any:
-    - {fileID: 11400000, guid: 71f72daac274dbf418997a4ec204d7aa, type: 2}
-    none:
-    - {fileID: 11400000, guid: 98def8821af511040aa92f13e377b4dc, type: 2}
+  query:
+    All:
+      Tags: []
+    Any:
+      Tags:
+      - ability.projectile
+    None:
+      Tags:
+      - ability.projectile.rain
   operations:
   - Key: 6
     OpType: 2
