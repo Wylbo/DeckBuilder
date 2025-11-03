@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = nameof(AbilityModifier), menuName = FileName.AbilityFolder + nameof(AbilityModifier), order = 0)]
 public class AbilityModifier : ScriptableObject
 {
-    [SerializeField] private TagQuery querry;
+    [SerializeField] private GTagQuery query;
     [SerializeField] private List<AbilityStatOp> operations = new List<AbilityStatOp>();
 
     [Tooltip("Lower order modifiers are applied first.")]
@@ -14,7 +14,7 @@ public class AbilityModifier : ScriptableObject
     [SerializeField] private string stackGroup = "";
     [SerializeField] private int maxStacks = 1;
 
-    public TagQuery Querry => querry;
+    public GTagQuery Query => query;
     public IReadOnlyList<AbilityStatOp> Operations => operations;
     public int Order => order;
     public string StackGroup => stackGroup;

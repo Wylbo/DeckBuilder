@@ -19,8 +19,16 @@ MonoBehaviour:
   debuffsOnEndCast: []
   tags:
   - {fileID: 11400000, guid: 71f72daac274dbf418997a4ec204d7aa, type: 2}
-  baseStats: []
-  sharedStats: {fileID: 11400000, guid: b71f1d85aa1a7fc47aee3ab1abd2823c, type: 2}
+  tagSet:
+    Tags:
+    - gameplay.projectile
+  baseStats:
+  - Key: 3
+    Value: 1
+  - Key: 5
+    Value: 10
+  - Key: 6
+    Value: 45
   followCursorDuringChanneling: 1
   holdToChannel: 1
   channelDuration: 2

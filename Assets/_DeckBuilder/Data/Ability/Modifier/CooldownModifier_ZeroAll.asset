@@ -12,10 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 540488d2bd639df469fa6d4c2ddce4c8, type: 3}
   m_Name: CooldownModifier_ZeroAll
   m_EditorClassIdentifier: Assembly-CSharp::CooldownModifier
-  querry:
-    all: []
-    any: []
-    none: []
+  query:
+    All:
+      Tags: []
+    Any:
+      Tags:
+      - ability.cooldown
+    None:
+      Tags: []
   operations:
   - Key: 0
     OpType: 2
