@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
+[RequiresAbilityBehaviour(typeof(AbilityChannelBehaviour))]
 public class AbilityChargedProjectileReleaseBehaviour : AbilityBehaviour
 {
 	[SerializeField] private LinearProjectile projectile;

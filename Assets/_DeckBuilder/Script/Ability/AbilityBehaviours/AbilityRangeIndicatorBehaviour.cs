@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
+[RequiresAbilityBehaviour(typeof(AbilityChannelBehaviour), requirePriorOccurrence: true)]
 public class AbilityRangeIndicatorBehaviour : AbilityBehaviour
 {
 	[SerializeField] private RangeIndicator rangeIndicator;
