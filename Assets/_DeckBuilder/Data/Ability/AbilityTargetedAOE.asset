@@ -18,8 +18,8 @@ MonoBehaviour:
   debuffsOnEndCast: []
   tagSet:
     Tags:
-    - gameplay.projectile.rain
     - ability.area_of_effect
+    - ability.projectile.rain
   baseStats:
   - Key: 2
     Value: 1
@@ -27,8 +27,11 @@ MonoBehaviour:
     Value: 1
   - Key: 6
     Value: 3
+  - Key: 0
+    Value: 0.3
   behaviours:
   - rid: 1062887273389097035
+  - rid: 1062887273389097040
   references:
     version: 2
     RefIds:
@@ -47,3 +50,7 @@ MonoBehaviour:
         applyMaxSpreadStat: 1
         maxSpreadStatKey: 6
         fireMode: 1
+    - rid: 1062887273389097040
+      type: {class: AbilityDamageTargetBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        damage: 20

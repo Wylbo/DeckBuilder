@@ -19,7 +19,7 @@ MonoBehaviour:
   debuffsOnEndCast: []
   tagSet:
     Tags:
-    - gameplay.projectile
+    - ability.projectile
   baseStats:
   - Key: 3
     Value: 1
@@ -27,7 +27,37 @@ MonoBehaviour:
     Value: 10
   - Key: 6
     Value: 45
-  behaviours: []
+  behaviours:
+  - rid: 1062887273389097037
+  - rid: 1062887273389097036
+  - rid: 1062887273389097038
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1062887273389097036
+      type: {class: AbilityRangeIndicatorBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        rangeIndicator: {fileID: 7172722905564688021, guid: aa684e0ff8d0e0342bb65a6ec2475b30, type: 3}
+        minDistance: 0
+        maxDistance: 5
+    - rid: 1062887273389097037
+      type: {class: AbilityChannelBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        followCursorDuringChanneling: 1
+        holdToChannel: 1
+        channelDuration: 1
+        canMoveDuringChanneling: 1
+        movingInterruptsChanneling: 0
+        channelingVFX: {fileID: 8487423217531587600, guid: 189a50bcf955e804aba85665d622b92b, type: 3}
+        groundLayerMask:
+          serializedVersion: 2
+          m_Bits: 64
+        forceSuccessOnInterrupt: 1
+    - rid: 1062887273389097038
+      type: {class: AbilityChargedProjectileReleaseBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        projectile: {fileID: 6428266943518908824, guid: 4cd1cddf8287ff2418a3efffacd0adf9, type: 3}
+        minDistance: 5
+        maxDistance: 10
+        minDamage: 5
+        maxDamage: 30

@@ -20,17 +20,19 @@ MonoBehaviour:
     Tags:
     - ability.projectile
     - ability.cooldown
+    - ability
   baseStats:
-  - Key: 0
-    Value: 2
   - Key: 3
     Value: 1
   - Key: 5
     Value: 10
   - Key: 6
     Value: 45
+  - Key: 0
+    Value: 0.1
   behaviours:
   - rid: 1062887273389097034
+  - rid: 1062887273389097039
   references:
     version: 2
     RefIds:
@@ -49,3 +51,7 @@ MonoBehaviour:
         applyMaxSpreadStat: 1
         maxSpreadStatKey: 6
         fireMode: 0
+    - rid: 1062887273389097039
+      type: {class: AbilityDamageTargetBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        damage: 10
