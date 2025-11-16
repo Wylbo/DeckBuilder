@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
 [RequiresAbilityBehaviour(typeof(AbilityChannelBehaviour))]
-public class AbilityPerpendicularProjectileVolleyBehaviour : AbilityBehaviour
+public class AbilityPerpendicularProjectileVolleyBehaviour : AbilityBehaviour, IRequireAbilityStats
 {
 	[SerializeField] private Projectile projectile;
 	[SerializeField] private AbilityStatKey projectileCountStat = AbilityStatKey.ProjectileCount;
-	[SerializeField, Min(0f)] private float spacing = 0.5f;
-	[SerializeField] private float verticalOffset = 0f;
+	[SerializeField] private AbilityStatKey spacingStat = AbilityStatKey.VolleySpacing;
+	[SerializeField] private AbilityStatKey verticalOffsetStat = AbilityStatKey.VolleyVerticalOffset;
 
 	public override void OnCastEnded(AbilityCastContext context, bool wasSuccessful)
 	{
@@ -30,13 +31,15 @@ public class AbilityPerpendicularProjectileVolleyBehaviour : AbilityBehaviour
 		if (right == Vector3.zero)
 			right = casterTransform.right.normalized;
 
+		float spacing = context.Ability.GetEvaluatedStatValue(spacingStat);
+		float vOffset = context.Ability.GetEvaluatedStatValue(verticalOffsetStat);
 		float offsetBase = spacing * (count - 1) * 0.5f;
 
 		for (int i = 0; i < count; i++)
 		{
 			float offset = (spacing * i) - offsetBase;
 			Vector3 spawnPos = casterTransform.position + right * offset;
-			spawnPos.y += verticalOffset;
+			spawnPos.y += vOffset;
 
 			context.ProjectileLauncher
 				.SetProjectile(projectile)
@@ -45,5 +48,12 @@ public class AbilityPerpendicularProjectileVolleyBehaviour : AbilityBehaviour
 				.SetProjectileCount(1)
 				.Launch<Projectile>();
 		}
+	}
+
+	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
+	{
+		yield return projectileCountStat;
+		yield return spacingStat;
+		yield return verticalOffsetStat;
 	}
 }

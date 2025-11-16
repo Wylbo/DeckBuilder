@@ -27,6 +27,8 @@ MonoBehaviour:
     Value: 10
   - Key: 6
     Value: 45
+  - Key: 7
+    Value: 1
   behaviours:
   - rid: 1062887273389097037
   - rid: 1062887273389097036
@@ -45,7 +47,7 @@ MonoBehaviour:
       data:
         followCursorDuringChanneling: 1
         holdToChannel: 1
-        channelDuration: 1
+        channelDurationStat: 7
         canMoveDuringChanneling: 1
         movingInterruptsChanneling: 0
         channelingVFX: {fileID: 8487423217531587600, guid: 189a50bcf955e804aba85665d622b92b, type: 3}

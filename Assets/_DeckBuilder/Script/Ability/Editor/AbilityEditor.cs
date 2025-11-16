@@ -219,6 +219,9 @@ public class AbilityEditor : Editor
 		{
 			EditorGUILayout.Space();
 			baseStatsList.DoLayoutList();
+
+			// Validation: ensure required stats for behaviours exist in base stats
+			DrawRequiredStatsValidation();
 		}
 
 		if (debuffsOnCastList != null)
@@ -238,6 +241,92 @@ public class AbilityEditor : Editor
 
 		serializedObject.ApplyModifiedProperties();
 	}
+	#endregion
+
+	#region Validation
+	private void DrawRequiredStatsValidation()
+	{
+		var missing = GetMissingRequiredStats();
+		if (missing == null || missing.Count == 0)
+			return;
+
+		EditorGUILayout.Space(4);
+		using (new EditorGUILayout.VerticalScope(GUI.skin.box))
+		{
+			EditorGUILayout.LabelField("Missing Required Stats", EditorStyles.boldLabel);
+			foreach (var key in missing)
+			{
+				EditorGUILayout.LabelField($"- {key}");
+			}
+
+			EditorGUILayout.Space(2);
+			if (GUILayout.Button("Add Missing Stats", GUILayout.Height(22)))
+			{
+				AddMissingStats(missing);
+			}
+		}
+	}
+
+	private HashSet<AbilityStatKey> GetMissingRequiredStats()
+	{
+		var required = CollectRequiredStatKeysFromBehaviours();
+		if (required.Count == 0 || baseStatsProperty == null)
+			return new HashSet<AbilityStatKey>();
+
+		var existing = new HashSet<AbilityStatKey>();
+		for (int i = 0; i < baseStatsProperty.arraySize; i++)
+		{
+			var elem = baseStatsProperty.GetArrayElementAtIndex(i);
+			if (elem == null) continue;
+			var keyProp = elem.FindPropertyRelative("Key");
+			if (keyProp == null) continue;
+			existing.Add((AbilityStatKey)keyProp.enumValueIndex);
+		}
+
+		var missing = new HashSet<AbilityStatKey>(required);
+		missing.ExceptWith(existing);
+		return missing;
+	}
+
+	private void AddMissingStats(IEnumerable<AbilityStatKey> keys)
+	{
+		if (baseStatsProperty == null) return;
+		foreach (var key in keys)
+		{
+			int idx = baseStatsProperty.arraySize;
+			baseStatsProperty.arraySize++;
+			var elem = baseStatsProperty.GetArrayElementAtIndex(idx);
+			if (elem == null) continue;
+			elem.FindPropertyRelative("Key").enumValueIndex = (int)key;
+			elem.FindPropertyRelative("Value").floatValue = 0f;
+		}
+
+		serializedObject.ApplyModifiedProperties();
+		serializedObject.Update();
+	}
+
+	private HashSet<AbilityStatKey> CollectRequiredStatKeysFromBehaviours()
+	{
+		var set = new HashSet<AbilityStatKey>();
+		if (behavioursProperty == null)
+			return set;
+
+		for (int i = 0; i < behavioursProperty.arraySize; i++)
+		{
+			var elem = behavioursProperty.GetArrayElementAtIndex(i);
+			if (elem == null) continue;
+			var obj = elem.managedReferenceValue;
+			if (obj is IRequireAbilityStats req)
+			{
+				foreach (var key in req.GetRequiredStatKeys())
+					set.Add(key);
+			}
+		}
+
+		return set;
+	}
+
+    // Reflection helpers no longer needed with IRequireAbilityStats
 	#endregion
 
 
@@ -536,6 +625,40 @@ public class AbilityEditor : Editor
 			if (GUILayout.Button("+", EditorStyles.toolbarButton, GUILayout.Width(24)))
 			{
 				ShowAddMenu(behaviourCount);
+			}
+
+			// Duplicate button (enabled when a behaviour is selected)
+			using (new EditorGUI.DisabledScope(behaviourCount == 0 || selectedIndex == 0))
+			{
+				if (GUILayout.Button("⧉", EditorStyles.toolbarButton, GUILayout.Width(24)))
+				{
+					int elementIndex = Mathf.Clamp(selectedIndex - 1, 0, behavioursProperty.arraySize - 1);
+					if (behavioursProperty != null && behavioursProperty.arraySize > 0)
+					{
+						var source = behavioursProperty.GetArrayElementAtIndex(elementIndex);
+						if (source != null)
+						{
+							var srcObj = source.managedReferenceValue as AbilityBehaviour;
+							if (srcObj != null)
+							{
+								var type = srcObj.GetType();
+								var clone = Activator.CreateInstance(type) as AbilityBehaviour;
+								if (clone != null)
+								{
+									string json = JsonUtility.ToJson(srcObj);
+									JsonUtility.FromJsonOverwrite(json, clone);
+									int insertIndex = Mathf.Clamp(elementIndex + 1, 0, behavioursProperty.arraySize);
+									behavioursProperty.InsertArrayElementAtIndex(insertIndex);
+									var dest = behavioursProperty.GetArrayElementAtIndex(insertIndex);
+									dest.managedReferenceValue = clone;
+									serializedObject.ApplyModifiedProperties();
+									serializedObject.Update();
+									selectedIndex = insertIndex + 1; // 1-based tab index
+								}
+							}
+						}
+					}
+				}
 			}
 
 			using (new EditorGUI.DisabledScope(behaviourCount == 0 || selectedIndex == 0))

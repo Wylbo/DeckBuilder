@@ -1,12 +1,13 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class AbilityChannelBehaviour : AbilityBehaviour
+public class AbilityChannelBehaviour : AbilityBehaviour, IRequireAbilityStats
 {
 	[SerializeField] private bool followCursorDuringChanneling = false;
 	[SerializeField] private bool holdToChannel = false;
-	[SerializeField] private float channelDuration = 0f;
+	[SerializeField] private AbilityStatKey channelDurationStat = AbilityStatKey.ChannelDuration;
 	[SerializeField, Tooltip("Can a move command be input during channeling")]
 	private bool canMoveDuringChanneling = false;
 	[SerializeField]
@@ -46,6 +47,7 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 
 		UpdateAimPoint(context);
 
+		float channelDuration = context.Ability.GetEvaluatedStatValue(channelDurationStat);
 		if (channelDuration <= 0f)
 			CompleteChannel(context, true);
 	}
@@ -70,6 +72,7 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 		}
 
 		elapsed += deltaTime;
+		float channelDuration = context.Ability.GetEvaluatedStatValue(channelDurationStat);
 		if (channelDuration > 0f)
 			context.ChannelRatio = Mathf.Clamp01(elapsed / channelDuration);
 		else
@@ -98,6 +101,7 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 			return;
 
 		isChanneling = false;
+		float channelDuration = context.Ability.GetEvaluatedStatValue(channelDurationStat);
 		context.ChannelRatio = Mathf.Clamp01(channelDuration > 0f ? elapsed / channelDuration : 1f);
 		bool finalSuccess = naturalSuccess || forceSuccessOnInterrupt;
 		context.Ability.EndCast(context.TargetPoint, finalSuccess);
@@ -132,5 +136,10 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 
 		worldPosition = Vector3.zero;
 		return false;
+	}
+
+	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
+	{
+		yield return channelDurationStat;
 	}
 }

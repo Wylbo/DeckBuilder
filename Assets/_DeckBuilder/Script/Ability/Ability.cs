@@ -34,6 +34,8 @@ public class Ability : ScriptableObject
 	private AbilityBehaviourContext behaviourContext;
 	private AbilityCastContext activeCastContext;
 	private Coroutine castRoutine;
+	private Coroutine startSequenceRoutine;
+	private bool hasPendingStartSequence;
 	private bool isCasting;
 
 	public float Cooldown
@@ -100,15 +102,16 @@ public class Ability : ScriptableObject
 
 		foreach (var behaviour in behaviours)
 		{
-			if (behaviour == null)
-				continue;
-
-			behaviour.OnCastStarted(activeCastContext);
+			if (behaviour == null) continue;
 			requiresUpdate |= behaviour.RequiresUpdate;
 			blocksAutoEnd |= behaviour.BlocksAbilityEnd;
 		}
 
-		isCasting = requiresUpdate || blocksAutoEnd;
+		// Execute behaviours in sequence with support for delay behaviour
+		hasPendingStartSequence = false;
+		RunStartBehavioursFromIndex(0);
+
+		isCasting = requiresUpdate || blocksAutoEnd || hasPendingStartSequence;
 
 		if (requiresUpdate && Caster != null)
 		{
@@ -117,6 +120,56 @@ public class Ability : ScriptableObject
 
 		if (!isCasting)
 			EndCast(worldPos);
+	}
+
+	private void RunStartBehavioursFromIndex(int startIndex)
+	{
+		if (behaviours == null || activeCastContext == null) return;
+
+		for (int i = startIndex; i < behaviours.Count; i++)
+		{
+			var behaviour = behaviours[i];
+			if (behaviour == null) continue;
+
+			if (behaviour is AbilityDelayBehaviour delay && delay.DelaySeconds > 0f)
+			{
+				// Schedule remaining behaviours after delay
+				hasPendingStartSequence = true;
+				if (startSequenceRoutine != null && Caster != null)
+					Caster.StopCoroutine(startSequenceRoutine);
+				if (Caster != null)
+					startSequenceRoutine = Caster.StartCoroutine(ResumeStartSequenceAfterDelay(delay.DelaySeconds, i + 1));
+				return;
+			}
+
+			behaviour.OnCastStarted(activeCastContext);
+		}
+	}
+
+	private IEnumerator ResumeStartSequenceAfterDelay(float seconds, int nextIndex)
+	{
+		if (seconds > 0f)
+			yield return new WaitForSeconds(seconds);
+
+		// Clear pending flag; if another delay is scheduled it will be set again inside RunStartBehavioursFromIndex
+		hasPendingStartSequence = false;
+		RunStartBehavioursFromIndex(nextIndex);
+
+		// If nothing else requires update or blocks, and we're not updating, auto end
+		bool requiresUpdate = false;
+		bool blocksAutoEnd = false;
+		foreach (var behaviour in behaviours)
+		{
+			if (behaviour == null) continue;
+			requiresUpdate |= behaviour.RequiresUpdate;
+			blocksAutoEnd |= behaviour.BlocksAbilityEnd;
+		}
+
+		bool stillCasting = requiresUpdate || blocksAutoEnd || hasPendingStartSequence;
+		if (!stillCasting)
+		{
+			EndCast(activeCastContext.TargetPoint);
+		}
 	}
 
 	public virtual void EndCast(Vector3 worldPos, bool isSucessful = true)
@@ -240,6 +293,12 @@ public class Ability : ScriptableObject
 			Caster.StopCoroutine(castRoutine);
 			castRoutine = null;
 		}
+		if (startSequenceRoutine != null && Caster != null)
+		{
+			Caster.StopCoroutine(startSequenceRoutine);
+			startSequenceRoutine = null;
+		}
+		hasPendingStartSequence = false;
 	}
 
 }

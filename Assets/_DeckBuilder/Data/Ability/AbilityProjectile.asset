@@ -20,7 +20,6 @@ MonoBehaviour:
     Tags:
     - ability.projectile
     - ability.cooldown
-    - ability
   baseStats:
   - Key: 3
     Value: 1
@@ -30,6 +29,8 @@ MonoBehaviour:
     Value: 45
   - Key: 0
     Value: 0.1
+  - Key: 1
+    Value: 10
   behaviours:
   - rid: 1062887273389097034
   - rid: 1062887273389097039
@@ -54,4 +55,4 @@ MonoBehaviour:
     - rid: 1062887273389097039
       type: {class: AbilityDamageTargetBehaviour, ns: , asm: Assembly-CSharp}
       data:
-        damage: 10
+        damageStat: 1
