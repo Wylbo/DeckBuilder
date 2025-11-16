@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -5,7 +6,8 @@ using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using Sirenix.OdinInspector;
 
-public abstract class Ability : ScriptableObject
+[CreateAssetMenu(fileName = nameof(Ability), menuName = FileName.AbilityFolder + nameof(Ability), order = 0)]
+public class Ability : ScriptableObject
 {
 	[SerializeField] private bool rotatingCasterToCastDirection = true;
 	[SerializeField] protected bool stopMovementOnCast = false;
@@ -13,6 +15,8 @@ public abstract class Ability : ScriptableObject
 	[SerializeField] protected List<ScriptableDebuff> debuffsOnEndCast;
 	[SerializeField] private GTagSet tagSet = new GTagSet();
 	[SerializeField] private List<AbilityStatEntry> baseStats;
+	[SerializeReference]
+	private List<AbilityBehaviour> behaviours = new List<AbilityBehaviour>();
 
 	// [SerializeField, InlineEditor] private AbilitySharedStats sharedStats;
 
@@ -20,12 +24,17 @@ public abstract class Ability : ScriptableObject
 	public bool RotatingCasterToCastDirection => rotatingCasterToCastDirection;
 	public GTagSet TagSet => tagSet;
 	public IReadOnlyList<AbilityStatEntry> BaseStats => baseStats;
+	public IReadOnlyList<ScriptableDebuff> DebuffsOnCast => debuffsOnCast;
 
 	public event UnityAction<Ability> On_StartCast;
 	public event UnityAction<bool> On_EndCast;
 
 	protected Movement movement;
 	protected bool isHeld = false;
+	private AbilityBehaviourContext behaviourContext;
+	private AbilityCastContext activeCastContext;
+	private Coroutine castRoutine;
+	private bool isCasting;
 
 	public float Cooldown
 	{
@@ -40,15 +49,28 @@ public abstract class Ability : ScriptableObject
 	{
 		Caster = caster;
 		movement = caster.GetComponent<Movement>();
+		behaviourContext = new AbilityBehaviourContext(this, caster, movement);
+		foreach (var behaviour in behaviours)
+			behaviour?.Initialize(behaviourContext);
 	}
 
 	public virtual void Disable()
 	{
+		StopCastRoutine();
+		if (behaviourContext != null)
+		{
+			foreach (var behaviour in behaviours)
+				behaviour?.OnAbilityDisabled(behaviourContext);
+		}
+		activeCastContext = null;
+		isCasting = false;
+		behaviourContext = null;
 		Caster = null;
 	}
 
 	public void Cast(Vector3 worldPos, bool isHeld)
 	{
+		activeCastContext = new AbilityCastContext(behaviourContext, worldPos, isHeld);
 		StartCast(worldPos);
 		ApplyDebuffs(debuffsOnCast);
 		this.isHeld = isHeld;
@@ -70,11 +92,46 @@ public abstract class Ability : ScriptableObject
 
 	protected virtual void DoCast(Vector3 worldPos)
 	{
-		EndCast(worldPos);
+		if (activeCastContext == null)
+			activeCastContext = new AbilityCastContext(behaviourContext, worldPos, isHeld);
+
+		bool requiresUpdate = false;
+		bool blocksAutoEnd = false;
+
+		foreach (var behaviour in behaviours)
+		{
+			if (behaviour == null)
+				continue;
+
+			behaviour.OnCastStarted(activeCastContext);
+			requiresUpdate |= behaviour.RequiresUpdate;
+			blocksAutoEnd |= behaviour.BlocksAbilityEnd;
+		}
+
+		isCasting = requiresUpdate || blocksAutoEnd;
+
+		if (requiresUpdate && Caster != null)
+		{
+			castRoutine = Caster.StartCoroutine(CastUpdateRoutine());
+		}
+
+		if (!isCasting)
+			EndCast(worldPos);
 	}
 
 	public virtual void EndCast(Vector3 worldPos, bool isSucessful = true)
 	{
+		if (activeCastContext == null)
+			return;
+
+		StopCastRoutine();
+		var context = activeCastContext;
+		activeCastContext = null;
+		isCasting = false;
+
+		foreach (var behaviour in behaviours)
+			behaviour?.OnCastEnded(context, isSucessful);
+
 		ApplyDebuffs(debuffsOnEndCast);
 		On_EndCast?.Invoke(isSucessful);
 	}
@@ -82,8 +139,14 @@ public abstract class Ability : ScriptableObject
 	public virtual void EndHold(Vector3 worldPos)
 	{
 		isHeld = false;
+		if (activeCastContext == null)
+			return;
+
+		activeCastContext.UpdateHoldState(false);
+		foreach (var behaviour in behaviours)
+			behaviour?.OnHoldEnded(activeCastContext);
 	}
-	protected void LookAtCastDirection(Vector3 worldPos)
+	public void LookAtCastDirection(Vector3 worldPos)
 	{
 		Vector3 castDirection = worldPos - Caster.transform.position;
 		castDirection.y = 0;
@@ -95,9 +158,23 @@ public abstract class Ability : ScriptableObject
 	#region Buff Application
 	protected void ApplyDebuffs(List<ScriptableDebuff> scriptableDebuffs)
 	{
+		if (scriptableDebuffs == null)
+			return;
+
 		foreach (ScriptableDebuff debuff in scriptableDebuffs)
 		{
 			Caster.AddDebuff(debuff);
+		}
+	}
+
+	protected void RemoveDebuffs(List<ScriptableDebuff> scriptableDebuffs)
+	{
+		if (scriptableDebuffs == null)
+			return;
+
+		foreach (ScriptableDebuff debuff in scriptableDebuffs)
+		{
+			Caster.RemoveDebuff(debuff);
 		}
 	}
 	#endregion
@@ -129,7 +206,7 @@ public abstract class Ability : ScriptableObject
 		return AbilityModifierRuntime.Evaluate(TagSet, GetBaseStats(), activeModifiers);
 	}
 
-	protected float GetEvaluatedStatValue(AbilityStatKey key)
+	public float GetEvaluatedStatValue(AbilityStatKey key)
 	{
 		var stats = EvaluateStats(Caster.ModifierManager.ActiveModifiers);
 		return StatOr(stats, key, GetBaseStatValue(key));
@@ -140,5 +217,29 @@ public abstract class Ability : ScriptableObject
 		return dict != null && dict.TryGetValue(key, out float val) ? val : defVal;
 	}
 	#endregion
+
+	private IEnumerator CastUpdateRoutine()
+	{
+		while (isCasting && activeCastContext != null)
+		{
+			float deltaTime = Time.deltaTime;
+			foreach (var behaviour in behaviours)
+			{
+				if (behaviour?.RequiresUpdate == true)
+					behaviour.OnCastUpdated(activeCastContext, deltaTime);
+			}
+
+			yield return null;
+		}
+	}
+
+	private void StopCastRoutine()
+	{
+		if (castRoutine != null && Caster != null)
+		{
+			Caster.StopCoroutine(castRoutine);
+			castRoutine = null;
+		}
+	}
 
 }
