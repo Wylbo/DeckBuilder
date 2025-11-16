@@ -29,7 +29,7 @@ MonoBehaviour:
       type: {class: AbilityDashBehaviour, ns: , asm: Assembly-CSharp}
       data:
         dashData:
-          dashDistance: 5
+          dashDistance: 3
           dashSpeed: 10
           slideOnWalls: 1
           dashCurve:

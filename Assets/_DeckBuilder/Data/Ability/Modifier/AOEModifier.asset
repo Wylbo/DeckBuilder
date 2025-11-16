@@ -17,7 +17,7 @@ MonoBehaviour:
       Tags: []
     Any:
       Tags:
-      - ability.areaofeffect
+      - ability.area_of_effect
     None:
       Tags: []
   operations:
