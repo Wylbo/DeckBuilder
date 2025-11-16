@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b056064913e3c204c95fcab0ff0f1668, type: 3}
+  m_Script: {fileID: 11500000, guid: a36dfa0d1d869d54aa69008e1fbc6b51, type: 3}
   m_Name: AbilityProjectile
   m_EditorClassIdentifier: 
   rotatingCasterToCastDirection: 1
@@ -29,4 +29,23 @@ MonoBehaviour:
     Value: 10
   - Key: 6
     Value: 45
-  projectile: {fileID: 6428266943518908824, guid: b2c2ae026b1ceca4fb60273c6b4e4a17, type: 3}
+  behaviours:
+  - rid: 1062887273389097034
+  references:
+    version: 2
+    RefIds:
+    - rid: 1062887273389097034
+      type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        projectile: {fileID: 6428266943518908824, guid: b2c2ae026b1ceca4fb60273c6b4e4a17, type: 3}
+        launchPosition: 0
+        alignWithCasterRotation: 1
+        applyScaleStat: 0
+        scaleStatKey: 2
+        applyProjectileCount: 1
+        projectileCountStat: 3
+        applySpreadStat: 1
+        spreadStatKey: 5
+        applyMaxSpreadStat: 1
+        maxSpreadStatKey: 6
+        fireMode: 0

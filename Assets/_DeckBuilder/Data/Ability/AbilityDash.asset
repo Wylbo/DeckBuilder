@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f400564edfc28642857fb9013f5cd7d, type: 3}
+  m_Script: {fileID: 11500000, guid: a36dfa0d1d869d54aa69008e1fbc6b51, type: 3}
   m_Name: AbilityDash
   m_EditorClassIdentifier: 
   rotatingCasterToCastDirection: 1
@@ -20,34 +20,42 @@ MonoBehaviour:
     Tags:
     - gameplay.movement
   baseStats: []
-  dashData:
-    dashDistance: 3
-    dashSpeed: 9
-    slideOnWalls: 1
-    dashCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 2
-        outSlope: 2
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    blockingMask:
-      serializedVersion: 2
-      m_Bits: 64
+  behaviours:
+  - rid: 1062887273389097033
+  references:
+    version: 2
+    RefIds:
+    - rid: 1062887273389097033
+      type: {class: AbilityDashBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        dashData:
+          dashDistance: 5
+          dashSpeed: 10
+          slideOnWalls: 1
+          dashCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 2
+              outSlope: 2
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          blockingMask:
+            serializedVersion: 2
+            m_Bits: 64

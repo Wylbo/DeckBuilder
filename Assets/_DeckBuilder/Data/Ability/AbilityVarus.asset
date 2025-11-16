@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1891c37fc77b52d4f9c328f6651e223d, type: 3}
+  m_Script: {fileID: 11500000, guid: a36dfa0d1d869d54aa69008e1fbc6b51, type: 3}
   m_Name: AbilityVarus
   m_EditorClassIdentifier: 
   rotatingCasterToCastDirection: 1
@@ -17,8 +17,6 @@ MonoBehaviour:
   debuffsOnCast:
   - {fileID: 11400000, guid: 8f7af324beb2e5146881368dbca0bf65, type: 2}
   debuffsOnEndCast: []
-  tags:
-  - {fileID: 11400000, guid: 71f72daac274dbf418997a4ec204d7aa, type: 2}
   tagSet:
     Tags:
     - gameplay.projectile
@@ -29,18 +27,7 @@ MonoBehaviour:
     Value: 10
   - Key: 6
     Value: 45
-  followCursorDuringChanneling: 1
-  holdToChannel: 1
-  channelDuration: 2
-  canMoveDuringChanneling: 1
-  movingInterupChanneling: 0
-  channelingVFX: {fileID: 8487423217531587600, guid: 189a50bcf955e804aba85665d622b92b, type: 3}
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  projectile: {fileID: 6428266943518908824, guid: 4cd1cddf8287ff2418a3efffacd0adf9, type: 3}
-  minDistance: 2
-  maxDistance: 5
-  minDamage: 5
-  maxDamage: 50
-  rangeIndicator: {fileID: 7172722905564688021, guid: aa684e0ff8d0e0342bb65a6ec2475b30, type: 3}
+  behaviours: []
+  references:
+    version: 2
+    RefIds: []
