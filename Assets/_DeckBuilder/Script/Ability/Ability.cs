@@ -242,4 +242,64 @@ public class Ability : ScriptableObject
 		}
 	}
 
+#if UNITY_EDITOR
+	private void OnValidate()
+	{
+		ValidateBehaviourDependencies();
+	}
+
+	private void ValidateBehaviourDependencies()
+	{
+		if (behaviours == null)
+			return;
+
+		var present = new List<(System.Type type, int index)>();
+		for (int i = 0; i < behaviours.Count; i++)
+		{
+			var behaviour = behaviours[i];
+			if (behaviour == null)
+				continue;
+
+			var type = behaviour.GetType();
+			if (type == null)
+				continue;
+
+			present.Add((type, i));
+		}
+
+		for (int i = 0; i < behaviours.Count; i++)
+		{
+			var behaviour = behaviours[i];
+			if (behaviour == null)
+				continue;
+
+			var type = behaviour.GetType();
+			var requirements = (RequiresAbilityBehaviourAttribute[])type.GetCustomAttributes(typeof(RequiresAbilityBehaviourAttribute), true);
+			foreach (var requirement in requirements)
+			{
+				if (requirement?.RequiredType == null)
+					continue;
+
+				int requiredIndex = -1;
+				foreach (var entry in present)
+				{
+					if (requirement.RequiredType.IsAssignableFrom(entry.type))
+					{
+						requiredIndex = entry.index;
+						break;
+					}
+				}
+
+				if (requiredIndex == -1)
+				{
+					UnityEngine.Debug.LogWarning($"{name}: Ability behaviour {type.Name} requires {requirement.RequiredType.Name} but it is not present.", this);
+				}
+				else if (requirement.RequirePriorOccurrence && requiredIndex > i)
+				{
+					UnityEngine.Debug.LogWarning($"{name}: Ability behaviour {type.Name} requires {requirement.RequiredType.Name} to appear earlier in the list.", this);
+				}
+			}
+		}
+	}
+#endif
 }
