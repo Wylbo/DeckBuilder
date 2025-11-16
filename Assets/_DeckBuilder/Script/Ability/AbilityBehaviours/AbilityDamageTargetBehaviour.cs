@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class AbilityDamageTargetBehaviour : AbilityBehaviour, IRequireAbilityStats
+public class AbilityDamageTargetBehaviour : AbilityBehaviour
 {
 	[SerializeField] private AbilityStatKey damageStat = AbilityStatKey.Damage;
 
@@ -20,8 +19,4 @@ public class AbilityDamageTargetBehaviour : AbilityBehaviour, IRequireAbilitySta
 		}
 	}
 
-	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
-	{
-		yield return damageStat;
-	}
 }

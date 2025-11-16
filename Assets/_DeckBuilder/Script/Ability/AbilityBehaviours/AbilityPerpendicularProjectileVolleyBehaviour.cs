@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
 [RequiresAbilityBehaviour(typeof(AbilityChannelBehaviour))]
-public class AbilityPerpendicularProjectileVolleyBehaviour : AbilityBehaviour, IRequireAbilityStats
+public class AbilityPerpendicularProjectileVolleyBehaviour : AbilityBehaviour
 {
 	[SerializeField] private Projectile projectile;
 	[SerializeField] private AbilityStatKey projectileCountStat = AbilityStatKey.ProjectileCount;
@@ -50,10 +49,4 @@ public class AbilityPerpendicularProjectileVolleyBehaviour : AbilityBehaviour, I
 		}
 	}
 
-	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
-	{
-		yield return projectileCountStat;
-		yield return spacingStat;
-		yield return verticalOffsetStat;
-	}
 }

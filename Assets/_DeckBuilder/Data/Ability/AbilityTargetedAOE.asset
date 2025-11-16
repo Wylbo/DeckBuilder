@@ -47,10 +47,12 @@ MonoBehaviour:
         scaleStatKey: 2
         applyProjectileCount: 1
         projectileCountStat: 3
-        applySpreadStat: 1
+        applySpreadStat: 0
         spreadStatKey: 5
         applyMaxSpreadStat: 1
         maxSpreadStatKey: 6
+        applyVerticalOffsetStat: 0
+        verticalOffsetStatKey: 7
         fireMode: 1
     - rid: 1062887273389097040
       type: {class: AbilityDamageTargetBehaviour, ns: , asm: Assembly-CSharp}

@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class AbilityChannelBehaviour : AbilityBehaviour, IRequireAbilityStats
+public class AbilityChannelBehaviour : AbilityBehaviour
 {
 	[SerializeField] private bool followCursorDuringChanneling = false;
 	[SerializeField] private bool holdToChannel = false;
@@ -138,8 +137,4 @@ public class AbilityChannelBehaviour : AbilityBehaviour, IRequireAbilityStats
 		return false;
 	}
 
-	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
-	{
-		yield return channelDurationStat;
-	}
 }

@@ -24,6 +24,8 @@ public class AbilityEditor : Editor
 	private ReorderableList debuffsOnEndCastList;
 	private ReorderableList tagSetList;
 	private static readonly Dictionary<Type, string> TagSetFieldNameCache = new Dictionary<Type, string>();
+	private sealed class StatField { public FieldInfo Field; public FieldInfo Gate; public StatField(FieldInfo f, FieldInfo g) { Field = f; Gate = g; } }
+	private static readonly Dictionary<Type, List<StatField>> StatFieldCache = new Dictionary<Type, List<StatField>>();
 
 	private float toolbarScrollOffset;
 	private float toolbarContentWidth;
@@ -316,17 +318,99 @@ public class AbilityEditor : Editor
 			var elem = behavioursProperty.GetArrayElementAtIndex(i);
 			if (elem == null) continue;
 			var obj = elem.managedReferenceValue;
-			if (obj is IRequireAbilityStats req)
-			{
-				foreach (var key in req.GetRequiredStatKeys())
-					set.Add(key);
-			}
+			if (obj == null) continue;
+			CollectKeysFromObject(obj, set);
 		}
 
 		return set;
 	}
 
-    // Reflection helpers no longer needed with IRequireAbilityStats
+	private static List<StatField> GetStatFieldsForType(Type t)
+	{
+		if (t == null) return new List<StatField>();
+		if (StatFieldCache.TryGetValue(t, out var cached) && cached != null) return cached;
+
+		const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+		var fields = t.GetFields(flags);
+		var result = new List<StatField>();
+
+		foreach (var f in fields)
+		{
+			var ft = f.FieldType;
+			bool isScalar = ft == typeof(AbilityStatKey);
+			bool isArray = ft.IsArray && ft.GetElementType() == typeof(AbilityStatKey);
+			bool isList = IsListOf(ft, typeof(AbilityStatKey));
+
+			if (!(isScalar || isArray || isList))
+				continue;
+
+			FieldInfo gate = null;
+			if (isScalar && f.Name.EndsWith("StatKey", StringComparison.Ordinal))
+			{
+				string baseName = f.Name.Substring(0, f.Name.Length - "StatKey".Length);
+				string gateName = "apply" + UpperFirst(baseName);
+				gate = t.GetField(gateName, flags);
+			}
+
+			result.Add(new StatField(f, gate));
+		}
+
+		StatFieldCache[t] = result;
+		return result;
+	}
+
+	private static void CollectKeysFromObject(object obj, HashSet<AbilityStatKey> dest)
+	{
+		if (obj == null || dest == null) return;
+
+		var type = obj.GetType();
+		var statFields = GetStatFieldsForType(type);
+
+		foreach (var sf in statFields)
+		{
+			if (sf.Gate != null)
+			{
+				var g = sf.Gate.GetValue(obj);
+				if (g is bool b && !b) continue;
+			}
+
+			var ft = sf.Field.FieldType;
+			var val = sf.Field.GetValue(obj);
+
+			if (ft == typeof(AbilityStatKey))
+			{
+				if (val is AbilityStatKey key) dest.Add(key);
+			}
+			else if (ft.IsArray && ft.GetElementType() == typeof(AbilityStatKey))
+			{
+				if (val is Array arr)
+					foreach (var e in arr)
+						if (e is AbilityStatKey k) dest.Add(k);
+			}
+			else if (IsListOf(ft, typeof(AbilityStatKey)))
+			{
+				if (val is System.Collections.IEnumerable ie)
+					foreach (var e in ie)
+						if (e is AbilityStatKey k) dest.Add(k);
+			}
+		}
+	}
+
+	private static bool IsListOf(Type type, Type elementType)
+	{
+		return type.IsGenericType
+			&& type.GetGenericTypeDefinition() == typeof(List<>)
+			&& type.GetGenericArguments()[0] == elementType;
+	}
+
+	private static string UpperFirst(string s)
+	{
+		if (string.IsNullOrEmpty(s)) return s;
+		if (char.IsUpper(s[0])) return s;
+		return char.ToUpperInvariant(s[0]) + s.Substring(1);
+	}
+
+	// Reflection helpers no longer needed with IRequireAbilityStats
 	#endregion
 
 
@@ -400,7 +484,14 @@ public class AbilityEditor : Editor
 				var label = new GUIContent(names[i]);
 				float tabWidth = EditorStyles.toolbarButton.CalcSize(label).x + 10f;
 				Rect tabRect = new Rect(x, 0f, tabWidth, tabsRect.height);
-				bool pressed = GUI.Toggle(tabRect, selectedIndex == i, label, EditorStyles.toolbarButton);
+				bool isSelected = selectedIndex == i;
+				bool pressed = GUI.Toggle(tabRect, isSelected, label, EditorStyles.toolbarButton);
+				if (isSelected)
+				{
+					// Draw a small blue underline to indicate active tab
+					var underlineRect = new Rect(tabRect.x + 2f, tabRect.height - 2f, Mathf.Max(0f, tabRect.width - 4f), 2f);
+					EditorGUI.DrawRect(underlineRect, new Color(0.2f, 0.6f, 1f, 1f));
+				}
 				if (pressed)
 					selectedIndex = i;
 				x += tabWidth;

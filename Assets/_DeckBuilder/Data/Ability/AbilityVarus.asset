@@ -59,7 +59,7 @@ MonoBehaviour:
       type: {class: AbilityChargedProjectileReleaseBehaviour, ns: , asm: Assembly-CSharp}
       data:
         projectile: {fileID: 6428266943518908824, guid: 4cd1cddf8287ff2418a3efffacd0adf9, type: 3}
-        minDistance: 5
-        maxDistance: 10
+        minDistance: 1
+        maxDistance: 5
         minDamage: 5
         maxDamage: 30

@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
 [RequiresAbilityBehaviour(typeof(AbilityChannelBehaviour))]
-public class AbilityChannelProjectileCountBehaviour : AbilityBehaviour, IRequireAbilityStats
+public class AbilityChannelProjectileCountBehaviour : AbilityBehaviour
 {
 	[SerializeField] private AbilityStatKey statKey = AbilityStatKey.ProjectileCount;
 	[SerializeField] private int minAdditionalProjectiles = 0;
@@ -29,8 +28,4 @@ public class AbilityChannelProjectileCountBehaviour : AbilityBehaviour, IRequire
 		context.SetSharedStatOverride(statKey, finalCount);
 	}
 
-	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
-	{
-		yield return statKey;
-	}
 }
