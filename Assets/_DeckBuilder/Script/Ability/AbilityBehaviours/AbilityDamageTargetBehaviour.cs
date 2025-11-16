@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class AbilityDamageTargetBehaviour : AbilityBehaviour
+public class AbilityDamageTargetBehaviour : AbilityBehaviour, IRequireAbilityStats
 {
-	[SerializeField] private int damage;
+	[SerializeField] private AbilityStatKey damageStat = AbilityStatKey.Damage;
 
 	public override void OnCastStarted(AbilityCastContext context)
 	{
@@ -13,6 +14,14 @@ public class AbilityDamageTargetBehaviour : AbilityBehaviour
 
 		Character character = context.Target.Character;
 		if (character != null)
-			character.TakeDamage(damage);
+		{
+			int dmg = Mathf.RoundToInt(context.Ability.GetEvaluatedStatValue(damageStat));
+			character.TakeDamage(dmg);
+		}
+	}
+
+	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
+	{
+		yield return damageStat;
 	}
 }

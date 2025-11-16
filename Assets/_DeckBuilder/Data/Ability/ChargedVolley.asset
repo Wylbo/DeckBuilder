@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Ability
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
-  debuffsOnCast: []
+  debuffsOnCast:
+  - {fileID: 11400000, guid: 8f7af324beb2e5146881368dbca0bf65, type: 2}
   debuffsOnEndCast: []
   tagSet:
     Tags:
@@ -28,6 +29,12 @@ MonoBehaviour:
     Value: 10
   - Key: 1
     Value: 10
+  - Key: 7
+    Value: 1
+  - Key: 10
+    Value: 0.3
+  - Key: 11
+    Value: 0
   behaviours:
   - rid: 1062887273389097041
   - rid: 1062887273389097042
@@ -40,7 +47,7 @@ MonoBehaviour:
       data:
         followCursorDuringChanneling: 1
         holdToChannel: 1
-        channelDuration: 1
+        channelDurationStat: 7
         canMoveDuringChanneling: 1
         movingInterruptsChanneling: 0
         channelingVFX: {fileID: 8487423217531587600, guid: 189a50bcf955e804aba85665d622b92b, type: 3}
@@ -83,5 +90,5 @@ MonoBehaviour:
       data:
         projectile: {fileID: 6428266943518908824, guid: b2c2ae026b1ceca4fb60273c6b4e4a17, type: 3}
         projectileCountStat: 3
-        spacing: 0.3
-        verticalOffset: 0
+        spacingStat: 10
+        verticalOffsetStat: 11

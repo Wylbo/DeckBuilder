@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
 [RequiresAbilityBehaviour(typeof(AbilityChannelBehaviour))]
-public class AbilityChargedProjectileReleaseBehaviour : AbilityBehaviour
+public class AbilityChargedProjectileReleaseBehaviour : AbilityBehaviour, IRequireAbilityStats
 {
 	[SerializeField] private LinearProjectile projectile;
 	[SerializeField] private float minDistance = 5f;
@@ -48,5 +49,12 @@ public class AbilityChargedProjectileReleaseBehaviour : AbilityBehaviour
 				context.Caster.RemoveDebuff(debuff);
 			}
 		}
+	}
+
+	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
+	{
+		yield return AbilityStatKey.ProjectileCount;
+		yield return AbilityStatKey.ProjectileSpreadAngle;
+		yield return AbilityStatKey.ProjectileMaxSpreadAngle;
 	}
 }

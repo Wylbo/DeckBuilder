@@ -18,8 +18,14 @@ MonoBehaviour:
   debuffsOnEndCast: []
   tagSet:
     Tags:
-    - gameplay.movement
-  baseStats: []
+    - ability.movement.dash
+  baseStats:
+  - Key: 0
+    Value: 0.2
+  - Key: 9
+    Value: 10
+  - Key: 8
+    Value: 3
   behaviours:
   - rid: 1062887273389097033
   references:
@@ -29,8 +35,8 @@ MonoBehaviour:
       type: {class: AbilityDashBehaviour, ns: , asm: Assembly-CSharp}
       data:
         dashData:
-          dashDistance: 3
-          dashSpeed: 10
+          dashDistance: 0
+          dashSpeed: 0
           slideOnWalls: 1
           dashCurve:
             serializedVersion: 2
@@ -59,3 +65,5 @@ MonoBehaviour:
           blockingMask:
             serializedVersion: 2
             m_Bits: 64
+        dashDistanceStat: 8
+        dashSpeedStat: 9

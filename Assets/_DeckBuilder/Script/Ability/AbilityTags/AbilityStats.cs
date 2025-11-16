@@ -10,7 +10,19 @@ public enum AbilityStatKey
     ProjectileCount,
     ProjectileSpeed,
     ProjectileSpreadAngle,
-    ProjectileMaxSpreadAngle
+    ProjectileMaxSpreadAngle,
+    ProjectileVerticalOffset,
+
+    // Channeling
+    ChannelDuration,
+
+    // Movement
+    DashDistance,
+    DashSpeed,
+
+    // Projectile arrangements / offsets
+    VolleySpacing,
+    VolleyVerticalOffset
 }
 
 [Serializable]

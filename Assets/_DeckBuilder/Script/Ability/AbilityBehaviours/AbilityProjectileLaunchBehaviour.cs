@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class AbilityProjectileLaunchBehaviour : AbilityBehaviour
+public class AbilityProjectileLaunchBehaviour : AbilityBehaviour, IRequireAbilityStats
 {
 	public enum LaunchPosition
 	{
@@ -21,6 +22,8 @@ public class AbilityProjectileLaunchBehaviour : AbilityBehaviour
 	[SerializeField] private AbilityStatKey spreadStatKey = AbilityStatKey.ProjectileSpreadAngle;
 	[SerializeField] private bool applyMaxSpreadStat = true;
 	[SerializeField] private AbilityStatKey maxSpreadStatKey = AbilityStatKey.ProjectileMaxSpreadAngle;
+	[SerializeField] private bool applyVerticalOffsetStat = false;
+	[SerializeField] private AbilityStatKey verticalOffsetStatKey = AbilityStatKey.ProjectileVerticalOffset;
 	[SerializeField] private ProjectileLauncher.MultipleProjectileFireMode fireMode = ProjectileLauncher.MultipleProjectileFireMode.Fan;
 
 	public override void OnCastStarted(AbilityCastContext context)
@@ -30,16 +33,25 @@ public class AbilityProjectileLaunchBehaviour : AbilityBehaviour
 
 		var launcher = context.ProjectileLauncher.SetProjectile(projectile);
 
+		float yOffset = applyVerticalOffsetStat ? context.Ability.GetEvaluatedStatValue(verticalOffsetStatKey) : 0f;
 		switch (launchPosition)
 		{
 			case LaunchPosition.Caster:
-				launcher.AtCasterPosition();
-				if (alignWithCasterRotation)
-					launcher.SetRotation(context.Caster.transform.rotation);
-				break;
+				{
+					Vector3 pos = context.Caster.transform.position;
+					pos.y += yOffset;
+					launcher.SetPosition(pos);
+					if (alignWithCasterRotation)
+						launcher.SetRotation(context.Caster.transform.rotation);
+					break;
+				}
 			case LaunchPosition.TargetPoint:
-				launcher.SetPosition(context.TargetPoint);
-				break;
+				{
+					Vector3 pos = context.TargetPoint;
+					pos.y += yOffset;
+					launcher.SetPosition(pos);
+					break;
+				}
 		}
 
 		launcher.SetMultipleProjectileFireMode(fireMode);
@@ -58,5 +70,14 @@ public class AbilityProjectileLaunchBehaviour : AbilityBehaviour
 
 		var launched = launcher.Launch<Projectile>();
 		context.LastLaunchedProjectiles = launched;
+	}
+
+	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
+	{
+		if (applyScaleStat) yield return scaleStatKey;
+		if (applyProjectileCount) yield return projectileCountStat;
+		if (applySpreadStat) yield return spreadStatKey;
+		if (applyMaxSpreadStat) yield return maxSpreadStatKey;
+		if (applyVerticalOffsetStat) yield return verticalOffsetStatKey;
 	}
 }

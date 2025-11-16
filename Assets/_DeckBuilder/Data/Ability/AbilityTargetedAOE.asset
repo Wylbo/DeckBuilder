@@ -29,6 +29,8 @@ MonoBehaviour:
     Value: 3
   - Key: 0
     Value: 0.3
+  - Key: 1
+    Value: 20
   behaviours:
   - rid: 1062887273389097035
   - rid: 1062887273389097040
@@ -53,4 +55,4 @@ MonoBehaviour:
     - rid: 1062887273389097040
       type: {class: AbilityDamageTargetBehaviour, ns: , asm: Assembly-CSharp}
       data:
-        damage: 20
+        damageStat: 1
