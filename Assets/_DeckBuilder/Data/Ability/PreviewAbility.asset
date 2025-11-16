@@ -13,13 +13,153 @@ MonoBehaviour:
   m_Name: PreviewAbility
   m_EditorClassIdentifier: Assembly-CSharp::Ability
   rotatingCasterToCastDirection: 1
-  stopMovementOnCast: 0
+  stopMovementOnCast: 1
   debuffsOnCast: []
   debuffsOnEndCast: []
   tagSet:
-    Tags: []
-  baseStats: []
-  behaviours: []
+    Tags:
+    - ability.movement
+    - ability.projectile.rain
+  baseStats:
+  - Key: 8
+    Value: 10
+  - Key: 9
+    Value: 10
+  - Key: 2
+    Value: 1
+  - Key: 3
+    Value: 1
+  - Key: 6
+    Value: 2
+  - Key: 7
+    Value: 0
+  - Key: 5
+    Value: 0
+  behaviours:
+  - rid: 1062887273389097053
+  - rid: 1062887273389097054
+  - rid: 1062887273389097055
+  - rid: 1062887273389097057
+  - rid: 1062887273389097059
+  - rid: 1062887273389097058
+  - rid: 1062887273389097060
+  - rid: 1062887273389097061
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1062887273389097053
+      type: {class: AbilityDashBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        dashData:
+          dashDistance: 0
+          dashSpeed: 0
+          slideOnWalls: 0
+          dashCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 2
+              outSlope: 2
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          blockingMask:
+            serializedVersion: 2
+            m_Bits: 64
+        dashDistanceStat: 8
+        dashSpeedStat: 9
+    - rid: 1062887273389097054
+      type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
+        launchPosition: 0
+        alignWithCasterRotation: 1
+        applyScaleStat: 1
+        scaleStatKey: 2
+        applyProjectileCount: 1
+        projectileCountStat: 3
+        applySpreadStat: 0
+        spreadStatKey: 5
+        applyMaxSpreadStat: 1
+        maxSpreadStatKey: 6
+        applyVerticalOffsetStat: 1
+        verticalOffsetStatKey: 7
+        fireMode: 1
+    - rid: 1062887273389097055
+      type: {class: AbilityDelayBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        delaySeconds: 0.1
+    - rid: 1062887273389097057
+      type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
+        launchPosition: 0
+        alignWithCasterRotation: 1
+        applyScaleStat: 1
+        scaleStatKey: 2
+        applyProjectileCount: 1
+        projectileCountStat: 3
+        applySpreadStat: 0
+        spreadStatKey: 5
+        applyMaxSpreadStat: 1
+        maxSpreadStatKey: 6
+        applyVerticalOffsetStat: 1
+        verticalOffsetStatKey: 7
+        fireMode: 1
+    - rid: 1062887273389097058
+      type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
+        launchPosition: 0
+        alignWithCasterRotation: 1
+        applyScaleStat: 1
+        scaleStatKey: 2
+        applyProjectileCount: 1
+        projectileCountStat: 3
+        applySpreadStat: 0
+        spreadStatKey: 5
+        applyMaxSpreadStat: 1
+        maxSpreadStatKey: 6
+        applyVerticalOffsetStat: 1
+        verticalOffsetStatKey: 7
+        fireMode: 1
+    - rid: 1062887273389097059
+      type: {class: AbilityDelayBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        delaySeconds: 0.1
+    - rid: 1062887273389097060
+      type: {class: AbilityDelayBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        delaySeconds: 0.1
+    - rid: 1062887273389097061
+      type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
+      data:
+        projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
+        launchPosition: 0
+        alignWithCasterRotation: 1
+        applyScaleStat: 1
+        scaleStatKey: 2
+        applyProjectileCount: 1
+        projectileCountStat: 3
+        applySpreadStat: 0
+        spreadStatKey: 5
+        applyMaxSpreadStat: 1
+        maxSpreadStatKey: 6
+        applyVerticalOffsetStat: 1
+        verticalOffsetStatKey: 7
+        fireMode: 1

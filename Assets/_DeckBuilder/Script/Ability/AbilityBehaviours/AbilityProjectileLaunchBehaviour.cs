@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class AbilityProjectileLaunchBehaviour : AbilityBehaviour, IRequireAbilityStats
+public class AbilityProjectileLaunchBehaviour : AbilityBehaviour
 {
 	public enum LaunchPosition
 	{
@@ -72,12 +71,4 @@ public class AbilityProjectileLaunchBehaviour : AbilityBehaviour, IRequireAbilit
 		context.LastLaunchedProjectiles = launched;
 	}
 
-	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
-	{
-		if (applyScaleStat) yield return scaleStatKey;
-		if (applyProjectileCount) yield return projectileCountStat;
-		if (applySpreadStat) yield return spreadStatKey;
-		if (applyMaxSpreadStat) yield return maxSpreadStatKey;
-		if (applyVerticalOffsetStat) yield return verticalOffsetStatKey;
-	}
 }

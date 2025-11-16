@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class AbilityDashBehaviour : AbilityBehaviour, IRequireAbilityStats
+public class AbilityDashBehaviour : AbilityBehaviour
 {
 	[SerializeField] private Movement.DashData dashData;
 	[SerializeField] private AbilityStatKey dashDistanceStat = AbilityStatKey.DashDistance;
@@ -22,9 +21,4 @@ public class AbilityDashBehaviour : AbilityBehaviour, IRequireAbilityStats
 		context.Movement.Dash(data, context.TargetPoint);
 	}
 
-	public IEnumerable<AbilityStatKey> GetRequiredStatKeys()
-	{
-		yield return dashDistanceStat;
-		yield return dashSpeedStat;
-	}
 }
