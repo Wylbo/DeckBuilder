@@ -78,7 +78,7 @@ public static class AreaSelectionEditorUtility
             float handleSize = HandleUtility.GetHandleSize(worldPoint) * 0.075f;
 
             EditorGUI.BeginChangeCheck();
-            Vector3 newWorld = Handles.FreeMoveHandle(worldPoint, Quaternion.identity, handleSize, Vector3.zero, Handles.DotHandleCap);
+            var fmh_81_67_638990110217334596 = Quaternion.identity; Vector3 newWorld = Handles.FreeMoveHandle(worldPoint, handleSize, Vector3.zero, Handles.DotHandleCap);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(owner, "Move Area Control Point");
