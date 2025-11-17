@@ -185,149 +185,160 @@ public class EnemySpawner : MonoBehaviour
 
     private Vector3 SampleControlPointArea()
     {
-        // Use ear clipping triangulation to support concave polygons
         var points = controlPointArea?.ControlPoints;
         if (points == null || points.Count < 3)
         {
             return SampleRadiusArea();
         }
 
+        // Build world positions
         int n = points.Count;
-        // Cache world positions for each vertex once
-        if (polygonCache.Capacity < n) polygonCache.Capacity = n;
         polygonCache.Clear();
         for (int i = 0; i < n; i++)
         {
-            Vector2 lp = points[i];
-            polygonCache.Add(transform.TransformPoint(new Vector3(lp.x, 0f, lp.y)));
+            polygonCache.Add(transform.TransformPoint(points[i]));
         }
 
-        // Triangulate indices
-        List<int> tris = TriangulateConcaveXZ(points);
+        // Compute plane basis and 2D projection
+        if (!TryBuildPlaneBasis(polygonCache, out Vector3 origin, out Vector3 axisX, out Vector3 axisY))
+        {
+            return SampleRadiusArea();
+        }
+
+        var poly2 = new List<Vector2>(n);
+        for (int i = 0; i < n; i++)
+        {
+            Vector3 r = polygonCache[i] - origin;
+            poly2.Add(new Vector2(Vector3.Dot(r, axisX), Vector3.Dot(r, axisY)));
+        }
+
+        List<int> tris = TriangulateConcave2D(poly2);
         if (tris == null || tris.Count < 3)
         {
             return SampleRadiusArea();
         }
 
-        // Accumulate triangle areas in world space
+        // Accumulate areas in world space
         float totalArea = 0f;
         for (int i = 0; i < tris.Count; i += 3)
         {
-            totalArea += TriangleArea(polygonCache[tris[i]], polygonCache[tris[i + 1]], polygonCache[tris[i + 2]]);
+            Vector3 a = polygonCache[tris[i]];
+            Vector3 b = polygonCache[tris[i + 1]];
+            Vector3 c = polygonCache[tris[i + 2]];
+            totalArea += TriangleArea(a, b, c);
         }
         if (totalArea <= Mathf.Epsilon)
         {
             return SampleRadiusArea();
         }
 
-        float r = Random.value * totalArea;
+        float pick = Random.value * totalArea;
         float acc = 0f;
         for (int i = 0; i < tris.Count; i += 3)
         {
-            Vector3 a = polygonCache[tris[i]];
-            Vector3 b = polygonCache[tris[i + 1]];
-            Vector3 c = polygonCache[tris[i + 2]];
+            int ia = tris[i];
+            int ib = tris[i + 1];
+            int ic = tris[i + 2];
+            Vector3 a = polygonCache[ia];
+            Vector3 b = polygonCache[ib];
+            Vector3 c = polygonCache[ic];
             float area = TriangleArea(a, b, c);
             if (area <= Mathf.Epsilon) continue;
             acc += area;
-            if (r <= acc)
+            if (pick <= acc)
             {
-                return RandomPointInTriangle(a, b, c);
+                // Sample uniformly in 2D using barycentric, then lift to 3D plane
+                Vector2 ua = poly2[ia];
+                Vector2 ub = poly2[ib];
+                Vector2 uc = poly2[ic];
+                Vector2 uv = RandomPointInTriangle2D(ua, ub, uc);
+                return origin + axisX * uv.x + axisY * uv.y;
             }
         }
 
-        // Fallback to last triangle
+        // Fallback to last triangle center
         int last = tris.Count - 3;
-        return RandomPointInTriangle(polygonCache[tris[last]], polygonCache[tris[last + 1]], polygonCache[tris[last + 2]]);
+        Vector2 u0 = poly2[tris[last]];
+        Vector2 u1 = poly2[tris[last + 1]];
+        Vector2 u2 = poly2[tris[last + 2]];
+        Vector2 ucent = (u0 + u1 + u2) / 3f;
+        return origin + axisX * ucent.x + axisY * ucent.y;
     }
 
-    // Ear clipping triangulation for simple polygons defined in local XZ (Vector2)
-    private static List<int> TriangulateConcaveXZ(IReadOnlyList<Vector2> poly)
+    private static bool TryBuildPlaneBasis(List<Vector3> pts, out Vector3 origin, out Vector3 axisX, out Vector3 axisY)
     {
-        int n = poly.Count;
-        if (n < 3) return null;
-
-        List<int> indices = new List<int>(n);
-        for (int i = 0; i < n; i++) indices.Add(i);
-
-        // Ensure CCW
-        if (SignedArea(poly) < 0f)
+        origin = Vector3.zero; axisX = Vector3.right; axisY = Vector3.forward;
+        if (pts == null || pts.Count < 3) return false;
+        // Newell's method for robust polygon normal
+        Vector3 normal = Vector3.zero;
+        for (int i = 0, j = pts.Count - 1; i < pts.Count; j = i, i++)
         {
-            indices.Reverse();
+            Vector3 pi = pts[i];
+            Vector3 pj = pts[j];
+            normal.x += (pj.y - pi.y) * (pj.z + pi.z);
+            normal.y += (pj.z - pi.z) * (pj.x + pi.x);
+            normal.z += (pj.x - pi.x) * (pj.y + pi.y);
         }
+        if (normal.sqrMagnitude < 1e-6f)
+        {
+            normal = Vector3.up; // fallback
+        }
+        else
+        {
+            normal.Normalize();
+        }
+        origin = pts[0];
+        // Choose axisX from a non-parallel vector
+        Vector3 tangent = Vector3.Cross(normal, Vector3.up);
+        if (tangent.sqrMagnitude < 1e-6f) tangent = Vector3.Cross(normal, Vector3.right);
+        tangent.Normalize();
+        axisX = tangent;
+        axisY = Vector3.Cross(normal, axisX).normalized;
+        return true;
+    }
 
-        List<int> triangles = new List<int>(Mathf.Max(0, (n - 2) * 3));
+    private static List<int> TriangulateConcave2D(IReadOnlyList<Vector2> poly)
+    {
+        int n = poly.Count; if (n < 3) return null;
+        List<int> idx = new List<int>(n); for (int i = 0; i < n; i++) idx.Add(i);
+        if (SignedArea2D(poly) < 0f) idx.Reverse();
+        List<int> tris = new List<int>(Mathf.Max(0, (n - 2) * 3));
         int guard = 0;
-        while (indices.Count > 3 && guard < 10000)
+        while (idx.Count > 3 && guard++ < 10000)
         {
-            guard++;
             bool earFound = false;
-            for (int i = 0; i < indices.Count; i++)
+            for (int i = 0; i < idx.Count; i++)
             {
-                int i0 = indices[(i + indices.Count - 1) % indices.Count];
-                int i1 = indices[i];
-                int i2 = indices[(i + 1) % indices.Count];
-
-                if (!IsConvex(poly[i0], poly[i1], poly[i2]))
-                    continue;
-
-                bool hasPointInside = false;
-                for (int j = 0; j < indices.Count; j++)
+                int i0 = idx[(i + idx.Count - 1) % idx.Count];
+                int i1 = idx[i];
+                int i2 = idx[(i + 1) % idx.Count];
+                if (!IsConvex2D(poly[i0], poly[i1], poly[i2])) continue;
+                bool inside = false;
+                for (int j = 0; j < idx.Count; j++)
                 {
-                    int v = indices[j];
+                    int v = idx[j];
                     if (v == i0 || v == i1 || v == i2) continue;
-                    if (PointInTriangle(poly[v], poly[i0], poly[i1], poly[i2]))
-                    {
-                        hasPointInside = true;
-                        break;
-                    }
+                    if (PointInTriangle2D(poly[v], poly[i0], poly[i1], poly[i2])) { inside = true; break; }
                 }
-                if (hasPointInside) continue;
-
-                // It's an ear
-                triangles.Add(i0);
-                triangles.Add(i1);
-                triangles.Add(i2);
-                indices.RemoveAt(i);
-                earFound = true;
-                break;
+                if (inside) continue;
+                tris.Add(i0); tris.Add(i1); tris.Add(i2);
+                idx.RemoveAt(i); earFound = true; break;
             }
-            if (!earFound)
-            {
-                // Polygon may be degenerate; break to avoid infinite loop
-                break;
-            }
+            if (!earFound) break;
         }
-
-        if (indices.Count == 3)
-        {
-            triangles.Add(indices[0]);
-            triangles.Add(indices[1]);
-            triangles.Add(indices[2]);
-        }
-
-        return triangles;
+        if (idx.Count == 3) { tris.Add(idx[0]); tris.Add(idx[1]); tris.Add(idx[2]); }
+        return tris;
     }
 
-    private static float SignedArea(IReadOnlyList<Vector2> poly)
+    private static float SignedArea2D(IReadOnlyList<Vector2> poly)
     {
-        float a = 0f;
-        for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i, i++)
-        {
-            a += (poly[j].x * poly[i].y - poly[i].x * poly[j].y);
-        }
-        return a * 0.5f;
+        float a = 0f; for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i, i++) a += (poly[j].x * poly[i].y - poly[i].x * poly[j].y); return a * 0.5f;
     }
-
-    private static bool IsConvex(Vector2 a, Vector2 b, Vector2 c)
+    private static bool IsConvex2D(Vector2 a, Vector2 b, Vector2 c)
     {
-        Vector2 ab = b - a;
-        Vector2 bc = c - b;
-        float cross = ab.x * bc.y - ab.y * bc.x;
-        return cross > 0f; // CCW
+        Vector2 ab = b - a; Vector2 bc = c - b; return (ab.x * bc.y - ab.y * bc.x) > 0f;
     }
-
-    private static bool PointInTriangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
+    private static bool PointInTriangle2D(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
     {
         float s = a.y * c.x - a.x * c.y + (c.y - a.y) * p.x + (a.x - c.x) * p.y;
         float t = a.x * b.y - a.y * b.x + (a.y - b.y) * p.x + (b.x - a.x) * p.y;
@@ -335,6 +346,11 @@ public class EnemySpawner : MonoBehaviour
         float A = -b.y * c.x + a.y * (c.x - b.x) + a.x * (b.y - c.y) + b.x * c.y;
         if (A < 0) { s = -s; t = -t; A = -A; }
         return s > 0 && t > 0 && (s + t) < A;
+    }
+
+    private static Vector2 RandomPointInTriangle2D(Vector2 a, Vector2 b, Vector2 c)
+    {
+        float r1 = Mathf.Sqrt(Random.value); float r2 = Random.value; return (1 - r1) * a + (r1 * (1 - r2)) * b + (r1 * r2) * c;
     }
 
     private static float TriangleArea(Vector3 a, Vector3 b, Vector3 c)
