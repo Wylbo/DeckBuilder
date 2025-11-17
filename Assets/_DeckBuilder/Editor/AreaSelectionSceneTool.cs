@@ -8,6 +8,7 @@ using UnityEngine;
 public static class AreaSelectionSceneTool
 {
     private enum AxisMode { World, Local }
+    private enum PlaneMode { BestFit, OwnerUp, WorldUp, Locked }
 
     private struct Key : IEquatable<Key>
     {
@@ -21,6 +22,10 @@ public static class AreaSelectionSceneTool
     {
         public int selectedIndex = -1;
         public AxisMode axisMode = AxisMode.World;
+        public PlaneMode planeMode = PlaneMode.BestFit;
+        public bool constrainToPlane = false;
+        public Vector3 cachedOrigin;
+        public Vector3 cachedNormal;
     }
 
     private static readonly Dictionary<Key, State> States = new Dictionary<Key, State>();
@@ -61,11 +66,7 @@ public static class AreaSelectionSceneTool
         SerializedProperty pointsProp = areaProperty.FindPropertyRelative("controlPoints");
         if (pointsProp == null) return;
 
-        // Capture clicks for our tool
-        if (Event.current.type == EventType.Layout)
-        {
-            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-        }
+        // Use default Unity picking; avoid forcing AddDefaultControl to not interfere with main gizmo
 
         var key = new Key { id = so.targetObject.GetInstanceID(), path = areaProperty.propertyPath };
         if (!States.TryGetValue(key, out var state))
@@ -88,14 +89,16 @@ public static class AreaSelectionSceneTool
             poly[i] = wp;
         }
         // Prepare 2D projection on polygon plane
-        Vector3 origin, ax, ay;
-        if (!TryBuildPlaneBasis(poly, out origin, out ax, out ay)) return;
+        Vector3 origin, ax, ay, normal;
+        if (!TryGetPlaneBasisForState(poly, owner, state, out origin, out ax, out ay, out normal)) return;
         var poly2 = new Vector2[count];
         for (int i = 0; i < count; i++)
         {
             Vector3 r = poly[i] - origin;
             poly2[i] = new Vector2(Vector3.Dot(r, ax), Vector3.Dot(r, ay));
         }
+
+        //
 
         // Fill (handle concave)
         var tris = TriangulateConcave(poly2);
@@ -104,7 +107,23 @@ public static class AreaSelectionSceneTool
         {
             for (int i = 0; i < tris.Count; i += 3)
             {
-                Handles.DrawAAConvexPolygon(poly[tris[i]], poly[tris[i + 1]], poly[tris[i + 2]]);
+                int ia = tris[i];
+                int ib = tris[i + 1];
+                int ic = tris[i + 2];
+                // Filled triangle
+                Handles.DrawAAConvexPolygon(poly[ia], poly[ib], poly[ic]);
+            }
+            // Draw inner triangle edges in a softer green
+            Color softGreen = new Color(0f, 1f, 0f, 0.2f);
+            Handles.color = softGreen;
+            for (int i = 0; i < tris.Count; i += 3)
+            {
+                int ia = tris[i];
+                int ib = tris[i + 1];
+                int ic = tris[i + 2];
+                Handles.DrawLine(poly[ia], poly[ib]);
+                Handles.DrawLine(poly[ib], poly[ic]);
+                Handles.DrawLine(poly[ic], poly[ia]);
             }
         }
 
@@ -137,7 +156,7 @@ public static class AreaSelectionSceneTool
             if (bestNext != -1)
             {
                 Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-                Plane plane = new Plane(Vector3.Cross(ax, ay).normalized, origin);
+                Plane plane = new Plane(normal, origin);
                 if (plane.Raycast(ray, out float enter))
                 {
                     Vector3 hit = ray.GetPoint(enter);
@@ -155,10 +174,15 @@ public static class AreaSelectionSceneTool
                     state.selectedIndex = bestNext;
                     so.ApplyModifiedProperties();
                     SceneView.RepaintAll();
+                    GUIUtility.hotControl = 0;
+                    GUIUtility.keyboardControl = 0;
                     e.Use();
+                    return;
                 }
             }
         }
+
+        // Do not hide the main GameObject transform gizmo
 
         // Overlay GUI
         Handles.BeginGUI();
@@ -206,38 +230,65 @@ public static class AreaSelectionSceneTool
         GUI.enabled = pointsProp.arraySize > 0;
         if (GUILayout.Button("Center Shape To Owner"))
         {
-            Vector3 centroid = ComputeCentroid3D(poly);
+            // Center shape so its centroid aligns to owner position (X/Z),
+            // then lift/lower so the lowest Y sits at owner's Y.
             Undo.RecordObject(so.targetObject, "Center Control Points");
-            for (int i = 0; i < pointsProp.arraySize; i++)
+
+            // 1) Translate by world delta to align centroid to owner position
+            Vector3 centroidWorld = ComputeCentroid3D(poly);
+            Vector3 deltaWorld = owner.position - centroidWorld;
+
+            // 2) Apply initial translation and find min Y
+            float minY = float.PositiveInfinity;
+            Vector3[] shifted = new Vector3[poly.Length];
+            for (int i = 0; i < poly.Length; i++)
             {
-                var p = pointsProp.GetArrayElementAtIndex(i);
-                p.vector3Value = p.vector3Value - centroid;
+                shifted[i] = poly[i] + deltaWorld;
+                if (shifted[i].y < minY) minY = shifted[i].y;
             }
+
+            // 3) Vertical offset so the lowest point equals owner's Y
+            float yOffset = owner.position.y - minY;
+            for (int i = 0; i < shifted.Length; i++)
+            {
+                Vector3 newWorld = shifted[i] + new Vector3(0f, yOffset, 0f);
+                Vector3 newLocal = owner.InverseTransformPoint(newWorld);
+                pointsProp.GetArrayElementAtIndex(i).vector3Value = newLocal;
+            }
+
             so.ApplyModifiedProperties();
             SceneView.RepaintAll();
         }
+        // Plane mode and constraint controls
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Plane:", GUILayout.Width(50));
+        int pm = (int)state.planeMode;
+        int newPm = GUILayout.Toolbar(pm, new[] { new GUIContent("Best"), new GUIContent("Owner"), new GUIContent("World"), new GUIContent("Lock") }, EditorStyles.miniButton);
+        if (newPm != pm)
+        {
+            state.planeMode = (PlaneMode)newPm;
+            if (state.planeMode == PlaneMode.Locked)
+            {
+                state.cachedOrigin = origin;
+                state.cachedNormal = normal;
+            }
+        }
+        GUILayout.EndHorizontal();
+
+        state.constrainToPlane = GUILayout.Toggle(state.constrainToPlane, "Constrain to plane");
+
         GUI.enabled = true;
         GUILayout.EndArea();
         Handles.EndGUI();
 
         // Point selection and movement
-        // Robust picking: custom layout controls per point
-        if (Event.current.type == EventType.Layout)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                int cid = GUIUtility.GetControlID(FocusType.Passive);
-                float dist = HandleUtility.DistanceToCircle(poly[i], HandleUtility.GetHandleSize(poly[i]) * 0.15f);
-                HandleUtility.AddControl(cid, dist);
-            }
-        }
 
         for (int i = 0; i < count; i++)
         {
             Vector3 worldPt = poly[i];
-            float size = HandleUtility.GetHandleSize(worldPt) * 0.12f;
+            float size = HandleUtility.GetHandleSize(worldPt) * 0.08f;
             Handles.color = (i == state.selectedIndex) ? Color.yellow : Color.green;
-            if (Handles.Button(worldPt, Quaternion.identity, size, size, Handles.SphereHandleCap))
+            if (Handles.Button(worldPt, Quaternion.identity, size, size, Handles.DotHandleCap))
             {
                 state.selectedIndex = i;
                 SceneView.RepaintAll();
@@ -365,6 +416,39 @@ public static class AreaSelectionSceneTool
         return true;
     }
 
+    // Chooses a plane basis based on user state and stabilizes normal orientation
+    private static bool TryGetPlaneBasisForState(Vector3[] polyWorld, Transform owner, State state,
+        out Vector3 origin, out Vector3 ax, out Vector3 ay, out Vector3 normal)
+    {
+        origin = Vector3.zero; ax = Vector3.right; ay = Vector3.forward; normal = Vector3.up;
+        if (polyWorld == null || polyWorld.Length < 3 || owner == null) return false;
+
+        Vector3 n; Vector3 o;
+        switch (state.planeMode)
+        {
+            case PlaneMode.OwnerUp:
+                n = owner.up; o = polyWorld[0];
+                break;
+            case PlaneMode.WorldUp:
+                n = Vector3.up; o = polyWorld[0];
+                break;
+            case PlaneMode.Locked:
+                n = (state.cachedNormal == Vector3.zero) ? owner.up : state.cachedNormal;
+                o = (state.cachedOrigin == Vector3.zero) ? polyWorld[0] : state.cachedOrigin;
+                break;
+            default:
+                if (!TryBuildPlaneBasis(polyWorld, out o, out ax, out ay)) return false;
+                n = Vector3.Cross(ax, ay).normalized;
+                if (Vector3.Dot(n, owner.up) < 0f) n = -n;
+                origin = o; normal = n; return true;
+        }
+
+        if (Vector3.Dot(n, owner.up) < 0f) n = -n;
+        Vector3 t = Vector3.Cross(n, Vector3.up);
+        if (t.sqrMagnitude < 1e-6f) t = Vector3.Cross(n, Vector3.right);
+        t.Normalize();
+        ax = t; ay = Vector3.Cross(n, ax).normalized; origin = o; normal = n; return true;
+    }
     private static Vector3 ComputeCentroid3D(Vector3[] pts)
     {
         if (pts == null || pts.Length == 0) return Vector3.zero;

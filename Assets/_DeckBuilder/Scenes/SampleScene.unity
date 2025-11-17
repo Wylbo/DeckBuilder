@@ -3615,11 +3615,14 @@ MonoBehaviour:
   radius: 5.207798
   controlPointArea:
     controlPoints:
-    - {x: 13.810462, y: -1.1997198, z: -36.259354}
-    - {x: 9.897161, y: 3.1736217, z: -41.894753}
-    - {x: 13.712596, y: -0.8126375, z: -44.308853}
-    - {x: 15.226249, y: -0.7556318, z: -46.072876}
-    - {x: 20.74107, y: -0.7556326, z: -41.73989}
+    - {x: -2.4309714, y: 3.2522464, z: -0.5369587}
+    - {x: -2.30165, y: -0.26082528, z: -4.732126}
+    - {x: -2.2807293, y: -0.3295021, z: -7.8922524}
+    - {x: 2.4211483, y: -0.33633327, z: -7.8701696}
+    - {x: 2.3583865, y: -0.30661094, z: -4.801571}
+    - {x: 2.4913056, y: 3.237042, z: -0.5591278}
+    - {x: 2.4251847, y: 3.238295, z: 5.0619926}
+    - {x: -2.3842642, y: 3.2409663, z: 5.073902}
   maxAttemptsPerSpawn: 10
   navMeshSampleDistance: 2
   navMeshAreaMask: -1
@@ -3631,13 +3634,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1888576963}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.34461117, z: -0, w: 0.9387455}
-  m_LocalPosition: {x: -38.4, y: 0.07, z: 22.57}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 11.59, y: 6.19, z: 11.95}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -40.316, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1907833318
 GameObject:
   m_ObjectHideFlags: 0
