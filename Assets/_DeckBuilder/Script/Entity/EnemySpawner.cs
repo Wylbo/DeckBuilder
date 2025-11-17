@@ -27,7 +27,7 @@ public class EnemySpawner : MonoBehaviour
     [Header("Area Settings")]
     [SerializeField] private SpawnAreaMode spawnAreaMode = SpawnAreaMode.Radius;
     [SerializeField, Min(0.1f)] private float radius = 5f;
-    [SerializeField] private SpawnAreaDefinition spawnAreaDefinition;
+    [SerializeField] private AreaSelection controlPointArea = new AreaSelection();
 
     [Header("NavMesh Settings")]
     [SerializeField, Min(1)] private int maxAttemptsPerSpawn = 10;
@@ -76,6 +76,8 @@ public class EnemySpawner : MonoBehaviour
 
         return SpawnEnemy(prefab);
     }
+
+    public AreaSelection ControlPointArea => controlPointArea;
 
     public Character SpawnEnemy(Character prefab)
     {
@@ -183,7 +185,7 @@ public class EnemySpawner : MonoBehaviour
 
     private Vector3 SampleControlPointArea()
     {
-        spawnAreaDefinition?.GetWorldPoints(transform, polygonCache);
+        controlPointArea?.GetWorldPoints(transform, polygonCache);
 
         if (polygonCache.Count < 3)
         {
@@ -242,7 +244,7 @@ public class EnemySpawner : MonoBehaviour
 
     private bool HasValidControlPoints()
     {
-        return spawnAreaDefinition != null && spawnAreaDefinition.HasValidPolygon;
+        return controlPointArea != null && controlPointArea.HasValidPolygon;
     }
 
     private void OnDrawGizmosSelected()
@@ -251,7 +253,7 @@ public class EnemySpawner : MonoBehaviour
 
         if (spawnAreaMode == SpawnAreaMode.ControlPoints && HasValidControlPoints())
         {
-            spawnAreaDefinition.GetWorldPoints(transform, polygonCache);
+            controlPointArea.GetWorldPoints(transform, polygonCache);
             if (polygonCache.Count == 0)
             {
                 return;
