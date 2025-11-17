@@ -3611,16 +3611,15 @@ MonoBehaviour:
     percentage: 32
   spawnOnStart: 1
   spawnCountOnStart: 100
-  spawnAreaMode: 0
-  radius: 7.52
+  spawnAreaMode: 1
+  radius: 5.207798
   controlPointArea:
     controlPoints:
-    - {x: 3.4507833, y: -2.1823888}
-    - {x: -6.754163, y: -7.7160025}
-    - {x: 1.1774156, y: 1.4404557}
-    - {x: -0.9992275, y: 11.073574}
-    - {x: 13.872824, y: 4.2702956}
-    - {x: 4.206857, y: -12.028315}
+    - {x: 13.810462, y: -1.1997198, z: -36.259354}
+    - {x: 9.897161, y: 3.1736217, z: -41.894753}
+    - {x: 13.712596, y: -0.8126375, z: -44.308853}
+    - {x: 15.226249, y: -0.7556318, z: -46.072876}
+    - {x: 20.74107, y: -0.7556326, z: -41.73989}
   maxAttemptsPerSpawn: 10
   navMeshSampleDistance: 2
   navMeshAreaMask: -1
@@ -3633,7 +3632,7 @@ Transform:
   m_GameObject: {fileID: 1888576963}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.34461117, z: -0, w: 0.9387455}
-  m_LocalPosition: {x: -40.01, y: 0.07, z: 28.64}
+  m_LocalPosition: {x: -38.4, y: 0.07, z: 22.57}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
