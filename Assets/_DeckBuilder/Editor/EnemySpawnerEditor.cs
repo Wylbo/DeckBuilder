@@ -13,7 +13,6 @@ public class EnemySpawnerEditor : Editor
     private SerializedProperty spawnAreaModeProperty;
     private SerializedProperty radiusProperty;
     private SerializedProperty controlPointAreaProperty;
-    private SerializedProperty controlPointsProperty;
     private SerializedProperty maxAttemptsProperty;
     private SerializedProperty navSampleDistanceProperty;
     private SerializedProperty navAreaMaskProperty;
@@ -30,7 +29,6 @@ public class EnemySpawnerEditor : Editor
         spawnAreaModeProperty = serializedObject.FindProperty("spawnAreaMode");
         radiusProperty = serializedObject.FindProperty("radius");
         controlPointAreaProperty = serializedObject.FindProperty("controlPointArea");
-        controlPointsProperty = controlPointAreaProperty?.FindPropertyRelative("controlPoints");
         maxAttemptsProperty = serializedObject.FindProperty("maxAttemptsPerSpawn");
         navSampleDistanceProperty = serializedObject.FindProperty("navMeshSampleDistance");
         navAreaMaskProperty = serializedObject.FindProperty("navMeshAreaMask");
@@ -43,20 +41,7 @@ public class EnemySpawnerEditor : Editor
 
         spawnableEnemiesList.drawElementCallback = DrawSpawnableEnemyElement;
 
-        if (controlPointsProperty != null)
-        {
-            controlPointsList = new ReorderableList(serializedObject, controlPointsProperty, true, true, true, true)
-            {
-                drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Control Points (local X/Z)")
-            };
-
-            controlPointsList.drawElementCallback = (rect, index, active, focused) =>
-            {
-                SerializedProperty element = controlPointsProperty.GetArrayElementAtIndex(index);
-                rect.height = EditorGUIUtility.singleLineHeight;
-                element.vector2Value = EditorGUI.Vector2Field(rect, GUIContent.none, element.vector2Value);
-            };
-        }
+        controlPointsList = AreaSelectionEditorUtility.CreateControlPointList(serializedObject, controlPointAreaProperty);
 
         SceneView.duringSceneGui += DuringSceneGUI;
     }
@@ -162,7 +147,7 @@ public class EnemySpawnerEditor : Editor
         }
 
         serializedObject.Update();
-        bool changed = DrawControlPointHandles(spawner.transform);
+        bool changed = AreaSelectionEditorUtility.DrawSceneHandles(controlPointAreaProperty, spawner.transform);
 
         if (changed)
         {
@@ -175,62 +160,5 @@ public class EnemySpawnerEditor : Editor
         }
     }
 
-    private bool DrawControlPointHandles(Transform ownerTransform)
-    {
-        if (controlPointsProperty == null || ownerTransform == null)
-        {
-            return false;
-        }
-
-        int count = controlPointsProperty.arraySize;
-        if (count == 0)
-        {
-            return false;
-        }
-
-        Vector3[] polygon = new Vector3[count];
-        for (int i = 0; i < count; i++)
-        {
-            Vector2 local = controlPointsProperty.GetArrayElementAtIndex(i).vector2Value;
-            polygon[i] = ownerTransform.TransformPoint(new Vector3(local.x, 0f, local.y));
-        }
-
-        Handles.color = new Color(0f, 0.85f, 0.3f, 0.15f);
-        for (int i = 1; i < polygon.Length - 1; i++)
-        {
-            Handles.DrawAAConvexPolygon(polygon[0], polygon[i], polygon[i + 1]);
-        }
-
-        Handles.color = Color.green;
-        if (polygon.Length > 1)
-        {
-            Vector3[] loop = new Vector3[polygon.Length + 1];
-            polygon.CopyTo(loop, 0);
-            loop[loop.Length - 1] = polygon[0];
-            Handles.DrawPolyLine(loop);
-        }
-
-        bool changed = false;
-        for (int i = 0; i < polygon.Length; i++)
-        {
-            SerializedProperty element = controlPointsProperty.GetArrayElementAtIndex(i);
-            Vector3 worldPoint = polygon[i];
-            float handleSize = HandleUtility.GetHandleSize(worldPoint) * 0.075f;
-
-            EditorGUI.BeginChangeCheck();
-            Vector3 newWorld = Handles.FreeMoveHandle(worldPoint, Quaternion.identity, handleSize, Vector3.zero, Handles.DotHandleCap);
-            if (EditorGUI.EndChangeCheck())
-            {
-                Undo.RecordObject(target, "Move Spawn Area Control Point");
-                Vector3 local = ownerTransform.InverseTransformPoint(newWorld);
-                element.vector2Value = new Vector2(local.x, local.z);
-                changed = true;
-            }
-
-            Handles.Label(worldPoint + Vector3.up * 0.2f, $"P{i}");
-        }
-
-        return changed;
-    }
 }
 #endif
