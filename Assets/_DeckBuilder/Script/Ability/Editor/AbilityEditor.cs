@@ -30,6 +30,9 @@ public class AbilityEditor : Editor
 	private float toolbarScrollOffset;
 	private float toolbarContentWidth;
 	private float toolbarVisibleWidth;
+
+	// Per-instance view mode (Tabs or List)
+	private Dictionary<int, bool> ListViewPerInstance = new Dictionary<int, bool>();
 	#endregion
 
 
@@ -221,7 +224,6 @@ public class AbilityEditor : Editor
 		{
 			EditorGUILayout.Space();
 			baseStatsList.DoLayoutList();
-
 			// Validation: ensure required stats for behaviours exist in base stats
 			DrawRequiredStatsValidation();
 		}
@@ -239,7 +241,7 @@ public class AbilityEditor : Editor
 		}
 
 		EditorGUILayout.Space();
-		DrawBehaviourTabs();
+		DrawBehavioursSection();
 
 		serializedObject.ApplyModifiedProperties();
 	}
@@ -437,8 +439,20 @@ public class AbilityEditor : Editor
 
 
 
-	#region Behaviour Tabs
-	private void DrawBehaviourTabs()
+	#region Behaviours Section
+	private bool GetListView()
+	{
+		int id = target != null ? target.GetInstanceID() : 0;
+		return ListViewPerInstance.TryGetValue(id, out var v) && v;
+	}
+
+	private void SetListView(bool listView)
+	{
+		int id = target != null ? target.GetInstanceID() : 0;
+		ListViewPerInstance[id] = listView;
+	}
+
+	private void DrawBehavioursSection()
 	{
 		if (behavioursProperty == null)
 			return;
@@ -446,6 +460,44 @@ public class AbilityEditor : Editor
 		EditorGUILayout.LabelField("Behaviours", EditorStyles.boldLabel);
 		EditorGUILayout.BeginVertical(GUI.skin.box);
 
+		// View toggle toolbar
+		using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+		{
+			GUILayout.Label("View:", EditorStyles.miniLabel, GUILayout.Width(34));
+			int viewIndex = GetListView() ? 1 : 0; // 0: Tabs, 1: List
+			int newViewIndex = GUILayout.Toolbar(viewIndex, new[] { new GUIContent("Tabs"), new GUIContent("List") }, EditorStyles.toolbarButton, GUILayout.Width(110));
+			if (newViewIndex != viewIndex)
+			{
+				SetListView(newViewIndex == 1);
+			}
+
+			GUILayout.FlexibleSpace();
+			// Global add button only in List view (tabs already has one)
+			if (newViewIndex == 1)
+			{
+				if (GUILayout.Button("+", EditorStyles.toolbarButton, GUILayout.Width(24)))
+				{
+					ShowAddMenu(behavioursProperty.arraySize);
+				}
+			}
+		}
+
+		EditorGUILayout.Space(2);
+
+		if (GetListView())
+		{
+			DrawBehaviourList();
+		}
+		else
+		{
+			DrawBehaviourTabs();
+		}
+
+		EditorGUILayout.EndVertical();
+	}
+
+	private void DrawBehaviourTabs()
+	{
 		int behaviourCount = behavioursProperty.arraySize;
 		int selectedIndex = GetSelectedTab();
 
@@ -459,12 +511,90 @@ public class AbilityEditor : Editor
 
 		EditorGUILayout.Space();
 		DrawSelectedBehaviour(behaviourCount, selectedIndex);
-
-		EditorGUILayout.EndVertical();
 	}
 
+	private void DrawBehaviourList()
+	{
+		// Show the basic behaviours first (equivalent to tab #0)
+		DrawBasicBehavioursContents();
+		EditorGUILayout.Space();
+
+		int count = behavioursProperty.arraySize;
+		if (count == 0)
+		{
+			EditorGUILayout.HelpBox("Add behaviours to compose this ability.", MessageType.Info);
+			return;
+		}
+
+		for (int i = 0; i < count; i++)
+		{
+			var element = behavioursProperty.GetArrayElementAtIndex(i);
+			DrawBehaviourContents(element, i);
+
+			// Per-item controls
+			using (new EditorGUILayout.HorizontalScope())
+			{
+				using (new EditorGUI.DisabledScope(i <= 0))
+				{
+					if (GUILayout.Button("▲", GUILayout.Width(28)))
+					{
+						MoveBehaviour(i, i - 1);
+						SetSelectedTab(Mathf.Clamp(i, 0, behavioursProperty.arraySize) + 1);
+						return; // list changed; redraw next frame
+					}
+				}
+				using (new EditorGUI.DisabledScope(i >= behavioursProperty.arraySize - 1))
+				{
+					if (GUILayout.Button("▼", GUILayout.Width(28)))
+					{
+						MoveBehaviour(i, i + 1);
+						SetSelectedTab(i + 2);
+						return;
+					}
+				}
+				if (GUILayout.Button("D", GUILayout.Width(28)))
+				{
+					// Duplicate behaviour i
+					var source = behavioursProperty.GetArrayElementAtIndex(i);
+					if (source != null)
+					{
+						var srcObj = source.managedReferenceValue as AbilityBehaviour;
+						if (srcObj != null)
+						{
+							var type = srcObj.GetType();
+							var clone = Activator.CreateInstance(type) as AbilityBehaviour;
+							if (clone != null)
+							{
+								string json = JsonUtility.ToJson(srcObj);
+								JsonUtility.FromJsonOverwrite(json, clone);
+								int insertIndex = Mathf.Clamp(i + 1, 0, behavioursProperty.arraySize);
+								behavioursProperty.InsertArrayElementAtIndex(insertIndex);
+								var dest = behavioursProperty.GetArrayElementAtIndex(insertIndex);
+								dest.managedReferenceValue = clone;
+								serializedObject.ApplyModifiedProperties();
+								serializedObject.Update();
+								SetSelectedTab(insertIndex + 1);
+								return;
+							}
+						}
+					}
+				}
+				if (GUILayout.Button("-", GUILayout.Width(28)))
+				{
+					RemoveBehaviour(i);
+					SetSelectedTab(Mathf.Clamp(i, 0, behavioursProperty.arraySize - 1) + 1);
+					return;
+				}
+
+				GUILayout.FlexibleSpace();
+			}
+
+			EditorGUILayout.Space();
+		}
+	}
 	private void DrawBehaviourToolbar(int behaviourCount, ref int selectedIndex)
 	{
+		EditorGUILayout.Space();
 		string[] names = GetAllTabNames();
 		toolbarContentWidth = CalculateToolbarContentWidth(names);
 
@@ -678,6 +808,7 @@ public class AbilityEditor : Editor
 		GUILayout.Label(FormatBehaviourLabel(element, index), CenteredBoldLabelStyle, GUILayout.ExpandWidth(true));
 		EditorGUILayout.Space();
 
+
 		if (element.managedReferenceValue == null)
 		{
 			EditorGUILayout.HelpBox("Missing behaviour reference.", MessageType.Warning);
@@ -702,6 +833,8 @@ public class AbilityEditor : Editor
 		EditorGUILayout.EndVertical();
 	}
 
+
+
 	private bool IsManagedReferenceHelper(string propertyName)
 	{
 		return propertyName == "managedReferenceFullTypename"
@@ -718,10 +851,31 @@ public class AbilityEditor : Editor
 				ShowAddMenu(behaviourCount);
 			}
 
+			using (new EditorGUI.DisabledScope(behaviourCount == 0 || selectedIndex == 0))
+			{
+				if (GUILayout.Button("-", EditorStyles.toolbarButton, GUILayout.Width(24)))
+				{
+					int elementIndex = Mathf.Clamp(selectedIndex - 1, 0, behavioursProperty.arraySize - 1);
+					RemoveBehaviour(elementIndex);
+				}
+				if (GUILayout.Button("▲", EditorStyles.toolbarButton, GUILayout.Width(24)))
+				{
+					int elementIndex = Mathf.Clamp(selectedIndex - 1, 0, behavioursProperty.arraySize - 1);
+					MoveBehaviour(elementIndex, elementIndex - 1);
+					selectedIndex = Mathf.Max(1, selectedIndex - 1);
+				}
+				if (GUILayout.Button("▼", EditorStyles.toolbarButton, GUILayout.Width(24)))
+				{
+					int elementIndex = Mathf.Clamp(selectedIndex - 1, 0, behavioursProperty.arraySize - 1);
+					MoveBehaviour(elementIndex, elementIndex + 1);
+					selectedIndex = Mathf.Min(behavioursProperty.arraySize, selectedIndex + 1);
+				}
+			}
+
 			// Duplicate button (enabled when a behaviour is selected)
 			using (new EditorGUI.DisabledScope(behaviourCount == 0 || selectedIndex == 0))
 			{
-				if (GUILayout.Button("⧉", EditorStyles.toolbarButton, GUILayout.Width(24)))
+				if (GUILayout.Button("D", EditorStyles.toolbarButton, GUILayout.Width(24)))
 				{
 					int elementIndex = Mathf.Clamp(selectedIndex - 1, 0, behavioursProperty.arraySize - 1);
 					if (behavioursProperty != null && behavioursProperty.arraySize > 0)
@@ -749,27 +903,6 @@ public class AbilityEditor : Editor
 							}
 						}
 					}
-				}
-			}
-
-			using (new EditorGUI.DisabledScope(behaviourCount == 0 || selectedIndex == 0))
-			{
-				if (GUILayout.Button("-", EditorStyles.toolbarButton, GUILayout.Width(24)))
-				{
-					int elementIndex = Mathf.Clamp(selectedIndex - 1, 0, behavioursProperty.arraySize - 1);
-					RemoveBehaviour(elementIndex);
-				}
-				if (GUILayout.Button("▲", EditorStyles.toolbarButton, GUILayout.Width(24)))
-				{
-					int elementIndex = Mathf.Clamp(selectedIndex - 1, 0, behavioursProperty.arraySize - 1);
-					MoveBehaviour(elementIndex, elementIndex - 1);
-					selectedIndex = Mathf.Max(1, selectedIndex - 1);
-				}
-				if (GUILayout.Button("▼", EditorStyles.toolbarButton, GUILayout.Width(24)))
-				{
-					int elementIndex = Mathf.Clamp(selectedIndex - 1, 0, behavioursProperty.arraySize - 1);
-					MoveBehaviour(elementIndex, elementIndex + 1);
-					selectedIndex = Mathf.Min(behavioursProperty.arraySize, selectedIndex + 1);
 				}
 			}
 		}
