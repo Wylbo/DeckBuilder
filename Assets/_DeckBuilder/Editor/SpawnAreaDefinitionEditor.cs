@@ -93,7 +93,7 @@ public class SpawnAreaDefinitionEditor : Editor
             float handleSize = HandleUtility.GetHandleSize(position) * 0.075f;
 
             EditorGUI.BeginChangeCheck();
-            Vector3 newPosition = Handles.FreeMoveHandle(position, Quaternion.identity, handleSize, Vector3.zero, Handles.DotHandleCap);
+            var fmh_96_68_638990098903205293 = Quaternion.identity; Vector3 newPosition = Handles.FreeMoveHandle(position, handleSize, Vector3.zero, Handles.DotHandleCap);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(target, "Move Spawn Area Control Point");
