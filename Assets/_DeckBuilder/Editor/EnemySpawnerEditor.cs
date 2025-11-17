@@ -12,12 +12,13 @@ public class EnemySpawnerEditor : Editor
     private SerializedProperty spawnCountOnStartProperty;
     private SerializedProperty spawnAreaModeProperty;
     private SerializedProperty radiusProperty;
-    private SerializedProperty spawnAreaDefinitionProperty;
+    private SerializedProperty controlPointAreaProperty;
     private SerializedProperty maxAttemptsProperty;
     private SerializedProperty navSampleDistanceProperty;
     private SerializedProperty navAreaMaskProperty;
 
     private ReorderableList spawnableEnemiesList;
+    private ReorderableList controlPointsList;
 
     private void OnEnable()
     {
@@ -27,7 +28,7 @@ public class EnemySpawnerEditor : Editor
         spawnCountOnStartProperty = serializedObject.FindProperty("spawnCountOnStart");
         spawnAreaModeProperty = serializedObject.FindProperty("spawnAreaMode");
         radiusProperty = serializedObject.FindProperty("radius");
-        spawnAreaDefinitionProperty = serializedObject.FindProperty("spawnAreaDefinition");
+        controlPointAreaProperty = serializedObject.FindProperty("controlPointArea");
         maxAttemptsProperty = serializedObject.FindProperty("maxAttemptsPerSpawn");
         navSampleDistanceProperty = serializedObject.FindProperty("navMeshSampleDistance");
         navAreaMaskProperty = serializedObject.FindProperty("navMeshAreaMask");
@@ -39,6 +40,15 @@ public class EnemySpawnerEditor : Editor
         };
 
         spawnableEnemiesList.drawElementCallback = DrawSpawnableEnemyElement;
+
+        controlPointsList = AreaSelectionEditorUtility.CreateControlPointList(serializedObject, controlPointAreaProperty);
+
+        SceneView.duringSceneGui += DuringSceneGUI;
+    }
+
+    private void OnDisable()
+    {
+        SceneView.duringSceneGui -= DuringSceneGUI;
     }
 
     public override void OnInspectorGUI()
@@ -61,7 +71,14 @@ public class EnemySpawnerEditor : Editor
         }
         else
         {
-            EditorGUILayout.PropertyField(spawnAreaDefinitionProperty);
+            if (controlPointsList != null)
+            {
+                controlPointsList.DoLayoutList();
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("Control points list is unavailable.", MessageType.Info);
+            }
         }
 
         EditorGUILayout.Space();
@@ -110,5 +127,38 @@ public class EnemySpawnerEditor : Editor
         MessageType messageType = total <= 0f ? MessageType.Error : MessageType.Warning;
         EditorGUILayout.HelpBox("Percentages do not sum to 100%. Values will be normalized at runtime.", messageType);
     }
+
+    private void DuringSceneGUI(SceneView sceneView)
+    {
+        if (spawnAreaModeProperty == null || spawnAreaModeProperty.enumValueIndex != 1)
+        {
+            return;
+        }
+
+        EnemySpawner spawner = (EnemySpawner)target;
+        if (spawner == null)
+        {
+            return;
+        }
+
+        if (System.Array.IndexOf(Selection.gameObjects, spawner.gameObject) < 0)
+        {
+            return;
+        }
+
+        serializedObject.Update();
+        bool changed = AreaSelectionEditorUtility.DrawSceneHandles(controlPointAreaProperty, spawner.transform);
+
+        if (changed)
+        {
+            serializedObject.ApplyModifiedProperties();
+            SceneView.RepaintAll();
+        }
+        else
+        {
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
+
 }
 #endif
