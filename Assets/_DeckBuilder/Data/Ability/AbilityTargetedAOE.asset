@@ -31,6 +31,10 @@ MonoBehaviour:
     Value: 0.3
   - Key: 1
     Value: 20
+  - Key: 5
+    Value: 0
+  - Key: 7
+    Value: 0
   behaviours:
   - rid: 1062887273389097035
   - rid: 1062887273389097040

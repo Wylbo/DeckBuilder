@@ -31,9 +31,9 @@ MonoBehaviour:
     Value: 10
   - Key: 7
     Value: 1
-  - Key: 10
-    Value: 0.3
   - Key: 11
+    Value: 0.3
+  - Key: 12
     Value: 0
   behaviours:
   - rid: 1062887273389097041
@@ -90,5 +90,5 @@ MonoBehaviour:
       data:
         projectile: {fileID: 6428266943518908824, guid: b2c2ae026b1ceca4fb60273c6b4e4a17, type: 3}
         projectileCountStat: 3
-        spacingStat: 10
-        verticalOffsetStat: 11
+        spacingStat: 11
+        verticalOffsetStat: 12
