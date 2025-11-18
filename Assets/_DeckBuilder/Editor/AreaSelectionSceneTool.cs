@@ -7,6 +7,7 @@ using UnityEngine;
 [InitializeOnLoad]
 public static class AreaSelectionSceneTool
 {
+    private const string PrefShowOnlySelected = "AreaSelection.ShowOnlySelected";
     private struct Key : IEquatable<Key>
     {
         public int id;
@@ -22,10 +23,20 @@ public static class AreaSelectionSceneTool
 
     private static readonly Dictionary<Key, State> States = new Dictionary<Key, State>();
 
+    private static bool showOnlySelected = false;
+    internal static bool GetShowOnlySelected() => showOnlySelected;
+    internal static void SetShowOnlySelected(bool value)
+    {
+        showOnlySelected = value;
+        EditorPrefs.SetBool(PrefShowOnlySelected, showOnlySelected);
+        SceneView.RepaintAll();
+    }
+
     static AreaSelectionSceneTool()
     {
         SceneView.duringSceneGui -= OnSceneGUI;
         SceneView.duringSceneGui += OnSceneGUI;
+        showOnlySelected = EditorPrefs.GetBool(PrefShowOnlySelected, false);
     }
 
     private static void OnSceneGUI(SceneView view)
@@ -83,30 +94,33 @@ public static class AreaSelectionSceneTool
         var prevZTest = Handles.zTest;
         Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
 
-        // Draw non-selected (dim cyan, no handles)
-        var allComponents = UnityEngine.Object.FindObjectsOfType<Component>();
-        foreach (var comp in allComponents)
+        // Draw non-selected (dim cyan, no handles) unless hidden by toggle
+        if (!showOnlySelected)
         {
-            if (comp == null || comp.gameObject == null) continue;
-            if (selectedSet.Contains(comp.gameObject)) continue;
-            var so = new SerializedObject(comp);
-            SerializedProperty it = so.GetIterator();
-            bool enterChildren = true;
-            while (it.Next(enterChildren))
+            var allComponents = UnityEngine.Object.FindObjectsOfType<Component>();
+            foreach (var comp in allComponents)
             {
-                enterChildren = false;
-                if (it.propertyType == SerializedPropertyType.Generic && it.type == nameof(AreaSelection))
+                if (comp == null || comp.gameObject == null) continue;
+                if (comp.gameObject == Selection.activeGameObject) continue;
+                var so = new SerializedObject(comp);
+                SerializedProperty it = so.GetIterator();
+                bool enterChildren = true;
+                while (it.Next(enterChildren))
                 {
-                    DrawAreaSelectionFilled(it, comp.transform, so, false);
+                    enterChildren = false;
+                    if (it.propertyType == SerializedPropertyType.Generic && it.type == nameof(AreaSelection))
+                    {
+                        DrawAreaSelectionFilled(it, comp.transform, so, false);
+                    }
                 }
             }
         }
 
-        // Draw selected (interactive + green)
-        foreach (var go in selected)
+        // Draw only the active selection as interactive; others (even if multi-selected) are dim non-interactive
+        var activeGO = Selection.activeGameObject;
+        if (activeGO != null)
         {
-            if (go == null) continue;
-            var components = go.GetComponents<Component>();
+            var components = activeGO.GetComponents<Component>();
             foreach (var comp in components)
             {
                 if (comp == null) continue;
@@ -204,47 +218,7 @@ public static class AreaSelectionSceneTool
             }
         }
 
-        Handles.BeginGUI();
-        GUILayout.BeginArea(new Rect(10, 10, 340, 90), EditorStyles.helpBox);
-        GUILayout.Label("Area Selection (2D + Height)", EditorStyles.boldLabel);
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("+ Add"))
-        {
-            Vector3 newWorld = owner.position + owner.right + owner.forward;
-            Vector3 local = owner.InverseTransformPoint(newWorld);
-            int idx = pointsProp.arraySize;
-            pointsProp.InsertArrayElementAtIndex(idx);
-            pointsProp.GetArrayElementAtIndex(idx).vector2Value = new Vector2(local.x, local.z);
-            state.selectedIndex = idx;
-            Undo.RecordObject(so.targetObject, "Add Control Point");
-            so.ApplyModifiedProperties();
-            SceneView.RepaintAll();
-        }
-        GUI.enabled = pointsProp.arraySize > 0 && state.selectedIndex >= 0 && state.selectedIndex < pointsProp.arraySize;
-        if (GUILayout.Button("- Remove Selected"))
-        {
-            pointsProp.DeleteArrayElementAtIndex(state.selectedIndex);
-            state.selectedIndex = Mathf.Clamp(state.selectedIndex - 1, -1, pointsProp.arraySize - 1);
-            Undo.RecordObject(so.targetObject, "Remove Control Point");
-            so.ApplyModifiedProperties();
-            SceneView.RepaintAll();
-        }
-        GUI.enabled = true;
-        if (GUILayout.Button("Center To Owner"))
-        {
-            Undo.RecordObject(so.targetObject, "Center Control Points");
-            Vector2 centroid = ComputeCentroid2D(pointsProp);
-            for (int i = 0; i < pointsProp.arraySize; i++)
-            {
-                var p = pointsProp.GetArrayElementAtIndex(i).vector2Value;
-                pointsProp.GetArrayElementAtIndex(i).vector2Value = p - centroid;
-            }
-            so.ApplyModifiedProperties();
-            SceneView.RepaintAll();
-        }
-        GUILayout.EndHorizontal();
-        GUILayout.EndArea();
-        Handles.EndGUI();
+        // Controls moved to an Overlay (AreaSelectionOverlay). No IMGUI here.
 
         for (int i = 0; i < count; i++)
         {
@@ -289,6 +263,23 @@ public static class AreaSelectionSceneTool
             so.ApplyModifiedProperties();
         }
         Handles.Label(topPos + owner.up * 0.2f, $"Height: {h:0.##}");
+    }
+
+    // Overlay helpers to share selection state
+    internal static int GetSelectedIndexFor(SerializedObject so, SerializedProperty areaProperty)
+    {
+        if (so == null || areaProperty == null) return -1;
+        var key = new Key { id = so.targetObject.GetInstanceID(), path = areaProperty.propertyPath };
+        if (!States.TryGetValue(key, out var state)) return -1;
+        return state.selectedIndex;
+    }
+
+    internal static void SetSelectedIndexFor(SerializedObject so, SerializedProperty areaProperty, int index)
+    {
+        if (so == null || areaProperty == null) return;
+        var key = new Key { id = so.targetObject.GetInstanceID(), path = areaProperty.propertyPath };
+        if (!States.TryGetValue(key, out var state)) { state = new State(); States[key] = state; }
+        state.selectedIndex = index;
     }
 
     private static void DrawAreaSelectionFilled(SerializedProperty areaProperty, Transform owner, SerializedObject so, bool active)
