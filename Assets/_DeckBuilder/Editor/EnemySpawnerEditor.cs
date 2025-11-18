@@ -205,16 +205,16 @@ public class EnemySpawnerEditor : Editor
         // Build an equilateral triangle centered at origin using current radius for scale
         float r = Mathf.Max(1f, radiusProperty.floatValue);
         float h = Mathf.Sqrt(3f) * 0.5f * r; // height of equilateral triangle with side ~ r
-        Vector3 p0 = new Vector3(0f, 0f, r * 0.5f);
-        Vector3 p1 = new Vector3(-h, 0f, -r * 0.5f);
-        Vector3 p2 = new Vector3(h, 0f, -r * 0.5f);
+        Vector2 p0 = new Vector2(0f, r * 0.5f);
+        Vector2 p1 = new Vector2(-h, -r * 0.5f);
+        Vector2 p2 = new Vector2(h, -r * 0.5f);
 
         pointsProp.InsertArrayElementAtIndex(0);
-        pointsProp.GetArrayElementAtIndex(0).vector3Value = p0;
+        pointsProp.GetArrayElementAtIndex(0).vector2Value = p0;
         pointsProp.InsertArrayElementAtIndex(1);
-        pointsProp.GetArrayElementAtIndex(1).vector3Value = p1;
+        pointsProp.GetArrayElementAtIndex(1).vector2Value = p1;
         pointsProp.InsertArrayElementAtIndex(2);
-        pointsProp.GetArrayElementAtIndex(2).vector3Value = p2;
+        pointsProp.GetArrayElementAtIndex(2).vector2Value = p2;
 
         Undo.RecordObject(target, "Create Default Control Points");
         serializedObject.ApplyModifiedProperties();
