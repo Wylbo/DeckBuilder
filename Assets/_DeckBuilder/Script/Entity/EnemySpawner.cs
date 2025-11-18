@@ -191,26 +191,9 @@ public class EnemySpawner : MonoBehaviour
             return SampleRadiusArea();
         }
 
-        // Build world positions
         int n = points.Count;
-        polygonCache.Clear();
-        for (int i = 0; i < n; i++)
-        {
-            polygonCache.Add(transform.TransformPoint(points[i]));
-        }
-
-        // Compute plane basis and 2D projection
-        if (!TryBuildPlaneBasis(polygonCache, out Vector3 origin, out Vector3 axisX, out Vector3 axisY))
-        {
-            return SampleRadiusArea();
-        }
-
         var poly2 = new List<Vector2>(n);
-        for (int i = 0; i < n; i++)
-        {
-            Vector3 r = polygonCache[i] - origin;
-            poly2.Add(new Vector2(Vector3.Dot(r, axisX), Vector3.Dot(r, axisY)));
-        }
+        for (int i = 0; i < n; i++) poly2.Add(points[i]);
 
         List<int> tris = TriangulateConcave2D(poly2);
         if (tris == null || tris.Count < 3)
@@ -218,14 +201,14 @@ public class EnemySpawner : MonoBehaviour
             return SampleRadiusArea();
         }
 
-        // Accumulate areas in world space
+        // Accumulate areas in 2D (local XZ)
         float totalArea = 0f;
         for (int i = 0; i < tris.Count; i += 3)
         {
-            Vector3 a = polygonCache[tris[i]];
-            Vector3 b = polygonCache[tris[i + 1]];
-            Vector3 c = polygonCache[tris[i + 2]];
-            totalArea += TriangleArea(a, b, c);
+            Vector2 a = poly2[tris[i]];
+            Vector2 b = poly2[tris[i + 1]];
+            Vector2 c = poly2[tris[i + 2]];
+            totalArea += Mathf.Abs((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) * 0.5f;
         }
         if (totalArea <= Mathf.Epsilon)
         {
@@ -239,62 +222,27 @@ public class EnemySpawner : MonoBehaviour
             int ia = tris[i];
             int ib = tris[i + 1];
             int ic = tris[i + 2];
-            Vector3 a = polygonCache[ia];
-            Vector3 b = polygonCache[ib];
-            Vector3 c = polygonCache[ic];
-            float area = TriangleArea(a, b, c);
+            Vector2 a = poly2[ia];
+            Vector2 b = poly2[ib];
+            Vector2 c = poly2[ic];
+            float area = Mathf.Abs((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) * 0.5f;
             if (area <= Mathf.Epsilon) continue;
             acc += area;
             if (pick <= acc)
             {
-                // Sample uniformly in 2D using barycentric, then lift to 3D plane
-                Vector2 ua = poly2[ia];
-                Vector2 ub = poly2[ib];
-                Vector2 uc = poly2[ic];
-                Vector2 uv = RandomPointInTriangle2D(ua, ub, uc);
-                return origin + axisX * uv.x + axisY * uv.y;
+                Vector2 uv = RandomPointInTriangle2D(a, b, c);
+                Vector3 local = new Vector3(uv.x, 0f, uv.y);
+                return transform.TransformPoint(local);
             }
         }
 
-        // Fallback to last triangle center
+        // Fallback to centroid of last triangle in local
         int last = tris.Count - 3;
-        Vector2 u0 = poly2[tris[last]];
-        Vector2 u1 = poly2[tris[last + 1]];
-        Vector2 u2 = poly2[tris[last + 2]];
-        Vector2 ucent = (u0 + u1 + u2) / 3f;
-        return origin + axisX * ucent.x + axisY * ucent.y;
-    }
-
-    private static bool TryBuildPlaneBasis(List<Vector3> pts, out Vector3 origin, out Vector3 axisX, out Vector3 axisY)
-    {
-        origin = Vector3.zero; axisX = Vector3.right; axisY = Vector3.forward;
-        if (pts == null || pts.Count < 3) return false;
-        // Newell's method for robust polygon normal
-        Vector3 normal = Vector3.zero;
-        for (int i = 0, j = pts.Count - 1; i < pts.Count; j = i, i++)
-        {
-            Vector3 pi = pts[i];
-            Vector3 pj = pts[j];
-            normal.x += (pj.y - pi.y) * (pj.z + pi.z);
-            normal.y += (pj.z - pi.z) * (pj.x + pi.x);
-            normal.z += (pj.x - pi.x) * (pj.y + pi.y);
-        }
-        if (normal.sqrMagnitude < 1e-6f)
-        {
-            normal = Vector3.up; // fallback
-        }
-        else
-        {
-            normal.Normalize();
-        }
-        origin = pts[0];
-        // Choose axisX from a non-parallel vector
-        Vector3 tangent = Vector3.Cross(normal, Vector3.up);
-        if (tangent.sqrMagnitude < 1e-6f) tangent = Vector3.Cross(normal, Vector3.right);
-        tangent.Normalize();
-        axisX = tangent;
-        axisY = Vector3.Cross(normal, axisX).normalized;
-        return true;
+        Vector2 la = poly2[tris[last]];
+        Vector2 lb = poly2[tris[last + 1]];
+        Vector2 lc = poly2[tris[last + 2]];
+        Vector2 ucent = (la + lb + lc) / 3f;
+        return transform.TransformPoint(new Vector3(ucent.x, 0f, ucent.y));
     }
 
     private static List<int> TriangulateConcave2D(IReadOnlyList<Vector2> poly)
@@ -351,13 +299,6 @@ public class EnemySpawner : MonoBehaviour
     private static Vector2 RandomPointInTriangle2D(Vector2 a, Vector2 b, Vector2 c)
     {
         float r1 = Mathf.Sqrt(Random.value); float r2 = Random.value; return (1 - r1) * a + (r1 * (1 - r2)) * b + (r1 * r2) * c;
-    }
-
-    private static float TriangleArea(Vector3 a, Vector3 b, Vector3 c)
-    {
-        Vector3 ab = b - a;
-        Vector3 ac = c - a;
-        return Vector3.Cross(ab, ac).magnitude * 0.5f;
     }
 
     private static Vector3 RandomPointInTriangle(Vector3 a, Vector3 b, Vector3 c)

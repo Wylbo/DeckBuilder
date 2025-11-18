@@ -5,170 +5,84 @@ using UnityEngine;
 public class AreaSelection
 {
     [SerializeField]
-    private List<Vector3> controlPoints = new List<Vector3>();
+    private List<Vector2> controlPoints = new List<Vector2>();
 
-    public IReadOnlyList<Vector3> ControlPoints => controlPoints;
+    [SerializeField, Min(0f)]
+    private float height = 2f; // vertical extrusion height (along world Y)
+
+    public IReadOnlyList<Vector2> ControlPoints => controlPoints;
+    public float Height { get => height; set => height = Mathf.Max(0f, value); }
 
     public bool HasValidPolygon => controlPoints != null && controlPoints.Count >= 3;
 
     public void GetWorldPoints(Transform reference, List<Vector3> results)
     {
-        if (results == null)
-        {
-            return;
-        }
-
+        if (results == null) return;
         results.Clear();
-
-        if (reference == null || !HasValidPolygon)
+        if (reference == null || !HasValidPolygon) return;
+        foreach (Vector2 p in controlPoints)
         {
-            return;
-        }
-
-        foreach (Vector3 point in controlPoints)
-        {
-            Vector3 worldPoint = reference.TransformPoint(point);
-            results.Add(worldPoint);
+            results.Add(reference.TransformPoint(new Vector3(p.x, 0f, p.y)));
         }
     }
 
     public Vector3 GetWorldPoint(Transform reference, int index)
     {
-        if (reference == null || controlPoints == null || index < 0 || index >= controlPoints.Count)
-        {
-            return Vector3.zero;
-        }
-
-        Vector3 point = controlPoints[index];
-        return reference.TransformPoint(point);
+        if (reference == null || controlPoints == null || index < 0 || index >= controlPoints.Count) return Vector3.zero;
+        Vector2 p = controlPoints[index];
+        return reference.TransformPoint(new Vector3(p.x, 0f, p.y));
     }
 
     public void SetFromWorldPoint(Transform reference, int index, Vector3 worldPosition)
     {
-        if (reference == null || controlPoints == null || index < 0 || index >= controlPoints.Count)
-        {
-            return;
-        }
-
-        Vector3 localPoint = reference.InverseTransformPoint(worldPosition);
-        controlPoints[index] = localPoint;
+        if (reference == null || controlPoints == null || index < 0 || index >= controlPoints.Count) return;
+        Vector3 local = reference.InverseTransformPoint(worldPosition);
+        controlPoints[index] = new Vector2(local.x, local.z);
     }
 
-    // Returns true if the given world-space point lies inside the polygon defined by controlPoints
-    // Supports concave shapes and arbitrary inclination (projects onto the polygon plane)
+    // Returns true if the given world-space point lies inside the extruded volume (extrusion along reference.up)
     public bool ContainsWorldPoint(Vector3 worldPoint, Transform reference)
     {
         if (!HasValidPolygon || reference == null) return false;
 
-        var world = new List<Vector3>(controlPoints.Count);
-        foreach (var lp in controlPoints)
-        {
-            world.Add(reference.TransformPoint(lp));
-        }
-
-        if (!TryBuildPlaneBasis(world, out var origin, out var axisX, out var axisY, out var normal))
-        {
-            return false;
-        }
-
-        var poly2 = new List<Vector2>(world.Count);
-        for (int i = 0; i < world.Count; i++)
-        {
-            Vector3 r = world[i] - origin;
-            poly2.Add(new Vector2(Vector3.Dot(r, axisX), Vector3.Dot(r, axisY)));
-        }
-
-        Vector3 rp = worldPoint - origin;
-        Vector2 p2 = new Vector2(Vector3.Dot(rp, axisX), Vector3.Dot(rp, axisY));
-        return PointInPolygon2D(poly2, p2);
+        // Work in reference local space: local.y is along reference.up
+        Vector3 local = reference.InverseTransformPoint(worldPoint);
+        if (local.y < 0f || local.y > height) return false;
+        Vector2 p = new Vector2(local.x, local.z);
+        return PointInPolygon2D(controlPoints, p);
     }
 
-    // Returns the closest point on the polygon in world space to the given world point.
-    // If inside, returns the projection onto the polygon plane; otherwise the closest point on any polygon edge.
+    // Closest point on the extruded volume (XZ polygon with Y in [base, base+height])
     public Vector3 ClosestPointOnAreaWorld(Vector3 worldPoint, Transform reference)
     {
-        if (reference == null || controlPoints == null || controlPoints.Count == 0)
+        if (reference == null || controlPoints == null || controlPoints.Count == 0) return worldPoint;
+
+        // Work in local space: local.y along up axis
+        Vector3 local = reference.InverseTransformPoint(worldPoint);
+        Vector2 p = new Vector2(local.x, local.z);
+
+        // If inside horizontally, clamp Y
+        if (PointInPolygon2D(controlPoints, p))
         {
-            return worldPoint;
+            local.y = Mathf.Clamp(local.y, 0f, height);
+            return reference.TransformPoint(local);
         }
 
-        var world = new List<Vector3>(controlPoints.Count);
-        foreach (var lp in controlPoints)
+        // Else, find closest point on polygon edges in local XZ, then convert back to world
+        Vector2 best = controlPoints[0];
+        float bestSq = float.PositiveInfinity;
+        for (int i = 0, j = controlPoints.Count - 1; i < controlPoints.Count; j = i, i++)
         {
-            world.Add(reference.TransformPoint(lp));
-        }
-
-        if (controlPoints.Count < 3)
-        {
-            // Fallback to nearest vertex
-            Vector3 best = world[0];
-            float bestSq = (worldPoint - best).sqrMagnitude;
-            for (int i = 1; i < world.Count; i++)
-            {
-                float d = (worldPoint - world[i]).sqrMagnitude;
-                if (d < bestSq) { bestSq = d; best = world[i]; }
-            }
-            return best;
-        }
-
-        if (!TryBuildPlaneBasis(world, out var origin, out var axisX, out var axisY, out var normal))
-        {
-            return world[0];
-        }
-
-        // Project onto plane
-        Plane plane = new Plane(normal, origin);
-        Vector3 onPlane = plane.ClosestPointOnPlane(worldPoint);
-
-        // If inside, the projected point is closest
-        var poly2 = new List<Vector2>(world.Count);
-        for (int i = 0; i < world.Count; i++)
-        {
-            Vector3 r = world[i] - origin;
-            poly2.Add(new Vector2(Vector3.Dot(r, axisX), Vector3.Dot(r, axisY)));
-        }
-        Vector3 rp = onPlane - origin;
-        Vector2 p2 = new Vector2(Vector3.Dot(rp, axisX), Vector3.Dot(rp, axisY));
-        if (PointInPolygon2D(poly2, p2)) return onPlane;
-
-        // Else closest on edges (3D)
-        Vector3 bestPoint = world[0];
-        float bestDistSq = float.PositiveInfinity;
-        for (int i = 0, j = world.Count - 1; i < world.Count; j = i, i++)
-        {
-            Vector3 a = world[j], b = world[i];
-            Vector3 ab = b - a;
+            Vector2 a = controlPoints[j];
+            Vector2 b = controlPoints[i];
+            Vector2 ab = b - a;
             float denom = ab.sqrMagnitude;
-            float t = denom > 1e-6f ? Mathf.Clamp01(Vector3.Dot(worldPoint - a, ab) / denom) : 0f;
-            Vector3 q = a + t * ab;
-            float d = (worldPoint - q).sqrMagnitude;
-            if (d < bestDistSq) { bestDistSq = d; bestPoint = q; }
+            float t = denom > 1e-6f ? Mathf.Clamp01(Vector2.Dot(p - a, ab) / denom) : 0f;
+            Vector2 q = a + t * ab;
+            float d = (p - q).sqrMagnitude;
+            if (d < bestSq) { bestSq = d; best = q; }
         }
-        return bestPoint;
-    }
-
-    private static bool TryBuildPlaneBasis(IReadOnlyList<Vector3> pts, out Vector3 origin, out Vector3 axisX, out Vector3 axisY, out Vector3 normal)
-    {
-        origin = Vector3.zero; axisX = Vector3.right; axisY = Vector3.forward; normal = Vector3.up;
-        if (pts == null || pts.Count < 3) return false;
-        // Newell's method for robust normal
-        Vector3 n = Vector3.zero;
-        for (int i = 0, j = pts.Count - 1; i < pts.Count; j = i, i++)
-        {
-            Vector3 pi = pts[i], pj = pts[j];
-            n.x += (pj.y - pi.y) * (pj.z + pi.z);
-            n.y += (pj.z - pi.z) * (pj.x + pi.x);
-            n.z += (pj.x - pi.x) * (pj.y + pi.y);
-        }
-        if (n.sqrMagnitude < 1e-6f) n = Vector3.up; else n.Normalize();
-        normal = n;
-        origin = pts[0];
-        Vector3 tangent = Vector3.Cross(n, Vector3.up);
-        if (tangent.sqrMagnitude < 1e-6f) tangent = Vector3.Cross(n, Vector3.right);
-        tangent.Normalize();
-        axisX = tangent;
-        axisY = Vector3.Cross(n, axisX).normalized;
-        return true;
+        return reference.TransformPoint(new Vector3(best.x, Mathf.Clamp(local.y, 0f, height), best.y));
     }
 
     private static bool PointInPolygon2D(IReadOnlyList<Vector2> poly, Vector2 p)
