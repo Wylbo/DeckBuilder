@@ -21,6 +21,10 @@ public class Character : Entity
     private void OnEnable()
     {
         isDead = false;
+        if (characterVisual != null)
+        {
+            characterVisual.ResetVisualState();
+        }
         health.On_Empty += Health_On_Empty;
         hurtbox.On_DamageReceived += Hurtbox_On_DamageReceived;
         hurtbox.SetOwner(this);
