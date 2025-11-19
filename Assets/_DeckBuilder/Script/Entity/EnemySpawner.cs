@@ -40,7 +40,7 @@ public class EnemySpawner : MonoBehaviour
     {
         if (enemyManager == null)
         {
-            enemyManager = FindObjectOfType<EnemyManager>();
+            enemyManager = FindFirstObjectByType<EnemyManager>();
         }
     }
 
@@ -248,8 +248,22 @@ public class EnemySpawner : MonoBehaviour
             if (pick <= acc)
             {
                 Vector2 uv = RandomPointInTriangle2D(a, b, c);
-                Vector3 local = new Vector3(uv.x, 0f, uv.y);
-                return transform.TransformPoint(local);
+                // Convert sampled local XZ to world, then raycast from top of extruded area downwards
+                float height = controlPointArea != null ? Mathf.Max(0f, controlPointArea.Height) : 0f;
+                Vector3 topWorld = transform.TransformPoint(new Vector3(uv.x, height, uv.y));
+                Vector3 bottomWorld = transform.TransformPoint(new Vector3(uv.x, 0f, uv.y));
+                Vector3 dir = (bottomWorld - topWorld);
+                float dist = dir.magnitude;
+                if (dist > 1e-4f)
+                {
+                    dir /= dist;
+                    if (Physics.Raycast(topWorld, dir, out RaycastHit rh, dist + 0.05f))
+                    {
+                        return rh.point;
+                    }
+                }
+                // Fallback to bottom plane if nothing hit
+                return bottomWorld;
             }
         }
 
@@ -259,7 +273,20 @@ public class EnemySpawner : MonoBehaviour
         Vector2 lb = poly2[tris[last + 1]];
         Vector2 lc = poly2[tris[last + 2]];
         Vector2 ucent = (la + lb + lc) / 3f;
-        return transform.TransformPoint(new Vector3(ucent.x, 0f, ucent.y));
+        float h = controlPointArea != null ? Mathf.Max(0f, controlPointArea.Height) : 0f;
+        Vector3 top = transform.TransformPoint(new Vector3(ucent.x, h, ucent.y));
+        Vector3 bottom = transform.TransformPoint(new Vector3(ucent.x, 0f, ucent.y));
+        Vector3 d = (bottom - top);
+        float L = d.magnitude;
+        if (L > 1e-4f)
+        {
+            d /= L;
+            if (Physics.Raycast(top, d, out RaycastHit hit, L + 0.05f))
+            {
+                return hit.point;
+            }
+        }
+        return bottom;
     }
 
     private static List<int> TriangulateConcave2D(IReadOnlyList<Vector2> poly)

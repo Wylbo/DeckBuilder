@@ -2099,60 +2099,6 @@ Transform:
   - {fileID: 1805991381}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
---- !u!1 &898475382
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 898475384}
-  - component: {fileID: 898475383}
-  m_Layer: 0
-  m_Name: \
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &898475383
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 898475382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca16b9a2f6c412b4bafade8da73b0670, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Tesy
-  area:
-    controlPoints:
-    - {x: 9.841622, y: 6.794073}
-    - {x: 2.6532106, y: 13.828105}
-    - {x: -7.0755596, y: 11.125163}
-    - {x: -13.082889, y: -2.1968832}
-    - {x: -9.067811, y: -17.063887}
-    - {x: -3.850276, y: -2.4129744}
-    - {x: 20.581703, y: -10.073597}
-    height: 22.963728
---- !u!4 &898475384
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 898475382}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 32.83, y: 0.71, z: -16.32}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &954381737 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6391905981978946593, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
@@ -3271,11 +3217,9 @@ MonoBehaviour:
   enemyManager: {fileID: 413988910}
   spawnableEnemies:
   - prefab: {fileID: 954381737}
-    percentage: 68
-  - prefab: {fileID: 954381737}
-    percentage: 32
+    percentage: 100
   spawnOnStart: 1
-  spawnCountOnStart: 100
+  spawnCountOnStart: 10
   spawnAreaMode: 1
   radius: 5.207798
   controlPointArea:
@@ -3716,7 +3660,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1888576964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4623,6 +4567,10 @@ PrefabInstance:
       propertyPath: 'activeModifiers.Array.data[4]'
       value: 
       objectReference: {fileID: 11400000, guid: 40de49396777806429804d7c76d10e4a, type: 2}
+    - target: {fileID: 6546554290466899498, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
+      propertyPath: maxHealth
+      value: 3000
+      objectReference: {fileID: 0}
     - target: {fileID: 6792054741448164557, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
       propertyPath: dodgeAbility.Ability
       value: 
@@ -4739,4 +4687,3 @@ SceneRoots:
   - {fileID: 1888576965}
   - {fileID: 1801437892}
   - {fileID: 413988911}
-  - {fileID: 898475384}
