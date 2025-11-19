@@ -13,14 +13,27 @@ public class Controller : MonoBehaviour
 	[SerializeField]
 	private ControlStrategy controlStrategy;
 
+	// Runtime instance to avoid shared SO state across multiple controllers
+	private ControlStrategy runtimeControlStrategy;
+
 	protected virtual void Start()
 	{
-		controlStrategy?.Initialize(this, character);
+		if (controlStrategy != null)
+		{
+			// Instantiate a per-controller copy so per-instance fields aren't shared
+			runtimeControlStrategy = Instantiate(controlStrategy);
+			runtimeControlStrategy.Initialize(this, character);
+		}
 	}
 
 	protected virtual void Update()
 	{
-		controlStrategy?.Control(Time.deltaTime);
+		runtimeControlStrategy?.Control(Time.deltaTime);
+	}
+
+	protected virtual void OnDestroy()
+	{
+		runtimeControlStrategy?.Disable();
 	}
 
 	private void Reset()

@@ -51,7 +51,7 @@ public static class AreaSelectionSceneTool
             Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
             Component bestComp = null;
             float bestDist = float.PositiveInfinity;
-            var allForPick = UnityEngine.Object.FindObjectsOfType<Component>();
+            var allForPick = UnityEngine.Object.FindObjectsByType<Component>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             foreach (var comp in allForPick)
             {
                 if (comp == null || comp.gameObject == null) continue;
@@ -97,7 +97,7 @@ public static class AreaSelectionSceneTool
         // Draw non-selected (dim cyan, no handles) unless hidden by toggle
         if (!showOnlySelected)
         {
-            var allComponents = UnityEngine.Object.FindObjectsOfType<Component>();
+            var allComponents = UnityEngine.Object.FindObjectsByType<Component>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             foreach (var comp in allComponents)
             {
                 if (comp == null || comp.gameObject == null) continue;
