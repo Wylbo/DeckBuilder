@@ -218,40 +218,15 @@ public class EnemySpawner : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.green;
-
-        if (spawnAreaMode == SpawnAreaMode.ControlPoints && HasValidControlPoints())
-        {
-            controlPointArea.GetWorldPoints(transform, polygonCache);
-            if (polygonCache.Count == 0)
-            {
-                return;
-            }
-
-            Vector3 previous = polygonCache[0];
-            Gizmos.DrawSphere(previous, 0.2f);
-
-            for (int i = 1; i < polygonCache.Count; i++)
-            {
-                Vector3 point = polygonCache[i];
-                Gizmos.DrawSphere(point, 0.2f);
-                Gizmos.DrawLine(previous, point);
-                previous = point;
-            }
-
-            Gizmos.DrawLine(previous, polygonCache[0]);
-        }
-        else
-        {
 #if UNITY_EDITOR
-            // Draw a filled disk in Scene view to match control area visuals
+        Gizmos.color = Color.green;
+        if (spawnAreaMode == SpawnAreaMode.Radius)
+        {
             UnityEditor.Handles.color = new Color(0f, 0.85f, 0.3f, 0.15f);
             UnityEditor.Handles.DrawSolidDisc(transform.position, Vector3.up, radius);
             UnityEditor.Handles.color = Color.green;
             UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, radius);
-#else
-            Gizmos.DrawWireSphere(transform.position, radius);
-#endif
         }
+#endif
     }
 }

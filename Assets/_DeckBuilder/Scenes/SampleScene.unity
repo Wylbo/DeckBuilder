@@ -3219,24 +3219,18 @@ MonoBehaviour:
   - prefab: {fileID: 954381737}
     percentage: 100
   spawnOnStart: 1
-  spawnCountOnStart: 10
+  spawnCountOnStart: 30
   spawnAreaMode: 1
   radius: 5.207798
   controlPointArea:
     controlPoints:
-    - {x: 2.55181, y: -15.089874}
-    - {x: 1.69287, y: -7.905411}
-    - {x: 6.287692, y: -4.096895}
-    - {x: 13.859874, y: -5.9716816}
-    - {x: 19.629078, y: 0.60595703}
-    - {x: 12.3623, y: 9.460298}
-    - {x: 1.5966244, y: 12.451316}
-    - {x: -7.329297, y: 10.640856}
-    - {x: -16.076452, y: 11.77635}
-    - {x: -15.741528, y: 5.301915}
-    - {x: -8.40998, y: -4.1973457}
-    - {x: -10.422994, y: -12.975479}
-    height: 11.114471
+    - {x: 2.29921, y: -7.77128}
+    - {x: 10.985013, y: -0.074226305}
+    - {x: 2.3347564, y: 7.8910775}
+    - {x: -3.1346827, y: 7.9338536}
+    - {x: -9.315425, y: -0.15409057}
+    - {x: -3.1688728, y: -7.825334}
+    height: 3.7125964
   maxAttemptsPerSpawn: 10
   navMeshSampleDistance: 2
   navMeshAreaMask: -1
@@ -3249,7 +3243,7 @@ Transform:
   m_GameObject: {fileID: 1801437890}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 31.54, y: 0.5, z: 16.02}
+  m_LocalPosition: {x: 18.67, y: 0.04, z: 16.535948}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4236,6 +4230,68 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2106810858}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &2119490753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2119490755}
+  - component: {fileID: 2119490754}
+  m_Layer: 0
+  m_Name: Spawner (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2119490754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2119490753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c785607f0d6471349a53389654e1239d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
+  enemyManager: {fileID: 413988910}
+  spawnableEnemies:
+  - prefab: {fileID: 954381737}
+    percentage: 100
+  spawnOnStart: 1
+  spawnCountOnStart: 30
+  spawnAreaMode: 1
+  radius: 5.207798
+  controlPointArea:
+    controlPoints:
+    - {x: 2.7410553, y: -10.301493}
+    - {x: 2.7277057, y: 10.307133}
+    - {x: -2.7417336, y: 10.349909}
+    - {x: -2.7270274, y: -10.355547}
+    height: 6.965247
+  maxAttemptsPerSpawn: 10
+  navMeshSampleDistance: 2
+  navMeshAreaMask: -1
+--- !u!4 &2119490755
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2119490753}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.033340592, y: 0.04, z: 14.171904}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2627399454117105824
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4686,4 +4742,5 @@ SceneRoots:
   - {fileID: 1467445572}
   - {fileID: 1888576965}
   - {fileID: 1801437892}
+  - {fileID: 2119490755}
   - {fileID: 413988911}

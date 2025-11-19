@@ -24,11 +24,38 @@ public static class AreaSelectionSceneTool
     private static readonly Dictionary<Key, State> States = new Dictionary<Key, State>();
 
     private static bool showOnlySelected = false;
-    internal static bool GetShowOnlySelected() => showOnlySelected;
-    internal static void SetShowOnlySelected(bool value)
+    private const string PrefShowAngles = "AreaSelection.ShowAngles";
+    private const string PrefShowWalls = "AreaSelection.ShowWalls";
+    private const string PrefShowTop = "AreaSelection.ShowTop";
+    private static bool showAngles = true;
+    private static bool showWalls = true;
+    private static bool showTop = true;
+    public static bool GetShowOnlySelected() => showOnlySelected;
+    public static void SetShowOnlySelected(bool value)
     {
         showOnlySelected = value;
         EditorPrefs.SetBool(PrefShowOnlySelected, showOnlySelected);
+        SceneView.RepaintAll();
+    }
+    public static bool GetShowAngles() => showAngles;
+    public static void SetShowAngles(bool v)
+    {
+        showAngles = v;
+        EditorPrefs.SetBool(PrefShowAngles, showAngles);
+        SceneView.RepaintAll();
+    }
+    public static bool GetShowWalls() => showWalls;
+    public static void SetShowWalls(bool v)
+    {
+        showWalls = v;
+        EditorPrefs.SetBool(PrefShowWalls, showWalls);
+        SceneView.RepaintAll();
+    }
+    public static bool GetShowTop() => showTop;
+    public static void SetShowTop(bool v)
+    {
+        showTop = v;
+        EditorPrefs.SetBool(PrefShowTop, showTop);
         SceneView.RepaintAll();
     }
 
@@ -37,7 +64,12 @@ public static class AreaSelectionSceneTool
         SceneView.duringSceneGui -= OnSceneGUI;
         SceneView.duringSceneGui += OnSceneGUI;
         showOnlySelected = EditorPrefs.GetBool(PrefShowOnlySelected, false);
+        showAngles = EditorPrefs.GetBool(PrefShowAngles, true);
+        showWalls = EditorPrefs.GetBool(PrefShowWalls, true);
+        showTop = EditorPrefs.GetBool(PrefShowTop, true);
     }
+
+    
 
     private static void OnSceneGUI(SceneView view)
     {
@@ -218,51 +250,98 @@ public static class AreaSelectionSceneTool
             }
         }
 
-        // Controls moved to an Overlay (AreaSelectionOverlay). No IMGUI here.
-
-        for (int i = 0; i < count; i++)
+        // Make control points directly draggable with FreeMoveHandle (toggleable)
+        if (showAngles)
         {
-            Vector3 worldPt = polyWorld[i];
-            float size = HandleUtility.GetHandleSize(worldPt) * 0.08f;
-            Handles.color = (i == state.selectedIndex) ? Color.yellow : Color.green;
-            if (Handles.Button(worldPt, Quaternion.identity, size, size, Handles.DotHandleCap))
+            for (int i = 0; i < count; i++)
             {
-                state.selectedIndex = i;
-                SceneView.RepaintAll();
+                Vector3 worldPt = polyWorld[i];
+                float size = HandleUtility.GetHandleSize(worldPt) * 0.08f;
+
+                // Click to select (no move required)
+                Handles.color = (i == state.selectedIndex) ? Color.yellow : Color.green;
+                if (Handles.Button(worldPt, Quaternion.identity, size, size, Handles.DotHandleCap))
+                {
+                    state.selectedIndex = i;
+                    SceneView.RepaintAll();
+                }
+
+                // Drag to move directly
+                EditorGUI.BeginChangeCheck();
+                Vector3 moved = Handles.FreeMoveHandle(worldPt, size * 0.95f, Vector3.zero, Handles.DotHandleCap);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(so.targetObject, "Move Area Control Point");
+                    Vector3 movedLocal = owner.InverseTransformPoint(moved);
+                    pointsProp.GetArrayElementAtIndex(i).vector2Value = new Vector2(movedLocal.x, movedLocal.z);
+                    state.selectedIndex = i;
+                    so.ApplyModifiedProperties();
+                    SceneView.RepaintAll();
+                }
+
+                Handles.color = Color.white;
+                Handles.Label(worldPt + Vector3.up * 0.2f, $"P{i}");
             }
-            Handles.color = Color.white;
-            Handles.Label(worldPt + Vector3.up * 0.2f, $"P{i}");
         }
 
-        if (state.selectedIndex >= 0 && state.selectedIndex < count)
+        // Side-plane sliders: drag each edge along its outward normal
+        if (showWalls && count >= 2)
         {
-            Vector2 selLocal2 = pointsProp.GetArrayElementAtIndex(state.selectedIndex).vector2Value;
-            Vector3 selWorld = owner.TransformPoint(new Vector3(selLocal2.x, 0f, selLocal2.y));
+            float hNow = Mathf.Max(0f, heightProp.floatValue);
+            Vector3 up = owner.up * hNow * 0.5f; // place handle halfway up the side
+            for (int i = 0; i < count; i++)
+            {
+                int j = (i + 1) % count;
+                Vector2 pi = pointsProp.GetArrayElementAtIndex(i).vector2Value;
+                Vector2 pj = pointsProp.GetArrayElementAtIndex(j).vector2Value;
+                Vector2 dir2 = (pj - pi);
+                if (dir2.sqrMagnitude < 1e-8f) continue;
+                dir2.Normalize();
+                // Perpendicular 2D (rotate 90deg CCW). Users can drag both directions anyway.
+                Vector2 n2 = new Vector2(-dir2.y, dir2.x);
+
+                Vector3 wi = owner.TransformPoint(new Vector3(pi.x, 0f, pi.y));
+                Vector3 wj = owner.TransformPoint(new Vector3(pj.x, 0f, pj.y));
+                Vector3 mid = (wi + wj) * 0.5f + up;
+                Vector3 nWorld = owner.TransformDirection(new Vector3(n2.x, 0f, n2.y));
+
+                Handles.color = new Color(1f, 0.6f, 0.2f, 1f);
+                float handleSize = HandleUtility.GetHandleSize(mid) * 0.15f;
+                EditorGUI.BeginChangeCheck();
+                Vector3 newMid = Handles.Slider(mid, nWorld, handleSize, Handles.CubeHandleCap, 0f);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(so.targetObject, "Slide Area Side");
+                    Vector3 deltaW = newMid - mid;
+                    Vector3 deltaL = owner.InverseTransformVector(deltaW);
+                    float d = Vector2.Dot(new Vector2(deltaL.x, deltaL.z), n2);
+                    // Shift both endpoints along the 2D normal
+                    Vector2 off = n2 * d;
+                    pointsProp.GetArrayElementAtIndex(i).vector2Value = pi + off;
+                    pointsProp.GetArrayElementAtIndex(j).vector2Value = pj + off;
+                    so.ApplyModifiedProperties();
+                    SceneView.RepaintAll();
+                }
+            }
+        }
+
+        if (showTop)
+        {
+            Vector3 centroidWorld = ComputeCentroidWorld(polyWorld);
+            Vector3 basePos = centroidWorld;
+            Vector3 topPos = basePos + owner.up * h;
+            Handles.color = new Color(0.2f, 0.8f, 1f, 1f);
             EditorGUI.BeginChangeCheck();
-            Vector3 newWorld = Handles.FreeMoveHandle(selWorld, HandleUtility.GetHandleSize(selWorld) * 0.075f, Vector3.zero, Handles.DotHandleCap);
+            Vector3 newTop = Handles.Slider(topPos, owner.up, HandleUtility.GetHandleSize(topPos) * 0.2f, Handles.ConeHandleCap, 0f);
             if (EditorGUI.EndChangeCheck())
             {
-                Undo.RecordObject(so.targetObject, "Move Area Control Point");
-                Vector3 newLocal = owner.InverseTransformPoint(newWorld);
-                pointsProp.GetArrayElementAtIndex(state.selectedIndex).vector2Value = new Vector2(newLocal.x, newLocal.z);
+                Undo.RecordObject(so.targetObject, "Adjust Area Height");
+                float newHeight = Mathf.Max(0f, Vector3.Dot(newTop - basePos, owner.up));
+                heightProp.floatValue = newHeight;
                 so.ApplyModifiedProperties();
             }
+            Handles.Label(topPos + owner.up * 0.2f, $"Height: {h:0.##}");
         }
-
-        Vector3 centroidWorld = ComputeCentroidWorld(polyWorld);
-        Vector3 basePos = centroidWorld;
-        Vector3 topPos = basePos + owner.up * h;
-        Handles.color = new Color(0.2f, 0.8f, 1f, 1f);
-        EditorGUI.BeginChangeCheck();
-        Vector3 newTop = Handles.Slider(topPos, owner.up, HandleUtility.GetHandleSize(topPos) * 0.2f, Handles.ConeHandleCap, 0f);
-        if (EditorGUI.EndChangeCheck())
-        {
-            Undo.RecordObject(so.targetObject, "Adjust Area Height");
-            float newHeight = Mathf.Max(0f, Vector3.Dot(newTop - basePos, owner.up));
-            heightProp.floatValue = newHeight;
-            so.ApplyModifiedProperties();
-        }
-        Handles.Label(topPos + owner.up * 0.2f, $"Height: {h:0.##}");
     }
 
     // Overlay helpers to share selection state
