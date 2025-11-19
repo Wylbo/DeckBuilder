@@ -93,8 +93,7 @@ public class EnemySpawner : MonoBehaviour
             return null;
         }
 
-        Character instance = Instantiate(prefab, spawnPosition, Quaternion.identity);
-        InitializeSpawnedEnemy(instance);
+        Character instance = SpawnFromManager(prefab, spawnPosition);
         return instance;
     }
 
@@ -147,14 +146,32 @@ public class EnemySpawner : MonoBehaviour
         return null;
     }
 
-    private void InitializeSpawnedEnemy(Character character)
+    private Character SpawnFromManager(Character prefab, Vector3 spawnPosition)
     {
-        if (character == null)
+        Character instance = null;
+
+        if (enemyManager != null)
         {
-            return;
+            instance = enemyManager.SpawnFromPool(prefab, spawnPosition, Quaternion.identity);
+        }
+        else
+        {
+            GameObject provided = PoolManager.Provide(prefab.gameObject, spawnPosition, Quaternion.identity, transform);
+            if (provided != null)
+            {
+                instance = provided.GetComponent<Character>();
+                if (instance == null)
+                {
+                    Debug.LogError($"[{nameof(EnemySpawner)}] Spawned object {provided.name} is missing a {nameof(Character)} component", this);
+                }
+                else
+                {
+                    Debug.LogWarning($"[{nameof(EnemySpawner)}] No {nameof(EnemyManager)} assigned, spawned enemy will not be tracked", this);
+                }
+            }
         }
 
-        enemyManager?.Register(character);
+        return instance;
     }
 
     private bool TryGetSpawnPosition(out Vector3 spawnPosition)
