@@ -1,19 +1,21 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Character : Entity
+public class Character : Entity, IFactionOwner
 {
     [SerializeField] private CharacterVisual characterVisual;
     [SerializeField] private Movement movement;
     [SerializeField] private AbilityCaster abilityCaster;
     [SerializeField] private Health health;
     [SerializeField] private Hurtbox hurtbox;
+    [SerializeField] private Faction faction;
 
     private bool isDead;
 
     public Movement Movement => movement;
     public Health Health => health;
     public bool IsDead => isDead;
+    public Faction Faction => faction;
 
     public event UnityAction On_Died;
     public event UnityAction<Character> On_ReadyForRelease;
@@ -101,5 +103,10 @@ public class Character : Entity
         }
 
         gameObject.SetActive(false);
+    }
+
+    public bool IsHostileTo(IFactionOwner other)
+    {
+        return FactionOwnerExtensions.IsHostileTo(this, other);
     }
 }

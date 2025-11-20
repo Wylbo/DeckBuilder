@@ -3224,13 +3224,15 @@ MonoBehaviour:
   radius: 5.207798
   controlPointArea:
     controlPoints:
-    - {x: 2.29921, y: -7.77128}
-    - {x: 10.985013, y: -0.074226305}
-    - {x: 2.3347564, y: 7.8910775}
-    - {x: -3.1346827, y: 7.9338536}
-    - {x: -9.315425, y: -0.15409057}
-    - {x: -3.1688728, y: -7.825334}
-    height: 3.7125964
+    - {x: 9.75461, y: -10.407583}
+    - {x: 9.730606, y: 10.953946}
+    - {x: -5.115935, y: 11.020982}
+    - {x: -5.1283383, y: 2.0569239}
+    - {x: 0.65641236, y: 2.1670847}
+    - {x: 0.389889, y: -2.657074}
+    - {x: -5.1735444, y: -2.8205252}
+    - {x: -5.1136994, y: -10.313755}
+    height: 3.3179455
   maxAttemptsPerSpawn: 10
   navMeshSampleDistance: 2
   navMeshAreaMask: -1
@@ -3243,7 +3245,7 @@ Transform:
   m_GameObject: {fileID: 1801437890}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.67, y: 0.04, z: 16.535948}
+  m_LocalPosition: {x: 11.749243, y: 0.13, z: 15.340659}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4286,7 +4288,7 @@ Transform:
   m_GameObject: {fileID: 2119490753}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.033340592, y: 0.04, z: 14.171904}
+  m_LocalPosition: {x: -0.06, y: 0.04, z: 14.171904}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

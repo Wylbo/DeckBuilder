@@ -16,7 +16,12 @@ public class Hitbox : MonoBehaviour, IDamager, IOwnable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out IDamageable damageable) && damageable.Owner != Owner)
+        if (Owner == null)
+        {
+            return;
+        }
+
+        if (other.TryGetComponent(out IDamageable damageable) && Owner.IsHostileTo(damageable.Owner))
         {
             damageable.TakeDamage(CreateDamageInstance());
         }
