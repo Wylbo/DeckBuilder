@@ -62,6 +62,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -83,6 +85,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -156,6 +159,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifeTime: 3
+  trailRenderers:
+  - {fileID: 5955434184048893913}
+  - {fileID: 1469851734481941481}
   maxSpeed: 10
   hasAcceleration: 0
   acceleration: 1000
@@ -267,6 +273,16 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 70651edd500249446a18cf7fc3ce06e0, type: 3}
+--- !u!96 &1469851734481941481 stripped
+TrailRenderer:
+  m_CorrespondingSourceObject: {fileID: 6321045772345686334, guid: 70651edd500249446a18cf7fc3ce06e0, type: 3}
+  m_PrefabInstance: {fileID: 4890113143938714327}
+  m_PrefabAsset: {fileID: 0}
+--- !u!96 &5955434184048893913 stripped
+TrailRenderer:
+  m_CorrespondingSourceObject: {fileID: 1258993764720727310, guid: 70651edd500249446a18cf7fc3ce06e0, type: 3}
+  m_PrefabInstance: {fileID: 4890113143938714327}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8400969031003361574 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3984303773520288753, guid: 70651edd500249446a18cf7fc3ce06e0, type: 3}
