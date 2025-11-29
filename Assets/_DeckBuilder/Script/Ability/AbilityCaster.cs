@@ -13,6 +13,7 @@ public class AbilityCaster : MonoBehaviour
     [SerializeField] private AbilityModifierManager modifierManager;
 
     public SpellSlot[] SpellSlots => spellSlots;
+    public SpellSlot DodgeSpellSlot => dodgeSpellSlot;
     public ProjectileLauncher ProjectileLauncher => projectileLauncher;
     public AbilityModifierManager ModifierManager => modifierManager;
 
@@ -70,6 +71,19 @@ public class AbilityCaster : MonoBehaviour
         {
             slot.UpdateCooldown(Time.deltaTime);
         }
+    }
+
+    public void AssignAbilityToSlot(int index, Ability ability)
+    {
+        if (index < 0 || index >= spellSlots.Length)
+            return;
+
+        spellSlots[index].SetAbility(ability, this);
+    }
+
+    public void AssignDodgeAbility(Ability ability)
+    {
+        dodgeSpellSlot.SetAbility(ability, this);
     }
 
     public bool Cast(int index, Vector3 worldPos)
