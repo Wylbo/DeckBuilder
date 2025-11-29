@@ -6,6 +6,7 @@ using UnityEngine.Events;
 [CreateAssetMenu(fileName = nameof(Ability), menuName = FileName.AbilityFolder + nameof(Ability), order = 0)]
 public class Ability : ScriptableObject
 {
+    [SerializeField] private Sprite icon;
     [SerializeField] private bool rotatingCasterToCastDirection = true;
     [SerializeField] protected bool stopMovementOnCast = false;
     [SerializeField] protected List<ScriptableDebuff> debuffsOnCast;
@@ -18,6 +19,7 @@ public class Ability : ScriptableObject
     // [SerializeField, InlineEditor] private AbilitySharedStats sharedStats;
 
     public AbilityCaster Caster { get; private set; }
+    public Sprite Icon => icon;
     public bool RotatingCasterToCastDirection => rotatingCasterToCastDirection;
     public GTagSet TagSet => tagSet;
     public IReadOnlyList<AbilityStatEntry> BaseStats => baseStats;

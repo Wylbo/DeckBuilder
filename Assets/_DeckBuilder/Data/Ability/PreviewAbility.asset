@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a36dfa0d1d869d54aa69008e1fbc6b51, type: 3}
   m_Name: PreviewAbility
   m_EditorClassIdentifier: Assembly-CSharp::Ability
+  icon: {fileID: 21300014, guid: 358b5d9f23bc9413e87c9948acc67ee1, type: 3}
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 1
   debuffsOnCast: []

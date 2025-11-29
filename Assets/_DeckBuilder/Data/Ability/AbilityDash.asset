@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a36dfa0d1d869d54aa69008e1fbc6b51, type: 3}
   m_Name: AbilityDash
   m_EditorClassIdentifier: 
+  icon: {fileID: 5524590292671962877, guid: f7043b7291f49844b9671b3d3dedcbb5, type: 3}
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 1
   debuffsOnCast: []

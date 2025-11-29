@@ -11,6 +11,7 @@ public class AbilityEditor : Editor
 {
 	#region Fields
 	private SerializedProperty behavioursProperty;
+	private SerializedProperty iconProperty;
 	private SerializedProperty rotatingCasterToCastDirectionProp;
 	private SerializedProperty stopMovementOnCastProp;
 	private static readonly Dictionary<int, int> SelectionPerInstance = new Dictionary<int, int>();
@@ -59,6 +60,7 @@ public class AbilityEditor : Editor
 	private void OnEnable()
 	{
 		behavioursProperty = serializedObject.FindProperty("behaviours");
+		iconProperty = serializedObject.FindProperty("icon");
 		rotatingCasterToCastDirectionProp = serializedObject.FindProperty("rotatingCasterToCastDirection");
 		stopMovementOnCastProp = serializedObject.FindProperty("stopMovementOnCast");
 		baseStatsProperty = serializedObject.FindProperty("baseStats");
@@ -217,6 +219,7 @@ public class AbilityEditor : Editor
 			return;
 
 		serializedObject.Update();
+		DrawIconField();
 		// Tags (inline reorderable list)
 		DrawAbilityTagSetList();
 
@@ -433,6 +436,40 @@ public class AbilityEditor : Editor
 			EditorGUILayout.Space();
 			tagSetList.DoLayoutList();
 		}
+	}
+	#endregion
+
+
+	#region Icon
+	private void DrawIconField()
+	{
+		if (iconProperty == null)
+			return;
+
+		EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+		EditorGUILayout.LabelField("Icon", EditorStyles.boldLabel);
+		using (new EditorGUILayout.HorizontalScope())
+		{
+			EditorGUILayout.PropertyField(iconProperty, GUIContent.none, GUILayout.ExpandWidth(true));
+
+			var sprite = iconProperty.objectReferenceValue as Sprite;
+			const float previewSize = 64f;
+			var previewRect = GUILayoutUtility.GetRect(previewSize, previewSize, GUILayout.Width(previewSize), GUILayout.Height(previewSize));
+
+			if (sprite != null && sprite.texture != null)
+			{
+				var tex = sprite.texture;
+				var texRect = sprite.rect;
+				var uv = new Rect(texRect.x / tex.width, texRect.y / tex.height, texRect.width / tex.width, texRect.height / tex.height);
+				GUI.DrawTextureWithTexCoords(previewRect, tex, uv, true);
+			}
+			else
+			{
+				EditorGUI.DrawRect(previewRect, new Color(0f, 0f, 0f, 0.1f));
+				EditorGUI.LabelField(previewRect, "No icon", CenteredBoldLabelStyle);
+			}
+		}
+		EditorGUILayout.EndVertical();
 	}
 	#endregion
 

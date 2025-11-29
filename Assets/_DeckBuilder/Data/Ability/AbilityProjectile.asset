@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a36dfa0d1d869d54aa69008e1fbc6b51, type: 3}
   m_Name: AbilityProjectile
   m_EditorClassIdentifier: 
+  icon: {fileID: 21300002, guid: 358b5d9f23bc9413e87c9948acc67ee1, type: 3}
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
   debuffsOnCast: []
@@ -51,6 +52,8 @@ MonoBehaviour:
         spreadStatKey: 5
         applyMaxSpreadStat: 1
         maxSpreadStatKey: 6
+        applyVerticalOffsetStat: 0
+        verticalOffsetStatKey: 7
         fireMode: 0
     - rid: 1062887273389097039
       type: {class: AbilityDamageTargetBehaviour, ns: , asm: Assembly-CSharp}
