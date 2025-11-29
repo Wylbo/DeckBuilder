@@ -8,6 +8,10 @@ using UnityEngine;
 /// </summary>
 public class UIManager : MonoBehaviour
 {
+    public static UIManager Instance { get; private set; }
+
+    [SerializeField] private bool dontDestroyOnLoad = true;
+
     [Serializable]
     private class LayerConfig
     {
@@ -39,8 +43,24 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        if (dontDestroyOnLoad)
+            DontDestroyOnLoad(gameObject);
+
         BuildLayerLookup();
         BuildPrefabLookup();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     /// <summary>
