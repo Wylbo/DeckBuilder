@@ -8,13 +8,15 @@ public class AbilityInventoryView : UIView
 {
     [SerializeField] private AbilityInventoryItem itemPrefab;
     [SerializeField] private Transform contentRoot;
-    [SerializeField] private Ability[] abilities;
     [SerializeField] private bool rebuildOnShow = true;
 
+    private PlayerInventory playerInventory;
     private readonly List<AbilityInventoryItem> spawnedItems = new List<AbilityInventoryItem>();
 
     private void Awake()
     {
+        if (playerInventory == null)
+            playerInventory = FindFirstObjectByType<PlayerInventory>();
         BuildInventory();
     }
 
@@ -39,10 +41,10 @@ public class AbilityInventoryView : UIView
 
     private void BuildInventory()
     {
-        if (itemPrefab == null || contentRoot == null || abilities == null)
+        if (itemPrefab == null || contentRoot == null || playerInventory == null)
             return;
 
-        foreach (var ability in abilities)
+        foreach (var ability in playerInventory.Abilities)
         {
             var item = Instantiate(itemPrefab, contentRoot);
             item.SetAbility(ability);

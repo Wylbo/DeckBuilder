@@ -153,8 +153,34 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 369680040252476415, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4295812501376704768}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2949185825831420414, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4618023731749051412}
   m_SourcePrefab: {fileID: 100100000, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+--- !u!1 &718024458411719844 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2949185825831420414, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+  m_PrefabInstance: {fileID: 2385627502197390682}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4618023731749051412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 718024458411719844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78cb62cb556da7849a59df0a87465f34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInventory
+  abilities:
+  - {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
+  - {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
+  - {fileID: 11400000, guid: bb774449982bd2a4abe182bb32f4f29d, type: 2}
+  - {fileID: 11400000, guid: be1af21a4381d4849945333216874200, type: 2}
+  - {fileID: 11400000, guid: b76cb0aa880a3a24482ae314e0aa9b0d, type: 2}
 --- !u!4 &2610449079589516965 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 369680040252476415, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
