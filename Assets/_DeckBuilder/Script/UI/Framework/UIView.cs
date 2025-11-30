@@ -9,11 +9,13 @@ public abstract class UIView : MonoBehaviour, IUIElement
     [SerializeField] private UILayer layer = UILayer.Screen;
     [SerializeField] private bool deactivateOnHide = true;
     [SerializeField] private bool moveToTopOnShow = true;
+    [SerializeField] private bool pauseGame = false;
 
     public UILayer Layer => layer;
     public bool IsVisible { get; private set; }
     public RectTransform RectTransform => transform as RectTransform;
     protected UIManager Owner { get; private set; }
+    public bool PauseGame => pauseGame;
 
     internal void AttachManager(UIManager manager)
     {
