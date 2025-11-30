@@ -15,6 +15,11 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     private int boundSlotIndex = -1;
     private bool isDodgeSlot;
 
+    private void OnEnable()
+    {
+        HideDropHighlight();
+    }
+
     private void OnDisable()
     {
         Unbind();
@@ -106,7 +111,7 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
 
     private bool CanAcceptDrop()
     {
-        return allowAbilityDrops && !isDodgeSlot && boundCaster != null && boundSlotIndex >= 0 && AbilityDragContext.HasPayload;
+        return allowAbilityDrops && boundCaster != null && boundSlotIndex >= 0 && AbilityDragContext.HasPayload;
     }
 
     private void ShowDropHighlight()

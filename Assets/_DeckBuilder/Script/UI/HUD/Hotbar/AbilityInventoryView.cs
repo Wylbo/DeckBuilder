@@ -15,8 +15,6 @@ public class AbilityInventoryView : UIView
 
     private void Awake()
     {
-        if (playerInventory == null)
-            playerInventory = FindFirstObjectByType<PlayerInventory>();
         BuildInventory();
     }
 
@@ -41,6 +39,9 @@ public class AbilityInventoryView : UIView
 
     private void BuildInventory()
     {
+        if (playerInventory == null)
+            playerInventory = FindFirstObjectByType<PlayerInventory>();
+
         if (itemPrefab == null || contentRoot == null || playerInventory == null)
             return;
 
