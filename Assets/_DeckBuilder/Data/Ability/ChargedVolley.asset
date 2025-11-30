@@ -15,15 +15,17 @@ MonoBehaviour:
   icon: {fileID: 5524590292671962877, guid: f7043b7291f49844b9671b3d3dedcbb5, type: 3}
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
+  startCooldownOnCast: 0
   debuffsOnCast:
   - {fileID: 11400000, guid: 8f7af324beb2e5146881368dbca0bf65, type: 2}
   debuffsOnEndCast: []
   tagSet:
     Tags:
     - ability.projectile
+    - ability.cooldown
   baseStats:
   - Key: 0
-    Value: 0.1
+    Value: 1
   - Key: 3
     Value: 0
   - Key: 4
@@ -36,6 +38,8 @@ MonoBehaviour:
     Value: 0.3
   - Key: 12
     Value: 0
+  - Key: 8
+    Value: 1
   behaviours:
   - rid: 1062887273389097041
   - rid: 1062887273389097042
@@ -48,7 +52,7 @@ MonoBehaviour:
       data:
         followCursorDuringChanneling: 1
         holdToChannel: 1
-        channelDurationStat: 7
+        channelDurationStat: 8
         canMoveDuringChanneling: 1
         movingInterruptsChanneling: 0
         channelingVFX: {fileID: 8487423217531587600, guid: 189a50bcf955e804aba85665d622b92b, type: 3}

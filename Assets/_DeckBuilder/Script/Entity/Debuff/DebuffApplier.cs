@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public abstract class DebuffApplier
 {
@@ -74,6 +75,17 @@ public abstract class DebuffApplier
         End();
         ApplyEffect();
     }
+
+    public float TickRate => tickRate;
+    public float NextTickIn => Mathf.Max(0f, tickRate - timeSinceLastTick);
+    public int CurrentStacks => effectStacks;
+    public float RemainingDuration => duration?.Remaining ?? 0f;
+    public float TotalDuration => duration?.TotalTime ?? 0f;
+    public float ElapsedDuration => duration?.ElapsedTime ?? 0f;
+    public float ElapsedDurationRatio => duration != null && duration.TotalTime > 0f
+        ? Mathf.Clamp01(duration.ElapsedTime / duration.TotalTime)
+        : 0f;
+    public bool IsDurationRunning => duration != null && duration.IsRunning;
 
     protected abstract void ApplyEffect();
     protected abstract void ApplyTick();

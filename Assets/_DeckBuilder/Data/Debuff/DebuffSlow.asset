@@ -15,5 +15,5 @@ MonoBehaviour:
   duration: 3
   tickrate: 1
   stackingPolicy: 0
-  durationPolicy: 2
+  durationPolicy: 1
   movementSpeedChangeRatio: 0.3

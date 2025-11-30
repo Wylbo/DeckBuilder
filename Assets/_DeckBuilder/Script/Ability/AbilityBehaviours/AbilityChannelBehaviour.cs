@@ -92,6 +92,14 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 			PoolManager.Release(spawnedVFX);
 			spawnedVFX = null;
 		}
+
+		if (context.Ability.DebuffsOnCast != null)
+		{
+			foreach (var debuff in context.Ability.DebuffsOnCast)
+			{
+				context.Caster.RemoveDebuff(debuff);
+			}
+		}
 	}
 
 	private void CompleteChannel(AbilityCastContext context, bool naturalSuccess)

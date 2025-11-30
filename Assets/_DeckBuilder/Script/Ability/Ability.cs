@@ -221,17 +221,6 @@ public class Ability : ScriptableObject
             Caster.AddDebuff(debuff);
         }
     }
-
-    protected void RemoveDebuffs(List<ScriptableDebuff> scriptableDebuffs)
-    {
-        if (scriptableDebuffs == null)
-            return;
-
-        foreach (ScriptableDebuff debuff in scriptableDebuffs)
-        {
-            Caster.RemoveDebuff(debuff);
-        }
-    }
     #endregion
 
     #region Modifier Application
