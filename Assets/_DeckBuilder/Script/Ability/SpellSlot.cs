@@ -53,6 +53,9 @@ public class SpellSlot
 		isHeld = true;
 		Ability.On_EndCast += Ability_OnEndCast;
 		Ability.Cast(worldPos, isHeld);
+
+		if (Ability.StartCooldownOnCast)
+			StartCooldown();
 	}
 
 	public void EndHold(AbilityCaster caster, Vector3 worldPos)
@@ -86,6 +89,12 @@ public class SpellSlot
 		if (!isSucessful || Ability == null)
 			return;
 
+		if (!Ability.StartCooldownOnCast)
+			StartCooldown();
+	}
+
+	private void StartCooldown()
+	{
 		cooldown = new Timer(Ability.Cooldown);
 		cooldown.Start();
 	}
