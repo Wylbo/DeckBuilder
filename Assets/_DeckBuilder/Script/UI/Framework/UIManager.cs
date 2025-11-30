@@ -115,6 +115,11 @@ public class UIManager : MonoBehaviour
         return TryGetInstance(out TView view) && view.IsVisible;
     }
 
+    public Transform GetLayerRoot(UILayer layer)
+    {
+        return GetOrCreateLayerConfig(layer)?.root;
+    }
+
     private void BuildLayerLookup()
     {
         layerLookup.Clear();

@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public class Ability : ScriptableObject
 {
     [SerializeField] private Sprite icon;
+    [SerializeField, TextArea] private string tooltip;
     [SerializeField] private bool rotatingCasterToCastDirection = true;
     [SerializeField] protected bool stopMovementOnCast = false;
     [Tooltip("if false, the cooldown will start at the end of the cast")]
@@ -22,6 +23,7 @@ public class Ability : ScriptableObject
 
     public AbilityCaster Caster { get; private set; }
     public Sprite Icon => icon;
+    public string Tooltip => tooltip;
     public bool RotatingCasterToCastDirection => rotatingCasterToCastDirection;
     public GTagSet TagSet => tagSet;
     public IReadOnlyList<AbilityStatEntry> BaseStats => baseStats;

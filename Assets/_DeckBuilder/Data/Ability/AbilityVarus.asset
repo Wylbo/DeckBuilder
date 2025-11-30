@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: AbilityVarus
   m_EditorClassIdentifier: 
   icon: {fileID: 2125737359283935466, guid: f7043b7291f49844b9671b3d3dedcbb5, type: 3}
+  tooltip: VARUS
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
   startCooldownOnCast: 0

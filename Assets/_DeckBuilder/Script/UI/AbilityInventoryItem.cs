@@ -5,7 +5,7 @@ using UnityEngine.UI;
 /// <summary>
 /// Represents an ability entry in the inventory list. Supports drag-and-drop into the hotbar.
 /// </summary>
-public class AbilityInventoryItem : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
+public class AbilityInventoryItem : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler, IPointerEnterHandler, IPointerExitHandler, ITooltipSource
 {
     [SerializeField] private Ability ability;
     [SerializeField] private Image iconImage;
@@ -13,9 +13,11 @@ public class AbilityInventoryItem : MonoBehaviour, IBeginDragHandler, IEndDragHa
     [SerializeField, Range(0f, 1f)] private float dragAlpha = 0.6f;
 
     public Ability Ability => ability;
+    private RectTransform rectTransform;
 
     private void Awake()
     {
+        rectTransform = transform as RectTransform;
         RefreshIcon();
     }
 
@@ -29,6 +31,8 @@ public class AbilityInventoryItem : MonoBehaviour, IBeginDragHandler, IEndDragHa
     {
         if (ability == null)
             return;
+
+        TooltipManager.Instance?.Hide(this);
 
         if (canvasGroup != null)
         {
@@ -56,6 +60,7 @@ public class AbilityInventoryItem : MonoBehaviour, IBeginDragHandler, IEndDragHa
         ResetCanvasGroup();
         if (AbilityDragContext.HasPayload && AbilityDragContext.DraggedAbility == ability)
             AbilityDragContext.EndDrag();
+        TooltipManager.Instance?.Hide(this);
     }
 
     private void ResetCanvasGroup()
@@ -82,5 +87,23 @@ public class AbilityInventoryItem : MonoBehaviour, IBeginDragHandler, IEndDragHa
             iconImage.enabled = false;
             iconImage.sprite = null;
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        TooltipManager.Instance?.Show(this, eventData);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        TooltipManager.Instance?.Hide(this);
+    }
+
+    public RectTransform TooltipAnchor => rectTransform != null ? rectTransform : transform as RectTransform;
+
+    public bool TryGetTooltipData(out TooltipData data)
+    {
+        data = TooltipData.FromAbility(ability);
+        return data.HasContent;
     }
 }

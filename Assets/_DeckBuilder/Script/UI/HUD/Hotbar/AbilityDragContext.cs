@@ -18,6 +18,7 @@ public static class AbilityDragContext
 
     public static void BeginDrag(Ability ability)
     {
+        TooltipManager.Instance?.HideImmediate();
         DraggedAbility = ability;
         preview?.Show(ability?.Icon);
     }
