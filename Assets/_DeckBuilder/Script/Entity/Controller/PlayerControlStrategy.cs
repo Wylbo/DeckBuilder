@@ -11,6 +11,7 @@ public class PlayerControlStrategy : ControlStrategy
 	[SerializeField]
 	private GameObject moveClickVFX;
 
+	private PlayerInputProvider inputProvider;
 	private PlayerInputs playerInput;
 
 	private bool isMoving;
@@ -21,7 +22,9 @@ public class PlayerControlStrategy : ControlStrategy
 	{
 		base.Initialize(controller, character);
 
-		playerInput = new PlayerInputs();
+		inputProvider = PlayerInputProvider.GetOrCreate();
+		playerInput = inputProvider.Inputs;
+		inputProvider.ApplySavedBindings();
 
 		RegisterGameplayCallbacks();
 		RegisterUICallbacks();
