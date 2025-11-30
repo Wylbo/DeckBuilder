@@ -15,21 +15,23 @@ MonoBehaviour:
   icon: {fileID: 21300012, guid: 358b5d9f23bc9413e87c9948acc67ee1, type: 3}
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
+  startCooldownOnCast: 1
   debuffsOnCast: []
   debuffsOnEndCast: []
   tagSet:
     Tags:
     - ability.area_of_effect
     - ability.projectile.rain
+    - ability.cooldown
   baseStats:
+  - Key: 0
+    Value: 0.3
   - Key: 2
     Value: 1
   - Key: 3
     Value: 1
   - Key: 6
     Value: 3
-  - Key: 0
-    Value: 0.3
   - Key: 1
     Value: 20
   - Key: 5

@@ -22,6 +22,8 @@ public class DebuffUpdater : MonoBehaviour
     private readonly Dictionary<ScriptableDebuff, DebuffApplier> debuffs =
      new Dictionary<ScriptableDebuff, DebuffApplier>();
 
+    public IEnumerable<DebuffApplier> ActiveDebuffs => debuffs.Values;
+
     #region Unity messages
     private void Update()
     {

@@ -5596,7 +5596,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4284705883021781481, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
       propertyPath: activeModifiers.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4284705883021781481, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
       propertyPath: 'activeModifiers.Array.data[0]'

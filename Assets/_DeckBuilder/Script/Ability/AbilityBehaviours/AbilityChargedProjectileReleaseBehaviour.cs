@@ -41,13 +41,6 @@ public class AbilityChargedProjectileReleaseBehaviour : AbilityBehaviour
 			}
 		}
 
-		if (context.Ability.DebuffsOnCast != null)
-		{
-			foreach (var debuff in context.Ability.DebuffsOnCast)
-			{
-				context.Caster.RemoveDebuff(debuff);
-			}
-		}
 	}
 
 }
