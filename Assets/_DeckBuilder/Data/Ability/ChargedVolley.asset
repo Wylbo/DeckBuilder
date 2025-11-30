@@ -13,18 +13,13 @@ MonoBehaviour:
   m_Name: ChargedVolley
   m_EditorClassIdentifier: Assembly-CSharp::Ability
   icon: {fileID: 5524590292671962877, guid: f7043b7291f49844b9671b3d3dedcbb5, type: 3}
-  tooltip: '
-
-    
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-    Proin commodo non mauris in facilisis. Curabitur ultrices metus ut justo sodales
-    pellentesque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
-    in neque in sapien tempor fringilla id eu diam. Fusce vel luctus sapien. Aliquam
-    lectus velit, molestie a enim vel, dignissim sagittis eros. Duis viverra nibh
-    eu ipsum vestibulum, vel rutrum lacus faucibus. Maecenas feugiat ex enim, nec
-    pulvinar massa egestas et. Donec et massa eget dui vehicula dapibus placerat
-    ac turpis. '
+  tooltip: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin commodo
+    non mauris in facilisis. Curabitur ultrices metus ut justo sodales pellentesque.
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce in neque in sapien
+    tempor fringilla id eu diam. Fusce vel luctus sapien. Aliquam lectus velit, molestie
+    a enim vel, dignissim sagittis eros. Duis viverra nibh eu ipsum vestibulum, vel
+    rutrum lacus faucibus. Maecenas feugiat ex enim, nec pulvinar massa egestas et.
+    Donec et massa eget dui vehicula dapibus placerat ac turpis. '
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 0
   startCooldownOnCast: 0
