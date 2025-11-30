@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
+public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler, ITooltipSource
 {
     [SerializeField] private Image iconImage;
     [SerializeField] private Image cooldownFillImage;
@@ -24,6 +24,7 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     {
         Unbind();
         HideDropHighlight();
+        TooltipManager.Instance?.Hide(this);
         boundCaster = null;
         boundSlotIndex = -1;
         isDodgeSlot = false;
@@ -81,6 +82,7 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     public void OnDrop(PointerEventData eventData)
     {
         HideDropHighlight();
+        TooltipManager.Instance?.Hide(this);
 
         if (!allowAbilityDrops || isDodgeSlot || boundCaster == null || boundSlotIndex < 0)
             return;
@@ -102,11 +104,15 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     {
         if (CanAcceptDrop())
             ShowDropHighlight();
+
+        if (boundAbility != null && !AbilityDragContext.HasPayload)
+            TooltipManager.Instance?.Show(this, eventData);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         HideDropHighlight();
+        TooltipManager.Instance?.Hide(this);
     }
 
     private bool CanAcceptDrop()
@@ -174,5 +180,13 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     private void HandleAbilityEnded(bool isSuccessful)
     {
         UpdateCooldownFill();
+    }
+
+    public RectTransform TooltipAnchor => iconImage != null ? iconImage.rectTransform : transform as RectTransform;
+
+    public bool TryGetTooltipData(out TooltipData data)
+    {
+        data = TooltipData.FromAbility(boundAbility);
+        return data.HasContent;
     }
 }

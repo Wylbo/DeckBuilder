@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: PreviewAbility
   m_EditorClassIdentifier: Assembly-CSharp::Ability
   icon: {fileID: 21300014, guid: 358b5d9f23bc9413e87c9948acc67ee1, type: 3}
+  tooltip: 'TEST TEST TEST '
   rotatingCasterToCastDirection: 1
   stopMovementOnCast: 1
   startCooldownOnCast: 1

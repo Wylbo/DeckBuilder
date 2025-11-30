@@ -12,6 +12,7 @@ public class AbilityEditor : Editor
 	#region Fields
 	private SerializedProperty behavioursProperty;
 	private SerializedProperty iconProperty;
+	private SerializedProperty tooltipProperty;
 	private SerializedProperty rotatingCasterToCastDirectionProp;
 	private SerializedProperty stopMovementOnCastProp;
 	private SerializedProperty startCooldownOnCastProp;
@@ -62,6 +63,7 @@ public class AbilityEditor : Editor
 	{
 		behavioursProperty = serializedObject.FindProperty("behaviours");
 		iconProperty = serializedObject.FindProperty("icon");
+		tooltipProperty = serializedObject.FindProperty("tooltip");
 		rotatingCasterToCastDirectionProp = serializedObject.FindProperty("rotatingCasterToCastDirection");
 		stopMovementOnCastProp = serializedObject.FindProperty("stopMovementOnCast");
 		startCooldownOnCastProp = serializedObject.FindProperty("startCooldownOnCast");
@@ -222,7 +224,7 @@ public class AbilityEditor : Editor
 
 		serializedObject.Update();
 		DrawIconField();
-		// Tags (inline reorderable list)
+		DrawTooltipField();
 		DrawAbilityTagSetList();
 
 		if (baseStatsList != null)
@@ -472,6 +474,17 @@ public class AbilityEditor : Editor
 			}
 		}
 		EditorGUILayout.EndVertical();
+	}
+	#endregion
+
+	#region Tooltip
+	private void DrawTooltipField()
+	{
+		if (tooltipProperty == null)
+			return;
+
+		EditorGUILayout.Space();
+		EditorGUILayout.PropertyField(tooltipProperty);
 	}
 	#endregion
 
