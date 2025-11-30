@@ -14,48 +14,35 @@ public class PlayerControlStrategy : ControlStrategy
 	private PlayerInputs playerInput;
 
 	private bool isMoving;
+	private UIManager UiManager => UIManager.Instance;
+	private bool InventoryVisible => UiManager != null && UiManager.IsVisible<AbilityInventoryView>();
+
 	public override void Initialize(Controller controller, Character character)
 	{
 		base.Initialize(controller, character);
 
 		playerInput = new PlayerInputs();
 
-		playerInput.Gameplay.Enable();
+		RegisterGameplayCallbacks();
+		RegisterUICallbacks();
+		SubscribeToUIManager();
 
-		playerInput.Gameplay.Move.performed += Move_performed;
-		playerInput.Gameplay.Dodge.performed += Dodge_performed;
-		playerInput.Gameplay.Ability1.performed += Ability1_performed;
-		playerInput.Gameplay.Ability2.performed += Ability2_performed;
-		playerInput.Gameplay.Ability3.performed += Ability3_performed;
-		playerInput.Gameplay.Ability4.performed += Ability4_performed;
-
-		playerInput.Gameplay.Move.canceled += Move_canceled;
-		playerInput.Gameplay.Ability1.canceled += Ability1_canceled;
-		playerInput.Gameplay.Ability2.canceled += Ability2_canceled;
-		playerInput.Gameplay.Ability3.canceled += Ability3_canceled;
-		playerInput.Gameplay.Ability4.canceled += Ability4_canceled;
-		playerInput.Gameplay.Dodge.canceled += Dodge_canceled;
+		SwitchToGameplayInput();
 
 		Debug.Log("Player controller strategy initialized");
 	}
 
 	public override void Disable()
 	{
-		playerInput.Gameplay.Move.performed -= Move_performed;
-		playerInput.Gameplay.Dodge.performed -= Dodge_performed;
-		playerInput.Gameplay.Ability1.performed -= Ability1_performed;
-		playerInput.Gameplay.Ability2.performed -= Ability2_performed;
-		playerInput.Gameplay.Ability3.performed -= Ability3_performed;
-		playerInput.Gameplay.Ability4.performed -= Ability4_performed;
+		if (playerInput == null)
+			return;
 
-		playerInput.Gameplay.Move.canceled -= Move_canceled;
-		playerInput.Gameplay.Ability1.canceled -= Ability1_canceled;
-		playerInput.Gameplay.Ability2.canceled -= Ability2_canceled;
-		playerInput.Gameplay.Ability3.canceled -= Ability3_canceled;
-		playerInput.Gameplay.Ability4.canceled -= Ability4_canceled;
-		playerInput.Gameplay.Dodge.canceled -= Dodge_canceled;
+		UnsubscribeFromUIManager();
+		UnregisterGameplayCallbacks();
+		UnregisterUICallbacks();
 
 		playerInput.Gameplay.Disable();
+		playerInput.UI.Disable();
 	}
 
 	// called each frame by the controller
@@ -80,6 +67,42 @@ public class PlayerControlStrategy : ControlStrategy
 	private void Move_canceled(InputAction.CallbackContext context)
 	{
 		isMoving = false;
+	}
+
+	private void ToggleInventory()
+	{
+		if (UiManager == null)
+			return;
+
+		if (InventoryVisible)
+			UiManager.Hide<AbilityInventoryView>();
+		else
+			UiManager.Show<AbilityInventoryView>();
+	}
+
+	private void HandleViewShown(UIView view)
+	{
+		if (view is AbilityInventoryView)
+			SwitchToUIInput();
+	}
+
+	private void HandleViewHidden(UIView view)
+	{
+		if (view is AbilityInventoryView)
+			SwitchToGameplayInput();
+	}
+
+	private void SwitchToUIInput()
+	{
+		isMoving = false;
+		playerInput.Gameplay.Disable();
+		playerInput.UI.Enable();
+	}
+
+	private void SwitchToGameplayInput()
+	{
+		playerInput.UI.Disable();
+		playerInput.Gameplay.Enable();
 	}
 
 	private Vector3 GetMousePositionInWorld()
@@ -153,6 +176,83 @@ public class PlayerControlStrategy : ControlStrategy
 	private void Ability4_canceled(InputAction.CallbackContext obj)
 	{
 		EndHold(3);
+	}
+
+	private void OpenInventory_performed(InputAction.CallbackContext context)
+	{
+		ToggleInventory();
+	}
+
+	private void UICancel_performed(InputAction.CallbackContext context)
+	{
+		if (InventoryVisible)
+			UiManager.Hide<AbilityInventoryView>();
+	}
+
+	private void RegisterGameplayCallbacks()
+	{
+		playerInput.Gameplay.Move.performed += Move_performed;
+		playerInput.Gameplay.Dodge.performed += Dodge_performed;
+		playerInput.Gameplay.Ability1.performed += Ability1_performed;
+		playerInput.Gameplay.Ability2.performed += Ability2_performed;
+		playerInput.Gameplay.Ability3.performed += Ability3_performed;
+		playerInput.Gameplay.Ability4.performed += Ability4_performed;
+
+		playerInput.Gameplay.Move.canceled += Move_canceled;
+		playerInput.Gameplay.Ability1.canceled += Ability1_canceled;
+		playerInput.Gameplay.Ability2.canceled += Ability2_canceled;
+		playerInput.Gameplay.Ability3.canceled += Ability3_canceled;
+		playerInput.Gameplay.Ability4.canceled += Ability4_canceled;
+		playerInput.Gameplay.Dodge.canceled += Dodge_canceled;
+
+		playerInput.Gameplay.OpenInventory.performed += OpenInventory_performed;
+	}
+
+	private void UnregisterGameplayCallbacks()
+	{
+		playerInput.Gameplay.Move.performed -= Move_performed;
+		playerInput.Gameplay.Dodge.performed -= Dodge_performed;
+		playerInput.Gameplay.Ability1.performed -= Ability1_performed;
+		playerInput.Gameplay.Ability2.performed -= Ability2_performed;
+		playerInput.Gameplay.Ability3.performed -= Ability3_performed;
+		playerInput.Gameplay.Ability4.performed -= Ability4_performed;
+
+		playerInput.Gameplay.Move.canceled -= Move_canceled;
+		playerInput.Gameplay.Ability1.canceled -= Ability1_canceled;
+		playerInput.Gameplay.Ability2.canceled -= Ability2_canceled;
+		playerInput.Gameplay.Ability3.canceled -= Ability3_canceled;
+		playerInput.Gameplay.Ability4.canceled -= Ability4_canceled;
+		playerInput.Gameplay.Dodge.canceled -= Dodge_canceled;
+
+		playerInput.Gameplay.OpenInventory.performed -= OpenInventory_performed;
+	}
+
+	private void RegisterUICallbacks()
+	{
+		playerInput.UI.Cancel.performed += UICancel_performed;
+	}
+
+	private void UnregisterUICallbacks()
+	{
+		playerInput.UI.Cancel.performed -= UICancel_performed;
+	}
+
+	private void SubscribeToUIManager()
+	{
+		if (UiManager == null)
+			return;
+
+		UiManager.AfterShow += HandleViewShown;
+		UiManager.AfterHide += HandleViewHidden;
+	}
+
+	private void UnsubscribeFromUIManager()
+	{
+		if (UiManager == null)
+			return;
+
+		UiManager.AfterShow -= HandleViewShown;
+		UiManager.AfterHide -= HandleViewHidden;
 	}
 
 	private void PerformAbility(int index)

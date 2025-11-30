@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     [SerializeField] private bool dontDestroyOnLoad = true;
+    [SerializeField] private GameStateManager gameStateManager;
 
     [Serializable]
     private class LayerConfig
@@ -76,6 +77,7 @@ public class UIManager : MonoBehaviour
         MoveToLayerRoot(view, config);
         AddToActive(view, config.layer);
         ApplyLayerBehaviourOnShow(config, view);
+        ApplyPause(view);
 
         InvokeShow(view, beforeShow, afterShow);
         return view;
@@ -192,6 +194,19 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void ApplyPause(UIView view)
+    {
+        if (view.PauseGame)
+        {
+            gameStateManager.RequestPause(view);
+        }
+    }
+
+    private void RemovePause(UIView view)
+    {
+        gameStateManager.ReleasePause(view);
+    }
+
     private void HideInternal<TView>(TView view, Action<TView> beforeHide, Action<TView> afterHide, bool removeFromLayer) where TView : UIView
     {
         if (view == null)
@@ -215,6 +230,8 @@ public class UIManager : MonoBehaviour
             RemoveFromActive(view);
             TryRestoreBelow(view.Layer);
         }
+
+        RemovePause(view);
     }
 
     private void InvokeShow<TView>(TView view, Action<TView> beforeShow, Action<TView> afterShow) where TView : UIView
