@@ -95,14 +95,9 @@ MonoBehaviour:
   layer: 0
   deactivateOnHide: 1
   moveToTopOnShow: 1
+  pauseGame: 1
   itemPrefab: {fileID: 7929331562617229253, guid: 9d664eb3db04e0c4c91f06359fc5fa5a, type: 3}
   contentRoot: {fileID: 1342297905230289585}
-  abilities:
-  - {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
-  - {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
-  - {fileID: 11400000, guid: bb774449982bd2a4abe182bb32f4f29d, type: 2}
-  - {fileID: 11400000, guid: be1af21a4381d4849945333216874200, type: 2}
-  - {fileID: 11400000, guid: b76cb0aa880a3a24482ae314e0aa9b0d, type: 2}
   rebuildOnShow: 1
 --- !u!1 &1474069986827464646
 GameObject:
@@ -484,7 +479,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8783420855379609713}
   m_HandleRect: {fileID: 180956762380578243}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -750,8 +745,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3446736243270174748}
   m_HandleRect: {fileID: 9037913244302020684}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.9999999
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
