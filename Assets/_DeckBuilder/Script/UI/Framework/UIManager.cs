@@ -36,6 +36,7 @@ public class UIManager : MonoBehaviour
     private readonly Dictionary<Type, UIView> prefabLookup = new Dictionary<Type, UIView>();
     private readonly Dictionary<Type, UIView> instances = new Dictionary<Type, UIView>();
     private readonly Dictionary<UILayer, List<UIView>> activeByLayer = new Dictionary<UILayer, List<UIView>>();
+    private readonly List<UIView> openHistory = new List<UIView>();
 
     public event Action<UIView> BeforeShow;
     public event Action<UIView> AfterShow;
@@ -95,6 +96,18 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Hides the most recently opened visible view, if any.
+    /// </summary>
+    public void HideCurrentView()
+    {
+        var view = GetLastOpenedView();
+        if (view == null)
+            return;
+
+        HideInternal(view, (Action<UIView>)null, (Action<UIView>)null, true);
+    }
+
+    /// <summary>
     /// Returns an existing instance without showing it. Useful for presenter binding.
     /// </summary>
     public bool TryGetInstance<TView>(out TView view) where TView : UIView
@@ -113,6 +126,25 @@ public class UIManager : MonoBehaviour
     public bool IsVisible<TView>() where TView : UIView
     {
         return TryGetInstance(out TView view) && view.IsVisible;
+    }
+
+    public bool HasVisibleViewOnLayer(UILayer layer)
+    {
+        var list = GetActiveList(layer);
+        for (int i = list.Count - 1; i >= 0; i--)
+        {
+            var view = list[i];
+            if (view == null)
+            {
+                list.RemoveAt(i);
+                continue;
+            }
+
+            if (view.IsVisible)
+                return true;
+        }
+
+        return false;
     }
 
     public Transform GetLayerRoot(UILayer layer)
@@ -217,6 +249,8 @@ public class UIManager : MonoBehaviour
         if (view == null)
             return;
 
+        TrackViewHidden(view);
+
         if (!view.IsVisible)
         {
             if (removeFromLayer)
@@ -243,6 +277,8 @@ public class UIManager : MonoBehaviour
     {
         if (view == null)
             return;
+
+        TrackViewOpened(view);
 
         if (view.IsVisible)
         {
@@ -278,6 +314,43 @@ public class UIManager : MonoBehaviour
             activeByLayer[layer] = list;
         }
         return list;
+    }
+
+    private UIView GetLastOpenedView()
+    {
+        for (int i = openHistory.Count - 1; i >= 0; i--)
+        {
+            var candidate = openHistory[i];
+            if (candidate == null)
+            {
+                openHistory.RemoveAt(i);
+                continue;
+            }
+
+            if (candidate.IsVisible)
+                return candidate;
+
+            openHistory.RemoveAt(i);
+        }
+
+        return null;
+    }
+
+    private void TrackViewOpened(UIView view)
+    {
+        if (view == null)
+            return;
+
+        openHistory.Remove(view);
+        openHistory.Add(view);
+    }
+
+    private void TrackViewHidden(UIView view)
+    {
+        if (view == null)
+            return;
+
+        openHistory.Remove(view);
     }
 
     private void TryRestoreBelow(UILayer layer)

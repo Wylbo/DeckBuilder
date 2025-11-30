@@ -82,13 +82,13 @@ public class PlayerControlStrategy : ControlStrategy
 
 	private void HandleViewShown(UIView view)
 	{
-		if (view is AbilityInventoryView)
+		if (ShouldUseUIInput(view))
 			SwitchToUIInput();
 	}
 
 	private void HandleViewHidden(UIView view)
 	{
-		if (view is AbilityInventoryView)
+		if (ShouldUseUIInput(view) && !HasAnyBlockingUIVisible())
 			SwitchToGameplayInput();
 	}
 
@@ -183,10 +183,15 @@ public class PlayerControlStrategy : ControlStrategy
 		ToggleInventory();
 	}
 
+	private void OpenMenuPerformed(InputAction.CallbackContext context)
+	{
+		UiManager.Show<MenuScreenView>();
+	}
+
+
 	private void UICancel_performed(InputAction.CallbackContext context)
 	{
-		if (InventoryVisible)
-			UiManager.Hide<AbilityInventoryView>();
+		UiManager.HideCurrentView();
 	}
 
 	private void RegisterGameplayCallbacks()
@@ -206,6 +211,7 @@ public class PlayerControlStrategy : ControlStrategy
 		playerInput.Gameplay.Dodge.canceled += Dodge_canceled;
 
 		playerInput.Gameplay.OpenInventory.performed += OpenInventory_performed;
+		playerInput.Gameplay.OpenMenu.performed += OpenMenuPerformed;
 	}
 
 	private void UnregisterGameplayCallbacks()
@@ -225,6 +231,7 @@ public class PlayerControlStrategy : ControlStrategy
 		playerInput.Gameplay.Dodge.canceled -= Dodge_canceled;
 
 		playerInput.Gameplay.OpenInventory.performed -= OpenInventory_performed;
+		playerInput.Gameplay.OpenMenu.performed -= OpenMenuPerformed;
 	}
 
 	private void RegisterUICallbacks()
@@ -265,5 +272,18 @@ public class PlayerControlStrategy : ControlStrategy
 	{
 		GetMousePositionInWorld(out Vector3 worldPos);
 		controller.EndHold(index, worldPos);
+	}
+
+	private bool ShouldUseUIInput(UIView view)
+	{
+		return view != null && (view.Layer == UILayer.Screen || view.Layer == UILayer.Popup);
+	}
+
+	private bool HasAnyBlockingUIVisible()
+	{
+		if (UiManager == null)
+			return false;
+
+		return UiManager.HasVisibleViewOnLayer(UILayer.Screen) || UiManager.HasVisibleViewOnLayer(UILayer.Popup);
 	}
 }
