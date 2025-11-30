@@ -14,6 +14,7 @@ public class AbilityEditor : Editor
 	private SerializedProperty iconProperty;
 	private SerializedProperty rotatingCasterToCastDirectionProp;
 	private SerializedProperty stopMovementOnCastProp;
+	private SerializedProperty startCooldownOnCastProp;
 	private static readonly Dictionary<int, int> SelectionPerInstance = new Dictionary<int, int>();
 	private List<Type> abilityBehaviourTypes;
 	private SerializedProperty baseStatsProperty;
@@ -63,6 +64,7 @@ public class AbilityEditor : Editor
 		iconProperty = serializedObject.FindProperty("icon");
 		rotatingCasterToCastDirectionProp = serializedObject.FindProperty("rotatingCasterToCastDirection");
 		stopMovementOnCastProp = serializedObject.FindProperty("stopMovementOnCast");
+		startCooldownOnCastProp = serializedObject.FindProperty("startCooldownOnCast");
 		baseStatsProperty = serializedObject.FindProperty("baseStats");
 		debuffsOnCastProperty = serializedObject.FindProperty("debuffsOnCast");
 		debuffsOnEndCastProperty = serializedObject.FindProperty("debuffsOnEndCast");
@@ -711,6 +713,8 @@ public class AbilityEditor : Editor
 			EditorGUILayout.PropertyField(rotatingCasterToCastDirectionProp);
 		if (stopMovementOnCastProp != null)
 			EditorGUILayout.PropertyField(stopMovementOnCastProp);
+		if (startCooldownOnCastProp != null)
+			EditorGUILayout.PropertyField(startCooldownOnCastProp);
 		EditorGUILayout.EndVertical();
 	}
 

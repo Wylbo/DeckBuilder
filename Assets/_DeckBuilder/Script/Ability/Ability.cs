@@ -9,6 +9,8 @@ public class Ability : ScriptableObject
     [SerializeField] private Sprite icon;
     [SerializeField] private bool rotatingCasterToCastDirection = true;
     [SerializeField] protected bool stopMovementOnCast = false;
+    [Tooltip("if false, the cooldown will start at the end of the cast")]
+    [SerializeField] private bool startCooldownOnCast = true;
     [SerializeField] protected List<ScriptableDebuff> debuffsOnCast;
     [SerializeField] protected List<ScriptableDebuff> debuffsOnEndCast;
     [SerializeField] private GTagSet tagSet = new GTagSet();
@@ -24,6 +26,8 @@ public class Ability : ScriptableObject
     public GTagSet TagSet => tagSet;
     public IReadOnlyList<AbilityStatEntry> BaseStats => baseStats;
     public IReadOnlyList<ScriptableDebuff> DebuffsOnCast => debuffsOnCast;
+    public bool StartCooldownOnCast => startCooldownOnCast;
+
 
     public event UnityAction<Ability> On_StartCast;
     public event UnityAction<bool> On_EndCast;
