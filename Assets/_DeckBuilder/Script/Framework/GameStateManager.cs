@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class GameStateManager : MonoBehaviour
 {
+    public static GameStateManager Instance { get; private set; }
+
     public enum GameState
     {
         Playing,
         Paused
     }
 
+    [SerializeField] private bool dontDestroyOnLoad = true;
     [SerializeField] private bool useTimeScale = true;
 
     private readonly HashSet<object> pauseRequesters = new HashSet<object>();
@@ -20,9 +23,28 @@ public class GameStateManager : MonoBehaviour
 
     public event Action<GameState> OnGameStateChanged;
 
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        if (dontDestroyOnLoad)
+            DontDestroyOnLoad(gameObject);
+    }
+
     private void Start()
     {
         ApplyState(currentState, false, true);
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     public void RequestPause(object source)
