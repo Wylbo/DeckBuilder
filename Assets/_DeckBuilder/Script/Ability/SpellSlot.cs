@@ -22,17 +22,18 @@ public class SpellSlot
 		return SetAbility(Ability, caster);
 	}
 
-	public bool SetAbility(Ability ability, AbilityCaster caster)
-	{
-		// Clean up existing ability instance
-		if (Ability != null)
-		{
-			Ability.Disable();
-		}
+        public bool SetAbility(Ability ability, AbilityCaster caster)
+        {
+                // Clean up existing ability instance
+                if (Ability != null)
+                {
+                        Ability.On_EndCast -= Ability_OnEndCast;
+                        Ability.Disable();
+                }
 
-		Ability = ability != null ? UnityEngine.Object.Instantiate(ability) : null;
-		this.caster = caster;
-		ResetCooldown();
+                Ability = ability != null ? UnityEngine.Object.Instantiate(ability) : null;
+                this.caster = caster;
+                ResetCooldown();
 
 		if (Ability != null && caster != null)
 		{
@@ -48,11 +49,12 @@ public class SpellSlot
 		if (Ability == null)
 			return;
 
-		this.caster = caster;
+                this.caster = caster;
 
-		isHeld = true;
-		Ability.On_EndCast += Ability_OnEndCast;
-		Ability.Cast(worldPos, isHeld);
+                isHeld = true;
+                Ability.On_EndCast -= Ability_OnEndCast;
+                Ability.On_EndCast += Ability_OnEndCast;
+                Ability.Cast(worldPos, isHeld);
 
 		if (Ability.StartCooldownOnCast)
 			StartCooldown();
@@ -76,10 +78,13 @@ public class SpellSlot
 		cooldown.Update(dt);
 	}
 
-	private void ResetCooldown()
-	{
-		cooldown = new Timer();
-	}
+        private void ResetCooldown()
+        {
+                if (Ability != null)
+                        Ability.On_EndCast -= Ability_OnEndCast;
+
+                cooldown = new Timer();
+        }
 
 	private void Ability_OnEndCast(bool isSucessful)
 	{
