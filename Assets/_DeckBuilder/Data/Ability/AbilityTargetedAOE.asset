@@ -38,7 +38,7 @@ MonoBehaviour:
   - Key: 5
     Value: 0
   - Key: 7
-    Value: 0
+    Value: -0.5
   behaviours:
   - rid: 1062887273389097035
   - rid: 1062887273389097040
@@ -59,7 +59,7 @@ MonoBehaviour:
         spreadStatKey: 5
         applyMaxSpreadStat: 1
         maxSpreadStatKey: 6
-        applyVerticalOffsetStat: 0
+        applyVerticalOffsetStat: 1
         verticalOffsetStatKey: 7
         fireMode: 1
     - rid: 1062887273389097040
