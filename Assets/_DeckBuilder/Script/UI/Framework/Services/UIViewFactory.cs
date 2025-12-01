@@ -49,7 +49,7 @@ public class UIViewFactory : IUIViewFactory
     public TView GetOrCreate<TView>() where TView : UIView
     {
         var type = typeof(TView);
-        if (instances.TryGetValue(type, out var cached) && cached != null)
+        if (instances.TryGetValue(type, out UIView cached) && cached != null)
         {
             var cachedView = cached as TView;
             if (cachedView != null)
@@ -59,14 +59,14 @@ public class UIViewFactory : IUIViewFactory
             }
         }
 
-        if (!prefabLookup.TryGetValue(type, out var prefab) || prefab == null)
+        if (!prefabLookup.TryGetValue(type, out UIView prefab) || prefab == null)
         {
             Debug.LogError($"UIManager: prefab for view {type.Name} is not registered.");
             return null;
         }
 
-        var root = layerController.GetLayerRoot(prefab.Layer);
-        var instance = UnityEngine.Object.Instantiate(prefab, root);
+        Transform root = layerController.GetLayerRoot(prefab.Layer);
+        UIView instance = UnityEngine.Object.Instantiate(prefab, root);
         instance.AttachManager(manager);
         instances[type] = instance;
         return instance as TView;
