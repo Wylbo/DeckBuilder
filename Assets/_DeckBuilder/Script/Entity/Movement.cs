@@ -10,7 +10,7 @@ using Unity.Mathematics;
 /// Component allowing an entity to move
 /// </summary>
 
-public class Movement : MonoBehaviour
+public class Movement : MonoBehaviour, IAbilityMovement
 {
     [Serializable]
     public struct DashData

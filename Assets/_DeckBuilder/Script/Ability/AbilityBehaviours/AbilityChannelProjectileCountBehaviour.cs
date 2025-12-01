@@ -22,7 +22,7 @@ public class AbilityChannelProjectileCountBehaviour : AbilityBehaviour
 		int max = Mathf.Max(minAdditionalProjectiles, maxAdditionalProjectiles);
 		float additional = Mathf.Lerp(min, max, curveValue);
 
-		float baseCount = context.Ability.GetEvaluatedStatValue(statKey);
+		float baseCount = context.GetStat(statKey);
 		float finalCount = Mathf.Max(1f, baseCount + additional);
 
 		context.SetSharedStatOverride(statKey, finalCount);

@@ -46,7 +46,7 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 
 		UpdateAimPoint(context);
 
-		float channelDuration = context.Ability.GetEvaluatedStatValue(channelDurationStat);
+		float channelDuration = context.GetStat(channelDurationStat);
 		if (channelDuration <= 0f)
 			CompleteChannel(context, true);
 	}
@@ -71,7 +71,7 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 		}
 
 		elapsed += deltaTime;
-		float channelDuration = context.Ability.GetEvaluatedStatValue(channelDurationStat);
+		float channelDuration = context.GetStat(channelDurationStat);
 		if (channelDuration > 0f)
 			context.ChannelRatio = Mathf.Clamp01(elapsed / channelDuration);
 		else
@@ -97,7 +97,7 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 		{
 			foreach (var debuff in context.Ability.DebuffsOnCast)
 			{
-				context.Caster.RemoveDebuff(debuff);
+				context.DebuffService?.RemoveDebuff(debuff);
 			}
 		}
 	}
@@ -108,10 +108,10 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 			return;
 
 		isChanneling = false;
-		float channelDuration = context.Ability.GetEvaluatedStatValue(channelDurationStat);
+		float channelDuration = context.GetStat(channelDurationStat);
 		context.ChannelRatio = Mathf.Clamp01(channelDuration > 0f ? elapsed / channelDuration : 1f);
 		bool finalSuccess = naturalSuccess || forceSuccessOnInterrupt;
-		context.Ability.EndCast(context.TargetPoint, finalSuccess);
+		context.EndCast(context.TargetPoint, finalSuccess);
 	}
 
 	private void UpdateAimPoint(AbilityCastContext context)
@@ -124,7 +124,7 @@ public class AbilityChannelBehaviour : AbilityBehaviour
 			worldPosition = cursorPosition;
 
 		context.SetAimPoint(worldPosition);
-		context.Ability.LookAtCastDirection(worldPosition);
+		context.LookAt(worldPosition);
 	}
 
 	private bool TryGetCursorPosition(out Vector3 worldPosition)

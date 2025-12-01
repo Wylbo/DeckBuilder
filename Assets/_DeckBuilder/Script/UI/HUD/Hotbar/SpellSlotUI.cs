@@ -11,6 +11,7 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
 
     private SpellSlot boundSlot;
     private Ability boundAbility;
+    private IAbilityExecutor boundExecutor;
     private AbilityCaster boundCaster;
     private int boundSlotIndex = -1;
     private bool isDodgeSlot;
@@ -39,13 +40,15 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     public void Bind(SpellSlot slot, AbilityCaster caster = null, int slotIndex = -1, bool isDodgeSlot = false)
     {
         bool sameSlot = ReferenceEquals(boundSlot, slot);
-        bool sameAbility = sameSlot && ReferenceEquals(boundAbility, slot?.Ability);
+        bool sameRuntime = sameSlot &&
+                           ReferenceEquals(boundAbility, slot?.Ability) &&
+                           ReferenceEquals(boundExecutor, slot?.Executor);
 
         boundCaster = caster;
         boundSlotIndex = slotIndex;
         this.isDodgeSlot = isDodgeSlot;
 
-        if (sameSlot && sameAbility)
+        if (sameRuntime)
         {
             RefreshVisuals();
             return;
@@ -55,11 +58,12 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
 
         boundSlot = slot;
         boundAbility = boundSlot?.Ability;
+        boundExecutor = boundSlot?.Executor;
 
-        if (boundAbility != null)
+        if (boundExecutor != null)
         {
-            boundAbility.On_StartCast += HandleAbilityStarted;
-            boundAbility.On_EndCast += HandleAbilityEnded;
+            boundExecutor.On_StartCast += HandleAbilityStarted;
+            boundExecutor.On_EndCast += HandleAbilityEnded;
         }
 
         RefreshVisuals();
@@ -67,14 +71,15 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
 
     public void Unbind()
     {
-        if (boundAbility != null)
+        if (boundExecutor != null)
         {
-            boundAbility.On_StartCast -= HandleAbilityStarted;
-            boundAbility.On_EndCast -= HandleAbilityEnded;
+            boundExecutor.On_StartCast -= HandleAbilityStarted;
+            boundExecutor.On_EndCast -= HandleAbilityEnded;
         }
 
         boundSlot = null;
         boundAbility = null;
+        boundExecutor = null;
 
         RefreshVisuals(true);
     }

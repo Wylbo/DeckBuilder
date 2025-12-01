@@ -16,14 +16,14 @@ public class AbilityChargedProjectileReleaseBehaviour : AbilityBehaviour
 		if (projectile == null || context?.ProjectileLauncher == null)
 			return;
 
-		context.Ability.LookAtCastDirection(context.AimPoint);
+		context.LookAt(context.AimPoint);
 		var launchedProjectiles = context.ProjectileLauncher.SetProjectile(projectile)
 			.AtCasterPosition()
 			.SetRotation(context.Caster.transform.rotation)
-			.SetProjectileCount(Mathf.RoundToInt(context.Ability.GetEvaluatedStatValue(AbilityStatKey.ProjectileCount)))
+			.SetProjectileCount(Mathf.RoundToInt(context.GetStat(AbilityStatKey.ProjectileCount)))
 			.SetMultipleProjectileFireMode(ProjectileLauncher.MultipleProjectileFireMode.Fan)
-			.SetSpreadAngle(context.Ability.GetEvaluatedStatValue(AbilityStatKey.ProjectileSpreadAngle))
-			.SetMaxSpreadAngle(context.Ability.GetEvaluatedStatValue(AbilityStatKey.ProjectileMaxSpreadAngle))
+			.SetSpreadAngle(context.GetStat(AbilityStatKey.ProjectileSpreadAngle))
+			.SetMaxSpreadAngle(context.GetStat(AbilityStatKey.ProjectileMaxSpreadAngle))
 			.Launch<LinearProjectile>();
 
 		context.LastLaunchedProjectiles = launchedProjectiles;

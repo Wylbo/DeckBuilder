@@ -15,7 +15,7 @@ public class AbilityPerpendicularProjectileVolleyBehaviour : AbilityBehaviour
 		if (!wasSuccessful || projectile == null || context?.ProjectileLauncher == null || context.Caster == null)
 			return;
 
-		float countValue = context.Ability.GetEvaluatedStatValue(projectileCountStat);
+		float countValue = context.GetStat(projectileCountStat);
 		if (context.TryGetSharedStatOverride(projectileCountStat, out float overrideCount))
 			countValue = overrideCount;
 
@@ -30,8 +30,8 @@ public class AbilityPerpendicularProjectileVolleyBehaviour : AbilityBehaviour
 		if (right == Vector3.zero)
 			right = casterTransform.right.normalized;
 
-		float spacing = context.Ability.GetEvaluatedStatValue(spacingStat);
-		float vOffset = context.Ability.GetEvaluatedStatValue(verticalOffsetStat);
+		float spacing = context.GetStat(spacingStat);
+		float vOffset = context.GetStat(verticalOffsetStat);
 		float offsetBase = spacing * (count - 1) * 0.5f;
 
 		for (int i = 0; i < count; i++)
