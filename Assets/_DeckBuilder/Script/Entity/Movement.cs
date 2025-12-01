@@ -25,6 +25,9 @@ public class Movement : MonoBehaviour
         public AnimationCurve dashCurve;
         [SerializeField]
         public LayerMask blockingMask;
+        [SerializeField]
+        [Min(1)]
+        public int maxWallIterations;
     }
 
     [SerializeField]
@@ -54,6 +57,8 @@ public class Movement : MonoBehaviour
     public bool IsMoving => wantedVelocity.magnitude > 0;
     public Rigidbody Body => body;
 
+    internal const int DefaultMaxWallIterations = 100;
+
     private void Reset()
     {
         body = GetComponent<Rigidbody>();
@@ -63,6 +68,14 @@ public class Movement : MonoBehaviour
     {
         baseMaxSpeed = agent.speed;
         agent.updateRotation = false;
+    }
+
+    private void OnValidate()
+    {
+        if (defaultDashData.maxWallIterations <= 0)
+        {
+            defaultDashData.maxWallIterations = DefaultMaxWallIterations;
+        }
     }
 
     private void Update()
@@ -193,7 +206,8 @@ public class Movement : MonoBehaviour
 
         bool forwardCheck = agent.Raycast(wantedPosition, out NavMeshHit forwardHit);
         int iterationCount = 0;
-        while (forwardCheck || iterationCount > 100)
+        int maxIterations = dashData.maxWallIterations > 0 ? dashData.maxWallIterations : DefaultMaxWallIterations;
+        while (forwardCheck && iterationCount < maxIterations)
         {
             iterationCount++;
             //Draw normal hit and position
@@ -219,9 +233,21 @@ public class Movement : MonoBehaviour
             forwardCheck = NavMesh.Raycast(agent.nextPosition, wantedPosition, out forwardHit, NavMesh.AllAreas);
         }
 
+        if (forwardCheck && iterationCount >= maxIterations)
+        {
+            LogWallCheckLimitReached(this, maxIterations);
+            remaining = Vector3.zero;
+        }
+
         dashPositions.Add(dashPositions[^1] + wantedDirection * remaining.magnitude);
 
         return dashPositions;
+    }
+
+    internal static void LogWallCheckLimitReached(Component owner, int maxIterations)
+    {
+        string ownerName = owner != null ? owner.name : "(unknown object)";
+        Debug.LogWarning($"Dash wall check reached the max iteration count ({maxIterations}) for {ownerName}. Ending dash early to avoid infinite loop.");
     }
 
     private IEnumerator DashRoutine(List<Vector3> dashPosition, DashData dashData)
