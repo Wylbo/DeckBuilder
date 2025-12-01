@@ -22,13 +22,20 @@ public class SpellSlot
 		return SetAbility(Ability, caster);
 	}
 
-	public bool SetAbility(Ability ability, AbilityCaster caster)
-	{
-		// Clean up existing ability instance
-		if (Ability != null)
-		{
-			Ability.Disable();
-		}
+        public bool SetAbility(Ability ability, AbilityCaster caster)
+        {
+                // Clean up existing ability instance
+                bool shouldDestroyInstance = Ability != null && Ability.Caster != null;
+                if (Ability != null)
+                {
+                        Ability.Disable();
+
+                        if (shouldDestroyInstance)
+                        {
+                                // Prevent ability reassignment from accumulating runtime instances
+                                UnityEngine.Object.Destroy(Ability);
+                        }
+                }
 
 		Ability = ability != null ? UnityEngine.Object.Instantiate(ability) : null;
 		this.caster = caster;
