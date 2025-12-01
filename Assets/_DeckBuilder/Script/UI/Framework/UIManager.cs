@@ -9,10 +9,10 @@ using UnityEngine;
 public class UIManager : MonoBehaviour, IUIManager
 {
     [SerializeField] private bool dontDestroyOnLoad = true;
-    [SerializeField] private GameStateManager gameStateManager;
     [SerializeField] private List<UILayerConfig> layerConfigs = new List<UILayerConfig>();
     [SerializeField] private List<UIView> registeredViews = new List<UIView>();
 
+    private GameStateManager gameStateManager;
     private IUIViewFactory viewFactory;
     private IUILayerController layerController;
     private IUIHistoryTracker historyTracker;
@@ -136,7 +136,7 @@ public class UIManager : MonoBehaviour, IUIManager
         if (gameStateManager != null)
             return gameStateManager;
 
-        gameStateManager = FindFirstObjectByType<GameStateManager>();
+        gameStateManager = GameStateManager.Instance;
         return gameStateManager;
     }
 
