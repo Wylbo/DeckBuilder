@@ -7,8 +7,11 @@ public sealed class AbilityCastContext
 
 	public Ability Ability => BehaviourContext?.Ability;
 	public AbilityCaster Caster => BehaviourContext?.Caster;
-	public Movement Movement => BehaviourContext?.Movement;
+	public IAbilityMovement Movement => BehaviourContext?.Movement;
 	public ProjectileLauncher ProjectileLauncher => BehaviourContext?.ProjectileLauncher;
+	public IAbilityExecutor Executor => BehaviourContext?.Executor;
+	public IAbilityDebuffService DebuffService => BehaviourContext?.DebuffService;
+	public IAbilityStatProvider StatProvider => BehaviourContext?.StatProvider;
 
 	public Vector3 TargetPoint { get; private set; }
 	public Vector3 AimPoint { get; private set; }
@@ -84,5 +87,20 @@ public sealed class AbilityCastContext
 	public bool TryGetSharedStatOverride(AbilityStatKey key, out float value)
 	{
 		return sharedStatOverrides.TryGetValue(key, out value);
+	}
+
+	public float GetStat(AbilityStatKey key)
+	{
+		return Executor != null ? Executor.GetStat(key) : 0f;
+	}
+
+	public void LookAt(Vector3 worldPos)
+	{
+		Executor?.LookAtCastDirection(worldPos);
+	}
+
+	public void EndCast(Vector3 worldPos, bool isSuccessful = true)
+	{
+		Executor?.EndCast(worldPos, isSuccessful);
 	}
 }

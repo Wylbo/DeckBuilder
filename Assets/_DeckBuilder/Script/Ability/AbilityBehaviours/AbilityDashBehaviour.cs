@@ -14,8 +14,8 @@ public class AbilityDashBehaviour : AbilityBehaviour
 			return;
 
 		var data = dashData;
-		float dist = context.Ability.GetEvaluatedStatValue(dashDistanceStat);
-		float spd = context.Ability.GetEvaluatedStatValue(dashSpeedStat);
+		float dist = context.GetStat(dashDistanceStat);
+		float spd = context.GetStat(dashSpeedStat);
 		if (dist > 0f) data.dashDistance = dist;
 		if (spd > 0f) data.dashSpeed = spd;
 		context.Movement.Dash(data, context.TargetPoint);

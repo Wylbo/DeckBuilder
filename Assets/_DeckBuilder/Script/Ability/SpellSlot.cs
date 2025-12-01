@@ -14,9 +14,13 @@ public class SpellSlot
         private bool isHeld = false;
         private AbilityCaster caster = null;
         private bool hasEndCastSubscription = false;
+        private bool ownsAbilityInstance = false;
+        private IAbilityExecutor executor;
+        private readonly IAbilityStatProvider statProvider = new AbilityStatProvider();
 
 	public bool HasAbility => Ability != null;
-	public bool CanCast => HasAbility && (cooldown == null || !cooldown.IsRunning);
+	public bool CanCast => executor != null && (cooldown == null || !cooldown.IsRunning);
+        public IAbilityExecutor Executor => executor;
 
 	public bool Initialize(AbilityCaster caster)
 	{
@@ -25,38 +29,37 @@ public class SpellSlot
 
         public bool SetAbility(Ability ability, AbilityCaster caster)
         {
-                // Clean up existing ability instance
-                if (Ability != null)
-                {
-                        UnsubscribeFromEndCast();
+                bool reusingOwnedAbilityInstance = ownsAbilityInstance && ReferenceEquals(Ability, ability);
 
-                        bool shouldDestroyInstance = Ability.Caster != null;
-                        Ability.Disable();
-
-                        if (shouldDestroyInstance)
-                        {
-                                // Prevent ability reassignment from accumulating runtime instances
-                                UnityEngine.Object.Destroy(Ability);
-                        }
-                }
+                CleanupAbilityInstance(!reusingOwnedAbilityInstance);
 
                 Ability = ability != null ? UnityEngine.Object.Instantiate(ability) : null;
+                if (reusingOwnedAbilityInstance && ability != null)
+                        UnityEngine.Object.Destroy(ability);
+                ownsAbilityInstance = Ability != null;
                 hasEndCastSubscription = false;
                 this.caster = caster;
                 ResetCooldown();
 
-		if (Ability != null && caster != null)
-		{
-			Ability.Initialize(caster);
-			return true;
-		}
+                if (Ability != null && caster != null)
+                {
+                        var movement = caster.GetComponent<IAbilityMovement>();
+                        if (movement == null)
+                                movement = caster.GetComponent<Movement>();
 
-		return false;
+                        IAbilityDebuffService debuffService = caster.DebuffService;
+                        if (debuffService == null)
+                                debuffService = caster.GetComponent<IAbilityDebuffService>();
+                        executor = new AbilityExecutor(Ability, caster, movement, debuffService, statProvider);
+                        return true;
+                }
+
+                return false;
 	}
 
 	public void Cast(AbilityCaster caster, Vector3 worldPos)
 	{
-		if (Ability == null)
+		if (executor == null)
 			return;
 
                 this.caster = caster;
@@ -64,20 +67,20 @@ public class SpellSlot
                 isHeld = true;
                 UnsubscribeFromEndCast();
                 SubscribeToEndCast();
-                Ability.Cast(worldPos, isHeld);
+                executor.Cast(worldPos, isHeld);
 
-                if (Ability.StartCooldownOnCast)
+                if (Ability != null && Ability.StartCooldownOnCast)
                         StartCooldown();
         }
 
 	public void EndHold(AbilityCaster caster, Vector3 worldPos)
 	{
-		if (Ability == null)
+		if (executor == null)
 			return;
 
 		this.caster = caster;
 		isHeld = false;
-		Ability.EndHold(worldPos);
+		executor.EndHold(worldPos);
 	}
 
 	public void UpdateCooldown(float dt)
@@ -86,6 +89,13 @@ public class SpellSlot
 			cooldown = new Timer();
 
 		cooldown.Update(dt);
+                executor?.Update(dt);
+	}
+
+        public void Disable()
+        {
+                UnsubscribeFromEndCast();
+                executor?.Disable();
 	}
 
         private void ResetCooldown()
@@ -108,25 +118,41 @@ public class SpellSlot
 
         private void StartCooldown()
         {
-                cooldown = new Timer(Ability.Cooldown);
+                float duration = executor != null ? executor.Cooldown : 0f;
+                cooldown = new Timer(duration);
                 cooldown.Start();
         }
 
         private void SubscribeToEndCast()
         {
-                if (Ability == null || hasEndCastSubscription)
+                if (executor == null || hasEndCastSubscription)
                         return;
 
-                Ability.On_EndCast += Ability_OnEndCast;
+                executor.On_EndCast += Ability_OnEndCast;
                 hasEndCastSubscription = true;
         }
 
         private void UnsubscribeFromEndCast()
         {
-                if (Ability == null || !hasEndCastSubscription)
+                if (executor == null || !hasEndCastSubscription)
                         return;
 
-                Ability.On_EndCast -= Ability_OnEndCast;
+                executor.On_EndCast -= Ability_OnEndCast;
                 hasEndCastSubscription = false;
+        }
+
+        private void CleanupAbilityInstance(bool destroyAbilityInstance = true)
+        {
+                UnsubscribeFromEndCast();
+
+                executor?.Disable();
+                executor = null;
+
+                if (destroyAbilityInstance && Ability != null && ownsAbilityInstance)
+                {
+                        UnityEngine.Object.Destroy(Ability);
+                }
+
+                ownsAbilityInstance = false;
         }
 }

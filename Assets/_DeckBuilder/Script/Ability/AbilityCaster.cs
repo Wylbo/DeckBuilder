@@ -15,6 +15,7 @@ public class AbilityCaster : MonoBehaviour
     public SpellSlot[] SpellSlots => spellSlots;
     public SpellSlot DodgeSpellSlot => dodgeSpellSlot;
     public ProjectileLauncher ProjectileLauncher => projectileLauncher;
+    public IAbilityDebuffService DebuffService => debuffUpdater;
     public AbilityModifierManager ModifierManager => modifierManager;
 
     private void OnEnable()
@@ -39,12 +40,18 @@ public class AbilityCaster : MonoBehaviour
 
     public void AddDebuff(ScriptableDebuff scriptableDebuff)
     {
-        debuffUpdater.AddDebuff(scriptableDebuff.InitDebuff(debuffUpdater));
+        if (DebuffService == null || scriptableDebuff == null)
+            return;
+
+        DebuffService.AddDebuff(scriptableDebuff);
     }
 
     public void RemoveDebuff(ScriptableDebuff scriptableDebuff)
     {
-        debuffUpdater.RemoveDebuff(scriptableDebuff);
+        if (DebuffService == null || scriptableDebuff == null)
+            return;
+
+        DebuffService.RemoveDebuff(scriptableDebuff);
     }
 
     private void InitializeAbilities()
@@ -58,18 +65,21 @@ public class AbilityCaster : MonoBehaviour
 
     private void DisableAllAbilities()
     {
+        dodgeSpellSlot?.Disable();
         foreach (SpellSlot spellSlot in spellSlots)
         {
-            spellSlot.Ability?.Disable();
+            spellSlot?.Disable();
         }
     }
 
     private void UpdateSpellSlotsCooldowns()
     {
-        dodgeSpellSlot.UpdateCooldown(Time.deltaTime);
+        if (dodgeSpellSlot != null)
+            dodgeSpellSlot.UpdateCooldown(Time.deltaTime);
+
         foreach (SpellSlot slot in spellSlots)
         {
-            slot.UpdateCooldown(Time.deltaTime);
+            slot?.UpdateCooldown(Time.deltaTime);
         }
     }
 

@@ -17,7 +17,7 @@ public enum DebuffDurationPolicy
     Refresh,
     none,
 }
-public class DebuffUpdater : MonoBehaviour
+public class DebuffUpdater : MonoBehaviour, IAbilityDebuffService
 {
     private readonly Dictionary<ScriptableDebuff, DebuffApplier> debuffs =
      new Dictionary<ScriptableDebuff, DebuffApplier>();
@@ -48,6 +48,14 @@ public class DebuffUpdater : MonoBehaviour
             debuffApplier.Activate();
             debuffApplier.On_Ended += DebuffApplier_On_Ended;
         }
+    }
+
+    public void AddDebuff(ScriptableDebuff scriptableDebuff)
+    {
+        if (scriptableDebuff == null)
+            return;
+
+        AddDebuff(scriptableDebuff.InitDebuff(this));
     }
 
     public void RemoveDebuff(ScriptableDebuff scriptableDebuff)

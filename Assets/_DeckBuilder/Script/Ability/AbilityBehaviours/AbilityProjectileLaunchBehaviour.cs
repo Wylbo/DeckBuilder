@@ -32,7 +32,7 @@ public class AbilityProjectileLaunchBehaviour : AbilityBehaviour
 
 		var launcher = context.ProjectileLauncher.SetProjectile(projectile);
 
-		float yOffset = applyVerticalOffsetStat ? context.Ability.GetEvaluatedStatValue(verticalOffsetStatKey) : 0f;
+		float yOffset = applyVerticalOffsetStat ? context.GetStat(verticalOffsetStatKey) : 0f;
 		switch (launchPosition)
 		{
 			case LaunchPosition.Caster:
@@ -56,16 +56,16 @@ public class AbilityProjectileLaunchBehaviour : AbilityBehaviour
 		launcher.SetMultipleProjectileFireMode(fireMode);
 
 		if (applyScaleStat)
-			launcher.SetScale(context.Ability.GetEvaluatedStatValue(scaleStatKey));
+			launcher.SetScale(context.GetStat(scaleStatKey));
 
 		if (applyProjectileCount)
-			launcher.SetProjectileCount(Mathf.RoundToInt(context.Ability.GetEvaluatedStatValue(projectileCountStat)));
+			launcher.SetProjectileCount(Mathf.RoundToInt(context.GetStat(projectileCountStat)));
 
 		if (applySpreadStat)
-			launcher.SetSpreadAngle(context.Ability.GetEvaluatedStatValue(spreadStatKey));
+			launcher.SetSpreadAngle(context.GetStat(spreadStatKey));
 
 		if (applyMaxSpreadStat)
-			launcher.SetMaxSpreadAngle(context.Ability.GetEvaluatedStatValue(maxSpreadStatKey));
+			launcher.SetMaxSpreadAngle(context.GetStat(maxSpreadStatKey));
 
 		var launched = launcher.Launch<Projectile>();
 		context.LastLaunchedProjectiles = launched;

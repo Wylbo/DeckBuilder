@@ -14,7 +14,7 @@ public class AbilityDamageTargetBehaviour : AbilityBehaviour
 		Character character = context.Target.Character;
 		if (character != null)
 		{
-			int dmg = Mathf.RoundToInt(context.Ability.GetEvaluatedStatValue(damageStat));
+			int dmg = Mathf.RoundToInt(context.GetStat(damageStat));
 			character.TakeDamage(dmg);
 		}
 	}
