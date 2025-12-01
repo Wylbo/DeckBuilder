@@ -4480,7 +4480,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   dontDestroyOnLoad: 1
-  gameStateManager: {fileID: 1526211929}
   layerConfigs:
   - layer: 3
     root: {fileID: 2068421543}
@@ -4513,6 +4512,7 @@ MonoBehaviour:
   tooltipView: {fileID: 1941660751}
   showDelay: 0.15
   screenOffset: {x: 16, y: -16}
+  uiManager: {fileID: 1890738979}
 --- !u!1 &1907833318
 GameObject:
   m_ObjectHideFlags: 0
@@ -5802,6 +5802,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4274541645389393329, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
+      propertyPath: uiManager
+      value: 
+      objectReference: {fileID: 1890738979}
     - target: {fileID: 4284705883021781481, guid: 552a2df38a4773847b7422a75fdb5bd5, type: 3}
       propertyPath: activeModifiers.Array.size
       value: 1

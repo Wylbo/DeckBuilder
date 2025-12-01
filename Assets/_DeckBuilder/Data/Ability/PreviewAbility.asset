@@ -39,7 +39,7 @@ MonoBehaviour:
   - Key: 6
     Value: 2
   - Key: 7
-    Value: -1
+    Value: -1.5
   - Key: 5
     Value: 0
   behaviours:
@@ -88,6 +88,7 @@ MonoBehaviour:
           blockingMask:
             serializedVersion: 2
             m_Bits: 64
+          maxWallIterations: 0
         dashDistanceStat: 8
         dashSpeedStat: 9
     - rid: 1062887273389097054
