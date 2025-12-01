@@ -8,11 +8,12 @@ public class SpellSlot
 	[SerializeField, InlineEditor]
 	public Ability Ability;
 
-	[ReadOnly]
-	public Timer cooldown = new Timer();
+        [ReadOnly]
+        public Timer cooldown = new Timer();
 
-	private bool isHeld = false;
-	private AbilityCaster caster = null;
+        private bool isHeld = false;
+        private AbilityCaster caster = null;
+        private bool hasEndCastSubscription = false;
 
 	public bool HasAbility => Ability != null;
 	public bool CanCast => HasAbility && (cooldown == null || !cooldown.IsRunning);
@@ -25,6 +26,9 @@ public class SpellSlot
         public bool SetAbility(Ability ability, AbilityCaster caster)
         {
                 // Clean up existing ability instance
+                if (Ability != null)
+                {
+                        UnsubscribeFromEndCast();
                 bool shouldDestroyInstance = Ability != null && Ability.Caster != null;
                 if (Ability != null)
                 {
@@ -37,9 +41,10 @@ public class SpellSlot
                         }
                 }
 
-		Ability = ability != null ? UnityEngine.Object.Instantiate(ability) : null;
-		this.caster = caster;
-		ResetCooldown();
+                Ability = ability != null ? UnityEngine.Object.Instantiate(ability) : null;
+                hasEndCastSubscription = false;
+                this.caster = caster;
+                ResetCooldown();
 
 		if (Ability != null && caster != null)
 		{
@@ -55,15 +60,16 @@ public class SpellSlot
 		if (Ability == null)
 			return;
 
-		this.caster = caster;
+                this.caster = caster;
 
-		isHeld = true;
-		Ability.On_EndCast += Ability_OnEndCast;
-		Ability.Cast(worldPos, isHeld);
+                isHeld = true;
+                UnsubscribeFromEndCast();
+                SubscribeToEndCast();
+                Ability.Cast(worldPos, isHeld);
 
-		if (Ability.StartCooldownOnCast)
-			StartCooldown();
-	}
+                if (Ability.StartCooldownOnCast)
+                        StartCooldown();
+        }
 
 	public void EndHold(AbilityCaster caster, Vector3 worldPos)
 	{
@@ -83,26 +89,45 @@ public class SpellSlot
 		cooldown.Update(dt);
 	}
 
-	private void ResetCooldown()
-	{
-		cooldown = new Timer();
-	}
+        private void ResetCooldown()
+        {
+                UnsubscribeFromEndCast();
 
-	private void Ability_OnEndCast(bool isSucessful)
-	{
-		if (Ability != null)
-			Ability.On_EndCast -= Ability_OnEndCast;
+                cooldown = new Timer();
+        }
 
-		if (!isSucessful || Ability == null)
-			return;
+        private void Ability_OnEndCast(bool isSucessful)
+        {
+                UnsubscribeFromEndCast();
+
+                if (!isSucessful || Ability == null)
+                        return;
 
 		if (!Ability.StartCooldownOnCast)
 			StartCooldown();
 	}
 
-	private void StartCooldown()
-	{
-		cooldown = new Timer(Ability.Cooldown);
-		cooldown.Start();
-	}
+        private void StartCooldown()
+        {
+                cooldown = new Timer(Ability.Cooldown);
+                cooldown.Start();
+        }
+
+        private void SubscribeToEndCast()
+        {
+                if (Ability == null || hasEndCastSubscription)
+                        return;
+
+                Ability.On_EndCast += Ability_OnEndCast;
+                hasEndCastSubscription = true;
+        }
+
+        private void UnsubscribeFromEndCast()
+        {
+                if (Ability == null || !hasEndCastSubscription)
+                        return;
+
+                Ability.On_EndCast -= Ability_OnEndCast;
+                hasEndCastSubscription = false;
+        }
 }
