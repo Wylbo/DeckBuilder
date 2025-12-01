@@ -29,7 +29,16 @@ public class SpellSlot
                 if (Ability != null)
                 {
                         UnsubscribeFromEndCast();
+                bool shouldDestroyInstance = Ability != null && Ability.Caster != null;
+                if (Ability != null)
+                {
                         Ability.Disable();
+
+                        if (shouldDestroyInstance)
+                        {
+                                // Prevent ability reassignment from accumulating runtime instances
+                                UnityEngine.Object.Destroy(Ability);
+                        }
                 }
 
                 Ability = ability != null ? UnityEngine.Object.Instantiate(ability) : null;
