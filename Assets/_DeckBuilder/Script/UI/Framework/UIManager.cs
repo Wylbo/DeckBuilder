@@ -6,37 +6,22 @@ using UnityEngine;
 /// Central UI entry point. Works with strongly typed views (no string keys),
 /// handles layer behaviours, and exposes callbacks before/after show/hide.
 /// </summary>
-public class UIManager : MonoBehaviour
+public class UIManager : MonoBehaviour, IUIManager
 {
-    public static UIManager Instance { get; private set; }
-
     [SerializeField] private bool dontDestroyOnLoad = true;
     [SerializeField] private GameStateManager gameStateManager;
-
-    [Serializable]
-    private class LayerConfig
-    {
-        public UILayer layer;
-        public Transform root;
-        public UILayerBehaviour behaviour = UILayerBehaviour.Exclusive;
-
-        public LayerConfig() { }
-
-        public LayerConfig(UILayer layer, UILayerBehaviour behaviour)
-        {
-            this.layer = layer;
-            this.behaviour = behaviour;
-        }
-    }
-
-    [SerializeField] private List<LayerConfig> layerConfigs = new List<LayerConfig>();
+    [SerializeField] private List<UILayerConfig> layerConfigs = new List<UILayerConfig>();
     [SerializeField] private List<UIView> registeredViews = new List<UIView>();
 
-    private readonly Dictionary<UILayer, LayerConfig> layerLookup = new Dictionary<UILayer, LayerConfig>();
-    private readonly Dictionary<Type, UIView> prefabLookup = new Dictionary<Type, UIView>();
-    private readonly Dictionary<Type, UIView> instances = new Dictionary<Type, UIView>();
-    private readonly Dictionary<UILayer, List<UIView>> activeByLayer = new Dictionary<UILayer, List<UIView>>();
-    private readonly List<UIView> openHistory = new List<UIView>();
+    private IUIViewFactory viewFactory;
+    private IUILayerController layerController;
+    private IUIHistoryTracker historyTracker;
+    private IPauseService pauseService;
+
+    public IUIViewFactory ViewFactory => viewFactory;
+    public IUILayerController LayerController => layerController;
+    public IUIHistoryTracker History => historyTracker;
+    public IPauseService PauseService => pauseService;
 
     public event Action<UIView> BeforeShow;
     public event Action<UIView> AfterShow;
@@ -45,24 +30,18 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
         if (dontDestroyOnLoad)
             DontDestroyOnLoad(gameObject);
 
-        BuildLayerLookup();
-        BuildPrefabLookup();
+        InitializeServices();
     }
 
-    private void OnDestroy()
+    public void ConfigureServices(IUIViewFactory viewFactory, IUILayerController layerController, IUIHistoryTracker historyTracker, IPauseService pauseService)
     {
-        if (Instance == this)
-            Instance = null;
+        this.viewFactory = viewFactory;
+        this.layerController = layerController;
+        this.historyTracker = historyTracker;
+        this.pauseService = pauseService;
     }
 
     /// <summary>
@@ -70,14 +49,15 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public TView Show<TView>(Action<TView> beforeShow = null, Action<TView> afterShow = null) where TView : UIView
     {
-        TView view = ResolveInstance<TView>();
+        EnsureServicesReady();
+
+        TView view = viewFactory.GetOrCreate<TView>();
         if (view == null)
             return null;
 
-        LayerConfig config = GetOrCreateLayerConfig(view.Layer);
-        MoveToLayerRoot(view, config);
-        AddToActive(view, config.layer);
-        ApplyLayerBehaviourOnShow(config, view);
+        layerController.MoveToLayerRoot(view);
+        layerController.AddToActive(view);
+        layerController.ApplyBehaviourOnShow(view, other => HideInternal(other, null, null, false));
         ApplyPause(view);
 
         InvokeShow(view, beforeShow, afterShow);
@@ -89,7 +69,9 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public void Hide<TView>(Action<TView> beforeHide = null, Action<TView> afterHide = null) where TView : UIView
     {
-        if (!TryGetInstance(out TView view))
+        EnsureServicesReady();
+
+        if (!viewFactory.TryGetExisting(out TView view))
             return;
 
         HideInternal(view, beforeHide, afterHide, true);
@@ -100,7 +82,9 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public void HideCurrentView()
     {
-        var view = GetLastOpenedView();
+        EnsureServicesReady();
+
+        var view = historyTracker.GetLastOpenedView();
         if (view == null)
             return;
 
@@ -112,15 +96,8 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public bool TryGetInstance<TView>(out TView view) where TView : UIView
     {
-        var type = typeof(TView);
-        if (instances.TryGetValue(type, out var existing) && existing != null)
-        {
-            view = existing as TView;
-            return view != null;
-        }
-
-        view = null;
-        return false;
+        EnsureServicesReady();
+        return viewFactory.TryGetExisting(out view);
     }
 
     public bool IsVisible<TView>() where TView : UIView
@@ -130,118 +107,49 @@ public class UIManager : MonoBehaviour
 
     public bool HasVisibleViewOnLayer(UILayer layer)
     {
-        var list = GetActiveList(layer);
-        for (int i = list.Count - 1; i >= 0; i--)
-        {
-            var view = list[i];
-            if (view == null)
-            {
-                list.RemoveAt(i);
-                continue;
-            }
-
-            if (view.IsVisible)
-                return true;
-        }
-
-        return false;
+        EnsureServicesReady();
+        return layerController.HasVisibleViewOnLayer(layer);
     }
 
     public Transform GetLayerRoot(UILayer layer)
     {
-        return GetOrCreateLayerConfig(layer)?.root;
+        EnsureServicesReady();
+        return layerController.GetLayerRoot(layer);
     }
 
-    private void BuildLayerLookup()
+    private void InitializeServices()
     {
-        layerLookup.Clear();
-        foreach (var config in layerConfigs)
-        {
-            if (config == null)
-                continue;
-
-            if (config.root == null)
-                config.root = CreateDefaultRoot(config.layer);
-
-            layerLookup[config.layer] = config;
-        }
-
-        // Ensure all layers exist even if not configured in the inspector.
-        foreach (UILayer layer in Enum.GetValues(typeof(UILayer)))
-        {
-            if (layerLookup.ContainsKey(layer))
-                continue;
-
-            var config = new LayerConfig(layer, GetDefaultBehaviour(layer))
-            {
-                root = CreateDefaultRoot(layer)
-            };
-            layerLookup[layer] = config;
-            layerConfigs.Add(config);
-        }
+        layerController = layerController ?? new UILayerController(layerConfigs, transform);
+        viewFactory = viewFactory ?? new UIViewFactory(registeredViews, layerController, this);
+        historyTracker = historyTracker ?? new UIHistoryTracker();
+        pauseService = pauseService ?? new GameStatePauseService(ResolvePauseManager());
     }
 
-    private void BuildPrefabLookup()
+    private void EnsureServicesReady()
     {
-        prefabLookup.Clear();
-        foreach (var view in registeredViews)
-        {
-            if (view == null)
-                continue;
-
-            var type = view.GetType();
-            prefabLookup[type] = view;
-        }
+        if (viewFactory == null || layerController == null || historyTracker == null || pauseService == null)
+            InitializeServices();
     }
 
-    private TView ResolveInstance<TView>() where TView : UIView
+    private GameStateManager ResolvePauseManager()
     {
-        var type = typeof(TView);
-        if (instances.TryGetValue(type, out var cached) && cached != null)
-            return cached as TView;
+        if (gameStateManager != null)
+            return gameStateManager;
 
-        if (!prefabLookup.TryGetValue(type, out var prefab) || prefab == null)
-        {
-            Debug.LogError($"UIManager: prefab for view {type.Name} is not registered.");
-            return null;
-        }
-
-        var config = GetOrCreateLayerConfig(prefab.Layer);
-        var instance = Instantiate(prefab, config.root);
-        instance.AttachManager(this);
-        instances[type] = instance;
-        return instance as TView;
-    }
-
-    private void ApplyLayerBehaviourOnShow(LayerConfig config, UIView view)
-    {
-        var actives = GetActiveList(config.layer);
-        if (config.behaviour != UILayerBehaviour.Exclusive)
-            return;
-
-        // Hide current visible view on exclusive layers (Screens/HUD).
-        for (int i = actives.Count - 1; i >= 0; i--)
-        {
-            var other = actives[i];
-            if (other == null || other == view)
-                continue;
-
-            if (other.IsVisible)
-                HideInternal(other, null, null, false);
-        }
+        gameStateManager = FindFirstObjectByType<GameStateManager>();
+        return gameStateManager;
     }
 
     private void ApplyPause(UIView view)
     {
-        if (view.PauseGame)
-        {
-            gameStateManager.RequestPause(view);
-        }
+        if (view != null && view.PauseGame)
+            pauseService?.RequestPause(view);
     }
 
     private void RemovePause(UIView view)
     {
-        gameStateManager.ReleasePause(view);
+        if (view != null)
+            pauseService?.ReleasePause(view);
     }
 
     private void HideInternal<TView>(TView view, Action<TView> beforeHide, Action<TView> afterHide, bool removeFromLayer) where TView : UIView
@@ -249,12 +157,12 @@ public class UIManager : MonoBehaviour
         if (view == null)
             return;
 
-        TrackViewHidden(view);
+        historyTracker.TrackViewHidden(view);
 
         if (!view.IsVisible)
         {
             if (removeFromLayer)
-                RemoveFromActive(view);
+                layerController.RemoveFromActive(view);
             return;
         }
 
@@ -266,8 +174,8 @@ public class UIManager : MonoBehaviour
 
         if (removeFromLayer)
         {
-            RemoveFromActive(view);
-            TryRestoreBelow(view.Layer);
+            layerController.RemoveFromActive(view);
+            layerController.TryRestoreBelow(view.Layer, candidate => InvokeShow(candidate, null, null));
         }
 
         RemovePause(view);
@@ -278,7 +186,7 @@ public class UIManager : MonoBehaviour
         if (view == null)
             return;
 
-        TrackViewOpened(view);
+        historyTracker.TrackViewOpened(view);
 
         if (view.IsVisible)
         {
@@ -291,132 +199,5 @@ public class UIManager : MonoBehaviour
         view.ShowInternal();
         AfterShow?.Invoke(view);
         afterShow?.Invoke(view);
-    }
-
-    private void AddToActive(UIView view, UILayer layer)
-    {
-        var list = GetActiveList(layer);
-        list.Remove(view);
-        list.Add(view);
-    }
-
-    private void RemoveFromActive(UIView view)
-    {
-        var list = GetActiveList(view.Layer);
-        list.Remove(view);
-    }
-
-    private List<UIView> GetActiveList(UILayer layer)
-    {
-        if (!activeByLayer.TryGetValue(layer, out var list))
-        {
-            list = new List<UIView>();
-            activeByLayer[layer] = list;
-        }
-        return list;
-    }
-
-    private UIView GetLastOpenedView()
-    {
-        for (int i = openHistory.Count - 1; i >= 0; i--)
-        {
-            var candidate = openHistory[i];
-            if (candidate == null)
-            {
-                openHistory.RemoveAt(i);
-                continue;
-            }
-
-            if (candidate.IsVisible)
-                return candidate;
-
-            openHistory.RemoveAt(i);
-        }
-
-        return null;
-    }
-
-    private void TrackViewOpened(UIView view)
-    {
-        if (view == null)
-            return;
-
-        openHistory.Remove(view);
-        openHistory.Add(view);
-    }
-
-    private void TrackViewHidden(UIView view)
-    {
-        if (view == null)
-            return;
-
-        openHistory.Remove(view);
-    }
-
-    private void TryRestoreBelow(UILayer layer)
-    {
-        var config = GetOrCreateLayerConfig(layer);
-        if (config.behaviour != UILayerBehaviour.Exclusive)
-            return;
-
-        var actives = GetActiveList(layer);
-        for (int i = actives.Count - 1; i >= 0; i--)
-        {
-            var candidate = actives[i];
-            if (candidate == null)
-            {
-                actives.RemoveAt(i);
-                continue;
-            }
-
-            if (!candidate.IsVisible)
-            {
-                InvokeShow(candidate, null, null);
-                break;
-            }
-        }
-    }
-
-    private LayerConfig GetOrCreateLayerConfig(UILayer layer)
-    {
-        if (layerLookup.TryGetValue(layer, out var config))
-            return config;
-
-        config = new LayerConfig(layer, GetDefaultBehaviour(layer))
-        {
-            root = CreateDefaultRoot(layer)
-        };
-        layerLookup[layer] = config;
-        layerConfigs.Add(config);
-        return config;
-    }
-
-    private Transform CreateDefaultRoot(UILayer layer)
-    {
-        var rootGO = new GameObject($"{layer}Layer");
-        rootGO.transform.SetParent(transform, false);
-        return rootGO.transform;
-    }
-
-    private void MoveToLayerRoot(UIView view, LayerConfig config)
-    {
-        if (view.transform.parent != config.root)
-            view.transform.SetParent(config.root, false);
-    }
-
-    private static UILayerBehaviour GetDefaultBehaviour(UILayer layer)
-    {
-        switch (layer)
-        {
-            case UILayer.Popup:
-                return UILayerBehaviour.Stacked;
-            case UILayer.Overlay:
-                return UILayerBehaviour.Additive;
-            case UILayer.Hud:
-                return UILayerBehaviour.Exclusive;
-            case UILayer.Screen:
-            default:
-                return UILayerBehaviour.Exclusive;
-        }
     }
 }

@@ -6,9 +6,9 @@ public class BaseEnemyControlStrategy : ControlStrategy
 {
     protected BehaviourTreeInstance bt;
 
-    public override void Initialize(Controller controller, Character character)
+    public override void Initialize(Controller controller, Character character, IUIManager uiManager = null)
     {
-        base.Initialize(controller, character);
+        base.Initialize(controller, character, uiManager);
         bt = character.GetComponent<BehaviourTreeInstance>();
         bt.tickMode = BehaviourTreeInstance.TickMode.None;
     }

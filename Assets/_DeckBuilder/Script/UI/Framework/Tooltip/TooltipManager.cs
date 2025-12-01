@@ -11,6 +11,7 @@ public class TooltipManager : MonoBehaviour
     [SerializeField] private TooltipView tooltipView;
     [SerializeField] private float showDelay = 0.15f;
     [SerializeField] private Vector2 screenOffset = new Vector2(16f, -16f);
+    [SerializeField] private UIManager uiManager;
 
     private ITooltipSource currentSource;
     private bool pendingShow;
@@ -28,6 +29,9 @@ public class TooltipManager : MonoBehaviour
         Instance = this;
         if (tooltipView == null)
             tooltipView = GetComponentInChildren<TooltipView>(true);
+
+        if (uiManager == null)
+            uiManager = FindFirstObjectByType<UIManager>();
 
         TryAttachToOverlay();
         HideImmediate();
@@ -128,10 +132,10 @@ public class TooltipManager : MonoBehaviour
 
     private void TryAttachToOverlay()
     {
-        if (tooltipView == null || UIManager.Instance == null)
+        if (tooltipView == null || uiManager == null)
             return;
 
-        var overlayRoot = UIManager.Instance.GetLayerRoot(UILayer.Overlay);
+        var overlayRoot = uiManager.GetLayerRoot(UILayer.Overlay);
         if (overlayRoot != null)
         {
             if (tooltipView.transform.parent != overlayRoot)

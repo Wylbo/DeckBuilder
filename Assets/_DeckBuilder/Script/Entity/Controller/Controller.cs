@@ -13,6 +13,9 @@ public class Controller : MonoBehaviour
 	[SerializeField]
 	private ControlStrategy controlStrategy;
 
+	[SerializeField]
+	private UIManager uiManager;
+
 	// Runtime instance to avoid shared SO state across multiple controllers
 	private ControlStrategy runtimeControlStrategy;
 
@@ -22,7 +25,7 @@ public class Controller : MonoBehaviour
 		{
 			// Instantiate a per-controller copy so per-instance fields aren't shared
 			runtimeControlStrategy = Instantiate(controlStrategy);
-			runtimeControlStrategy.Initialize(this, character);
+			runtimeControlStrategy.Initialize(this, character, ResolveUIManager());
 		}
 	}
 
@@ -39,6 +42,14 @@ public class Controller : MonoBehaviour
 	private void Reset()
 	{
 		character = GetComponent<Character>();
+	}
+
+	private IUIManager ResolveUIManager()
+	{
+		if (uiManager == null)
+			uiManager = FindFirstObjectByType<UIManager>();
+
+		return uiManager;
 	}
 
 	public bool TryMove(Vector3 worldTo)
