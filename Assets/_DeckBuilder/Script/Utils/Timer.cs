@@ -18,7 +18,7 @@ public class Timer
 	public float TotalTime => duration;
 	public float Remaining => remaining;
 	public float ElapsedTime => duration - remaining;
-	public float ElapsedRatio => ElapsedTime / duration;
+        public float ElapsedRatio => duration <= Mathf.Epsilon ? 0f : ElapsedTime / duration;
 	public bool IsRunning => Remaining > 0;
 
 	public Timer()
@@ -41,15 +41,22 @@ public class Timer
 		Start(duration);
 	}
 
-	public void Start(float duration)
-	{
-		if (IsRunning)
-			return;
+        public void Start(float duration)
+        {
+                if (IsRunning)
+                        return;
 
-		remaining = duration;
+                if (duration <= Mathf.Epsilon)
+                {
+                        Debug.LogWarning("Timer duration must be greater than zero.");
+                        return;
+                }
 
-		On_Started?.Invoke();
-	}
+                this.duration = duration;
+                remaining = duration;
+
+                On_Started?.Invoke();
+        }
 
 	public void Update(float deltaTime)
 	{
