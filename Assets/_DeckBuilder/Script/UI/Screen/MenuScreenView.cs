@@ -7,7 +7,8 @@ public class MenuScreenView : UIView
     [SerializeField] private Button optionButton;
     [SerializeField] private Button quitButton;
 
-    private UIManager Manager => Owner != null ? Owner : UIManager.Instance;
+    private IUIManager Manager => Owner;
+    private IPauseService PauseService => Owner?.PauseService;
 
     private void Awake()
     {
@@ -76,11 +77,11 @@ public class MenuScreenView : UIView
 
     private void RequestPause()
     {
-        GameStateManager.Instance.RequestPause(this);
+        PauseService?.RequestPause(this);
     }
 
     private void ReleasePause()
     {
-        GameStateManager.Instance.ReleasePause(this);
+        PauseService?.ReleasePause(this);
     }
 }

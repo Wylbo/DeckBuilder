@@ -15,12 +15,11 @@ public class PlayerControlStrategy : ControlStrategy
 	private PlayerInputs playerInput;
 
 	private bool isMoving;
-	private UIManager UiManager => UIManager.Instance;
 	private bool InventoryVisible => UiManager != null && UiManager.IsVisible<AbilityInventoryView>();
 
-	public override void Initialize(Controller controller, Character character)
+	public override void Initialize(Controller controller, Character character, IUIManager uiManager = null)
 	{
-		base.Initialize(controller, character);
+		base.Initialize(controller, character, uiManager);
 
 		inputProvider = PlayerInputProvider.GetOrCreate();
 		playerInput = inputProvider.Inputs;
@@ -188,13 +187,13 @@ public class PlayerControlStrategy : ControlStrategy
 
 	private void OpenMenuPerformed(InputAction.CallbackContext context)
 	{
-		UiManager.Show<MenuScreenView>();
+		UiManager?.Show<MenuScreenView>();
 	}
 
 
 	private void UICancel_performed(InputAction.CallbackContext context)
 	{
-		UiManager.HideCurrentView();
+		UiManager?.HideCurrentView();
 	}
 
 	private void RegisterGameplayCallbacks()

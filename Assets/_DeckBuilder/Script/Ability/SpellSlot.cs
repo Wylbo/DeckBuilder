@@ -29,9 +29,8 @@ public class SpellSlot
                 if (Ability != null)
                 {
                         UnsubscribeFromEndCast();
-                bool shouldDestroyInstance = Ability != null && Ability.Caster != null;
-                if (Ability != null)
-                {
+
+                        bool shouldDestroyInstance = Ability.Caster != null;
                         Ability.Disable();
 
                         if (shouldDestroyInstance)

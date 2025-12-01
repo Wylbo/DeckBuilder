@@ -14,10 +14,10 @@ public abstract class UIView : MonoBehaviour, IUIElement
     public UILayer Layer => layer;
     public bool IsVisible { get; private set; }
     public RectTransform RectTransform => transform as RectTransform;
-    protected UIManager Owner { get; private set; }
+    protected IUIManager Owner { get; private set; }
     public bool PauseGame => pauseGame;
 
-    internal void AttachManager(UIManager manager)
+    internal void AttachManager(IUIManager manager)
     {
         Owner = manager;
     }
