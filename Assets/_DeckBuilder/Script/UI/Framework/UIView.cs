@@ -28,6 +28,8 @@ public abstract class UIView : MonoBehaviour, IUIElement
     internal void AttachManager(IUIManager manager)
     {
         Owner = manager;
+        if (animator)
+            animator.updateMode = AnimatorUpdateMode.UnscaledTime;
     }
 
     internal void ShowInternal()
@@ -133,7 +135,6 @@ public abstract class UIView : MonoBehaviour, IUIElement
         if (canvasGroup == null)
             return;
 
-        canvasGroup.interactable = enabled;
         canvasGroup.blocksRaycasts = enabled;
     }
 }
