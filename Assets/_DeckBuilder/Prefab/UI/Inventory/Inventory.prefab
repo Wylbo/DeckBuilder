@@ -11,7 +11,9 @@ GameObject:
   - component: {fileID: 8635683362418949961}
   - component: {fileID: 212735047673600400}
   - component: {fileID: 2616984651484497752}
+  - component: {fileID: 5216689811780740325}
   - component: {fileID: 5388095207502220314}
+  - component: {fileID: 4354826631789934319}
   m_Layer: 5
   m_Name: Inventory
   m_TagString: Untagged
@@ -80,6 +82,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 2047
+--- !u!225 &5216689811780740325
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244602685792882326}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &5388095207502220314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96,9 +110,35 @@ MonoBehaviour:
   deactivateOnHide: 1
   moveToTopOnShow: 1
   pauseGame: 1
+  canvasGroup: {fileID: 5216689811780740325}
+  animator: {fileID: 4354826631789934319}
+  openAnimClip: {fileID: 7400000, guid: c67acd5620a86d54bb3ef448fbab3c12, type: 2}
+  closeAnimClip: {fileID: 7400000, guid: 6920ae437be11b94681e6fc76996b83e, type: 2}
   itemPrefab: {fileID: 7929331562617229253, guid: 9d664eb3db04e0c4c91f06359fc5fa5a, type: 3}
   contentRoot: {fileID: 1342297905230289585}
   rebuildOnShow: 1
+--- !u!95 &4354826631789934319
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244602685792882326}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 38c996919e83ea94cad2cd8133657e11, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 2
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1474069986827464646
 GameObject:
   m_ObjectHideFlags: 0
@@ -480,7 +520,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 180956762380578243}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.6398559
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

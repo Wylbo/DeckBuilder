@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Hotbar : UIView
+public class Hotbar : MonoBehaviour
 {
     [SerializeField] private AbilityCaster abilityCaster;
     [SerializeField] private SpellSlotUI[] spellSlots;
@@ -19,12 +19,6 @@ public class Hotbar : UIView
     public void SetCaster(AbilityCaster caster)
     {
         abilityCaster = caster;
-        BindSlots();
-    }
-
-    public override void OnShow()
-    {
-        base.OnShow();
         BindSlots();
     }
 

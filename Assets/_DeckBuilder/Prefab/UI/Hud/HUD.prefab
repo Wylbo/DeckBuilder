@@ -175,6 +175,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5990171156146779092, guid: 1a1e6c9edb1ea9b4e8b39103ebda8208, type: 3}
+      propertyPath: dodgeSlot
+      value: 
+      objectReference: {fileID: 1393533899612575395}
     - target: {fileID: 7657178810796690704, guid: 1a1e6c9edb1ea9b4e8b39103ebda8208, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -291,7 +295,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 840628156219915719, guid: 254754e7cf6e1fb4eb22cc3c84c30974, type: 3}
       propertyPath: m_Name
-      value: SpellSlot
+      value: DodgeSpellSlot
       objectReference: {fileID: 0}
     - target: {fileID: 1125961460814807377, guid: 254754e7cf6e1fb4eb22cc3c84c30974, type: 3}
       propertyPath: m_Pivot.x
@@ -387,13 +391,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8621348779006045952, guid: 254754e7cf6e1fb4eb22cc3c84c30974, type: 3}
       propertyPath: allowAbilityDrops
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 254754e7cf6e1fb4eb22cc3c84c30974, type: 3}
+--- !u!114 &1393533899612575395 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8621348779006045952, guid: 254754e7cf6e1fb4eb22cc3c84c30974, type: 3}
+  m_PrefabInstance: {fileID: 7274435706137115043}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 305d665927c996042a53b1b428607ffc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpellSlotUI
 --- !u!224 &7733748461050132722 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1125961460814807377, guid: 254754e7cf6e1fb4eb22cc3c84c30974, type: 3}

@@ -5,6 +5,7 @@ public interface IUIElement
     UILayer Layer { get; }
     bool IsVisible { get; }
     RectTransform RectTransform { get; }
+    CanvasGroup CanvasGroup { get; }
     bool PauseGame { get; }
 
     /// <summary>
