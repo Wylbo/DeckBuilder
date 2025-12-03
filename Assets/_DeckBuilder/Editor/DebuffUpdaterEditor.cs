@@ -10,10 +10,10 @@ public class DebuffUpdaterEditor : Editor
 
     private void OnEnable()
     {
-        headerStyle = new GUIStyle(EditorStyles.boldLabel)
-        {
-            fontSize = 12
-        };
+        // headerStyle = new GUIStyle(EditorStyles.boldLabel)
+        // {
+        //     fontSize = 12
+        // };
     }
 
     public override void OnInspectorGUI()

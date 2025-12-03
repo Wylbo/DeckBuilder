@@ -30,6 +30,7 @@ public class Movement : MonoBehaviour, IAbilityMovement
         public int maxWallIterations;
     }
 
+    [SerializeField] private GlobalStatKey movementSpeedStatKey = GlobalStatKey.MovementSpeed;
     [SerializeField]
     private Rigidbody body = null;
 

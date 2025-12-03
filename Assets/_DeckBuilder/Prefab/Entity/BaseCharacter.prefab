@@ -61,6 +61,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -82,6 +84,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -105,6 +108,7 @@ GameObject:
   - component: {fileID: 9176447491751950743}
   - component: {fileID: 6244960309705328274}
   - component: {fileID: 6938576570393643543}
+  - component: {fileID: 5097382059795255847}
   m_Layer: 0
   m_Name: BaseCharacter
   m_TagString: Untagged
@@ -216,6 +220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   character: {fileID: 4938447398858601016}
   controlStrategy: {fileID: 0}
+  uiManager: {fileID: 0}
 --- !u!114 &4938447398858601016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,6 +238,7 @@ MonoBehaviour:
   abilityCaster: {fileID: 9176447491751950743}
   health: {fileID: 8917544956100770672}
   hurtbox: {fileID: 5301469400233989028}
+  faction: 0
 --- !u!114 &7480439906567705019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,6 +288,7 @@ MonoBehaviour:
     blockingMask:
       serializedVersion: 2
       m_Bits: 64
+    maxWallIterations: 100
 --- !u!114 &1904220953553573043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,7 +301,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea0ae8e9041e7be45bcaaa1d753690ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allModifiers: []
+  activeAbilityModifiers: []
+  activeGlobalModifiers: []
 --- !u!114 &9176447491751950743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332,6 +340,7 @@ MonoBehaviour:
   projectileLauncher: {fileID: 6938576570393643543}
   debuffUpdater: {fileID: 6244960309705328274}
   modifierManager: {fileID: 1904220953553573043}
+  globalStatSource: {fileID: 0}
 --- !u!114 &6244960309705328274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -356,6 +365,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7fb08a9d8946234e98642de98ca5112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5097382059795255847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2949185825831420414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27e1b62d84067324cbd1e56a9be7aa4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalStatSource
+  baseStats:
+  - Key: 0
+    Value: 10
+  - Key: 1
+    Value: 1
+  - Key: 2
+    Value: 0
+  activeModifiers: []
+  modifierProvider: {fileID: 1904220953553573043}
 --- !u!1 &3284660828925175538
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,6 +517,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -508,6 +540,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -641,9 +674,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9af19efe3e0d6244a9c04a53afdd6fdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderers:
-  - {fileID: 7657718530847626762}
-  - {fileID: 5928950176303749073}
+  DissolveProperties: []
   dissolveDuration: 1
   waitBeforeDissolve: 0.5
   dissolveCurve:
