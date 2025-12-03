@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: MovementSpeedModifier
   m_EditorClassIdentifier: Assembly-CSharp::GlobalModifier
   operations:
-  - Key: 0
+  - Key: 3
     OpType: 1
-    Value: 1.5
+    Value: 3
   order: 0
   stackGroup: 
   maxStacks: 1
