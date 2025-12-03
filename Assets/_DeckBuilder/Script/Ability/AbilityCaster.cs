@@ -10,14 +10,14 @@ public class AbilityCaster : MonoBehaviour
     private ProjectileLauncher projectileLauncher = null;
     [SerializeField]
     private DebuffUpdater debuffUpdater = null;
-    [SerializeField] private AbilityModifierManager modifierManager;
+    [SerializeField] private StatsModifierManager modifierManager;
     [SerializeField] private GlobalStatSource globalStatSource;
 
     public SpellSlot[] SpellSlots => spellSlots;
     public SpellSlot DodgeSpellSlot => dodgeSpellSlot;
     public ProjectileLauncher ProjectileLauncher => projectileLauncher;
     public IAbilityDebuffService DebuffService => debuffUpdater;
-    public AbilityModifierManager ModifierManager => modifierManager;
+    public StatsModifierManager ModifierManager => modifierManager;
     public IGlobalStatSource GlobalStatSource => globalStatSource;
 
     private void OnEnable()

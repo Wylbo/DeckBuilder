@@ -10,9 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8f9a4df58855b140ba768f4f795caf6, type: 3}
-  m_Name: GlobalModifier
+  m_Name: MovementSpeedModifier
   m_EditorClassIdentifier: Assembly-CSharp::GlobalModifier
-  operations: []
+  operations:
+  - Key: 0
+    OpType: 1
+    Value: 1.5
   order: 0
   stackGroup: 
   maxStacks: 1

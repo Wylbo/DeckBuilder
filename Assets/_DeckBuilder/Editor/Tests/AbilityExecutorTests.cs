@@ -180,7 +180,7 @@ public class AbilityExecutorTests
     {
         private readonly Dictionary<GlobalStatKey, float> stats = new Dictionary<GlobalStatKey, float>();
 
-        public Dictionary<GlobalStatKey, float> EvaluateGlobalStats(IEnumerable<GlobalModifier> externalModifiers = null) => stats;
+        public Dictionary<GlobalStatKey, float> EvaluateGlobalStats() => stats;
 
         public Dictionary<GlobalStatKey, float> EvaluateGlobalStatsRaw() => stats;
     }

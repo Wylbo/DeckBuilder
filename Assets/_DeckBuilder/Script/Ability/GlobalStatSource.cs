@@ -3,7 +3,7 @@ using UnityEngine;
 
 public interface IGlobalStatSource
 {
-    Dictionary<GlobalStatKey, float> EvaluateGlobalStats(IEnumerable<GlobalModifier> externalModifiers = null);
+    Dictionary<GlobalStatKey, float> EvaluateGlobalStats();
     Dictionary<GlobalStatKey, float> EvaluateGlobalStatsRaw();
 }
 
@@ -11,14 +11,13 @@ public interface IGlobalStatSource
 public sealed class GlobalStatSource : MonoBehaviour, IGlobalStatSource
 {
     [SerializeField] private List<GlobalStatEntry> baseStats = new List<GlobalStatEntry>();
-    [SerializeField, Tooltip("If present, global modifiers will be pulled from this provider in addition to the local list.")]
-    private AbilityModifierManager modifierProvider;
+    [SerializeField] private StatsModifierManager modifierProvider;
 
     public IReadOnlyList<GlobalStatEntry> BaseStats => baseStats;
 
-    public Dictionary<GlobalStatKey, float> EvaluateGlobalStats(IEnumerable<GlobalModifier> externalModifiers = null)
+    public Dictionary<GlobalStatKey, float> EvaluateGlobalStats()
     {
-        return GlobalModifierRuntime.Evaluate(baseStats, externalModifiers);
+        return GlobalModifierRuntime.Evaluate(baseStats, modifierProvider?.ActiveGlobalModifiers);
     }
 
     public Dictionary<GlobalStatKey, float> EvaluateGlobalStatsRaw()
