@@ -6,14 +6,17 @@ using UnityEngine;
 
 public static class AbilityModifierRuntime
 {
-    public static Dictionary<AbilityStatKey, float> Evaluate(GTagSet set /*IReadOnlyList<AbilityTagSO> tags*/, IEnumerable<AbilityStatEntry> baseStats, IEnumerable<AbilityModifier> activeModifiers)
+    public static Dictionary<AbilityStatKey, float> Evaluate(GTagSet set, IReadOnlyDictionary<AbilityStatKey, float> baseStats, IEnumerable<AbilityModifier> activeModifiers)
     {
         var result = new Dictionary<AbilityStatKey, float>();
 
-        foreach (var s in baseStats)
-            result[s.Key] = s.Value;
+        if (baseStats != null)
+        {
+            foreach (var kvp in baseStats)
+                result[kvp.Key] = kvp.Value;
+        }
 
-        var abilityTags = set;//tags ?? new List<AbilityTagSO>();
+        var abilityTags = set;
 
 
         var matching = activeModifiers.Where(mod => mod && mod.Query.Matches(abilityTags.AsTags())).ToList();

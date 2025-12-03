@@ -36,7 +36,13 @@ public class Ability : ScriptableObject
         foreach (var stat in baseStats)
         {
             if (stat.Key == key)
-                return stat.Value;
+            {
+                if (stat.Source == AbilityStatSource.Flat)
+                    return stat.Value;
+
+                // Ratio/copy values depend on caster globals; treat as zero here.
+                return 0f;
+            }
         }
         return 0f;
     }

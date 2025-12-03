@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -5,6 +6,7 @@ public class Health : MonoBehaviour
 {
     [SerializeField] private int maxHealth;
 
+    [ShowInInspector, ProgressBar(0, "maxHealth")]
     private int currentHealth;
 
     public int MaxHealth => maxHealth;

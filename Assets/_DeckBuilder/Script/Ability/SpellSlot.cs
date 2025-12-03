@@ -50,7 +50,10 @@ public class SpellSlot
                         IAbilityDebuffService debuffService = caster.DebuffService;
                         if (debuffService == null)
                                 debuffService = caster.GetComponent<IAbilityDebuffService>();
-                        executor = new AbilityExecutor(Ability, caster, movement, debuffService, statProvider);
+                        IGlobalStatSource globalStats = caster.GlobalStatSource;
+                        if (globalStats == null)
+                                globalStats = caster.GetComponent<IGlobalStatSource>();
+                        executor = new AbilityExecutor(Ability, caster, movement, debuffService, statProvider, globalStats);
                         return true;
                 }
 

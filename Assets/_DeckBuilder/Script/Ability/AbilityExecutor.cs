@@ -20,7 +20,11 @@ public interface IAbilityDebuffService
 
 public interface IAbilityStatProvider
 {
-    Dictionary<AbilityStatKey, float> EvaluateStats(GTagSet tagSet, IEnumerable<AbilityStatEntry> baseStats, IEnumerable<AbilityModifier> activeModifiers);
+    Dictionary<AbilityStatKey, float> EvaluateStats(
+        GTagSet tagSet,
+        IEnumerable<AbilityStatEntry> baseStats,
+        IEnumerable<AbilityModifier> activeModifiers,
+        IReadOnlyDictionary<GlobalStatKey, float> globalStats);
 }
 
 public interface IAbilityExecutor
@@ -31,6 +35,7 @@ public interface IAbilityExecutor
     ProjectileLauncher ProjectileLauncher { get; }
     AbilityModifierManager ModifierManager { get; }
     IAbilityStatProvider StatProvider { get; }
+    IGlobalStatSource GlobalStatSource { get; }
     IAbilityDebuffService DebuffService { get; }
     event UnityAction<Ability> On_StartCast;
     event UnityAction<bool> On_EndCast;
@@ -62,6 +67,7 @@ public sealed class AbilityExecutor : IAbilityExecutor
     public ProjectileLauncher ProjectileLauncher { get; }
     public AbilityModifierManager ModifierManager { get; }
     public IAbilityStatProvider StatProvider { get; }
+    public IGlobalStatSource GlobalStatSource { get; }
     public IAbilityDebuffService DebuffService { get; }
     public bool IsCasting { get; private set; }
     public float Cooldown => GetStat(AbilityStatKey.Cooldown);
@@ -74,13 +80,15 @@ public sealed class AbilityExecutor : IAbilityExecutor
         AbilityCaster caster,
         IAbilityMovement movement,
         IAbilityDebuffService debuffService,
-        IAbilityStatProvider statProvider)
+        IAbilityStatProvider statProvider,
+        IGlobalStatSource globalStatSource)
     {
         Definition = ability ?? throw new ArgumentNullException(nameof(ability));
         Caster = caster;
         Movement = movement;
         DebuffService = debuffService;
         StatProvider = statProvider ?? throw new ArgumentNullException(nameof(statProvider));
+        GlobalStatSource = globalStatSource;
         ProjectileLauncher = caster != null ? caster.ProjectileLauncher : null;
         ModifierManager = caster != null ? caster.ModifierManager : null;
         behaviours = ability.Behaviours != null
@@ -95,7 +103,8 @@ public sealed class AbilityExecutor : IAbilityExecutor
             ModifierManager,
             this,
             DebuffService,
-            StatProvider);
+            StatProvider,
+            GlobalStatSource);
 
         foreach (var behaviour in behaviours)
             behaviour?.Initialize(behaviourContext);
@@ -157,11 +166,11 @@ public sealed class AbilityExecutor : IAbilityExecutor
         if (activeCastContext == null)
             return;
 
-        var context = activeCastContext;
+        AbilityCastContext context = activeCastContext;
         StopCastingState();
         activeCastContext = null;
 
-        foreach (var behaviour in behaviours)
+        foreach (AbilityBehaviour behaviour in behaviours)
             behaviour?.OnCastEnded(context, isSuccessful);
 
         ApplyDebuffs(Definition.DebuffsOnEndCast);
@@ -170,11 +179,11 @@ public sealed class AbilityExecutor : IAbilityExecutor
 
     public float GetStat(AbilityStatKey key)
     {
-        float baseVal = Definition.GetBaseStatValue(key);
-        var modifiers = ModifierManager != null ? ModifierManager.ActiveModifiers : Array.Empty<AbilityModifier>();
-        var stats = StatProvider.EvaluateStats(Definition.TagSet, Definition.BaseStats, modifiers);
+        IReadOnlyList<AbilityModifier> modifiers = ModifierManager != null ? ModifierManager.ActiveModifiers : Array.Empty<AbilityModifier>();
+        Dictionary<GlobalStatKey, float> globalStats = GlobalStatSource != null ? GlobalStatSource.EvaluateGlobalStats() : null;
+        Dictionary<AbilityStatKey, float> stats = StatProvider.EvaluateStats(Definition.TagSet, Definition.BaseStats, modifiers, globalStats);
 
-        float value = baseVal;
+        float value = 0f;
         if (stats != null && stats.TryGetValue(key, out float result))
             value = result;
 

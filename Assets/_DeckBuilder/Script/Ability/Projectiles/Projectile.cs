@@ -15,6 +15,7 @@ public class Projectile : MonoBehaviour, IOwnable
 	private Character owner;
 	public Character Owner => owner;
 
+	private Hitbox hitbox;
 	private Vector3 baseScale;
 	private Coroutine trailResetRoutine;
 
@@ -22,6 +23,7 @@ public class Projectile : MonoBehaviour, IOwnable
 	{
 		baseScale = transform.localScale;
 	}
+
 	protected virtual void OnEnable()
 	{
 		elapsedLifeTime = 0;

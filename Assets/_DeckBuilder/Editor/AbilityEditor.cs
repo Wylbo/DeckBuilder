@@ -74,36 +74,32 @@ public class AbilityEditor : Editor
 		if (baseStatsProperty != null)
 		{
 			baseStatsList = new ReorderableList(serializedObject, baseStatsProperty, true, true, true, true);
-			baseStatsList.drawHeaderCallback = rect =>
-			{
-				EditorGUI.LabelField(rect, "Base Stats");
-			};
-			baseStatsList.drawElementCallback = (rect, index, active, focused) =>
-			{
-				if (index < 0 || index >= baseStatsProperty.arraySize)
-					return;
+            baseStatsList.drawHeaderCallback = rect =>
+            {
+                EditorGUI.LabelField(rect, "Base Stats");
+            };
+            baseStatsList.drawElementCallback = (rect, index, active, focused) =>
+            {
+                if (index < 0 || index >= baseStatsProperty.arraySize)
+                    return;
 
-				var element = baseStatsProperty.GetArrayElementAtIndex(index);
-				if (element == null)
-					return;
+                var element = baseStatsProperty.GetArrayElementAtIndex(index);
+                if (element == null)
+                    return;
 
-				var keyProp = element.FindPropertyRelative("Key");
-				var valueProp = element.FindPropertyRelative("Value");
+                rect.y += 2f;
+                rect.height = EditorGUI.GetPropertyHeight(element, GUIContent.none, true);
+                EditorGUI.PropertyField(rect, element, GUIContent.none, true);
+            };
+            baseStatsList.elementHeightCallback = index =>
+            {
+                if (index < 0 || index >= baseStatsProperty.arraySize)
+                    return EditorGUIUtility.singleLineHeight + 4f;
 
-				float vPad = 2f;
-				rect.y += vPad;
-				rect.height = EditorGUIUtility.singleLineHeight;
-
-				float spacing = 8f;
-				float keyWidth = Mathf.Floor((rect.width - spacing) * 0.5f);
-				var keyRect = new Rect(rect.x, rect.y, keyWidth, rect.height);
-				var valRect = new Rect(rect.x + keyWidth + spacing, rect.y, rect.width - keyWidth - spacing, rect.height);
-
-				EditorGUI.PropertyField(keyRect, keyProp, GUIContent.none);
-				EditorGUI.PropertyField(valRect, valueProp, GUIContent.none);
-			};
-			baseStatsList.elementHeightCallback = _ => EditorGUIUtility.singleLineHeight + 4f;
-		}
+                var element = baseStatsProperty.GetArrayElementAtIndex(index);
+                return EditorGUI.GetPropertyHeight(element, GUIContent.none, true) + 6f;
+            };
+        }
 
 		if (debuffsOnCastProperty != null)
 		{
@@ -306,11 +302,13 @@ public class AbilityEditor : Editor
 		{
 			int idx = baseStatsProperty.arraySize;
 			baseStatsProperty.arraySize++;
-			var elem = baseStatsProperty.GetArrayElementAtIndex(idx);
-			if (elem == null) continue;
-			elem.FindPropertyRelative("Key").enumValueIndex = (int)key;
-			elem.FindPropertyRelative("Value").floatValue = 0f;
-		}
+            var elem = baseStatsProperty.GetArrayElementAtIndex(idx);
+            if (elem == null) continue;
+            elem.FindPropertyRelative("Key").enumValueIndex = (int)key;
+            elem.FindPropertyRelative("Source").enumValueIndex = (int)AbilityStatSource.Flat;
+            elem.FindPropertyRelative("Value").floatValue = 0f;
+            elem.FindPropertyRelative("GlobalKey").enumValueIndex = 0;
+        }
 
 		serializedObject.ApplyModifiedProperties();
 		serializedObject.Update();
