@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -14,7 +15,7 @@ public class Controller : MonoBehaviour
 	private ControlStrategy controlStrategy;
 
 	[SerializeField]
-	private UIManager uiManager;
+	private MonoBehaviour uiManagerComponent;
 
 	// Runtime instance to avoid shared SO state across multiple controllers
 	private ControlStrategy runtimeControlStrategy;
@@ -46,10 +47,15 @@ public class Controller : MonoBehaviour
 
 	private IUIManager ResolveUIManager()
 	{
-		if (uiManager == null)
-			uiManager = FindFirstObjectByType<UIManager>();
+		if (uiManagerComponent is IUIManager cachedManager)
+			return cachedManager;
 
-		return uiManager;
+		var manager = FindObjectsOfType<MonoBehaviour>()
+			.OfType<IUIManager>()
+			.FirstOrDefault();
+
+		uiManagerComponent = manager as MonoBehaviour;
+		return manager;
 	}
 
 	public bool TryMove(Vector3 worldTo)

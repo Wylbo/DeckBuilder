@@ -45,13 +45,13 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 1062887273389097036
-      type: {class: AbilityRangeIndicatorBehaviour, ns: , asm: Assembly-CSharp}
+      type: {class: AbilityRangeIndicatorBehaviour, ns: , asm: DeckBuilder}
       data:
         rangeIndicator: {fileID: 7172722905564688021, guid: aa684e0ff8d0e0342bb65a6ec2475b30, type: 3}
         minDistance: 0
         maxDistance: 5
     - rid: 1062887273389097037
-      type: {class: AbilityChannelBehaviour, ns: , asm: Assembly-CSharp}
+      type: {class: AbilityChannelBehaviour, ns: , asm: DeckBuilder}
       data:
         followCursorDuringChanneling: 1
         holdToChannel: 1
@@ -64,7 +64,7 @@ MonoBehaviour:
           m_Bits: 64
         forceSuccessOnInterrupt: 1
     - rid: 1062887273389097038
-      type: {class: AbilityChargedProjectileReleaseBehaviour, ns: , asm: Assembly-CSharp}
+      type: {class: AbilityChargedProjectileReleaseBehaviour, ns: , asm: DeckBuilder}
       data:
         projectile: {fileID: 6428266943518908824, guid: 4cd1cddf8287ff2418a3efffacd0adf9, type: 3}
         minDistance: 1

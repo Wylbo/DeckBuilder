@@ -35,7 +35,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 1062887273389097033
-      type: {class: AbilityDashBehaviour, ns: , asm: Assembly-CSharp}
+      type: {class: AbilityDashBehaviour, ns: , asm: DeckBuilder}
       data:
         dashData:
           dashDistance: 0

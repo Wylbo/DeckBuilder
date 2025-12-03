@@ -46,7 +46,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 1062887273389097035
-      type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
+      type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: DeckBuilder}
       data:
         projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
         launchPosition: 1
@@ -63,6 +63,6 @@ MonoBehaviour:
         verticalOffsetStatKey: 7
         fireMode: 1
     - rid: 1062887273389097040
-      type: {class: AbilityDamageTargetBehaviour, ns: , asm: Assembly-CSharp}
+      type: {class: AbilityDamageTargetBehaviour, ns: , asm: DeckBuilder}
       data:
         damageStat: 1

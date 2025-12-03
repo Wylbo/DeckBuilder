@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using MG.Extend;
-using Unity.Mathematics;
 
 /// <summary>
 /// Component allowing an entity to move
@@ -138,7 +137,7 @@ public class Movement : MonoBehaviour, IAbilityMovement
         direction.y = 0;
         direction = direction.normalized;
 
-        Quaternion rotation = quaternion.LookRotation(direction, Vector3.up);
+        Quaternion rotation = Quaternion.LookRotation(direction, Vector3.up);
         transform.rotation = rotation;
     }
 

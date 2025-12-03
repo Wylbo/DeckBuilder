@@ -32,7 +32,7 @@ public abstract class UIView : MonoBehaviour, IUIElement
             animator.updateMode = AnimatorUpdateMode.UnscaledTime;
     }
 
-    internal void ShowInternal()
+    public void ShowInternal()
     {
         if (IsVisible && !isHiding)
             return;
@@ -53,7 +53,7 @@ public abstract class UIView : MonoBehaviour, IUIElement
         transitionRoutine = StartCoroutine(PlayShowAnimation());
     }
 
-    internal void HideInternal()
+    public void HideInternal()
     {
         if (isHiding && transitionRoutine != null)
             return;

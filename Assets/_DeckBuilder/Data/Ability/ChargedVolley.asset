@@ -55,7 +55,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 1062887273389097041
-      type: {class: AbilityChannelBehaviour, ns: , asm: Assembly-CSharp}
+      type: {class: AbilityChannelBehaviour, ns: , asm: DeckBuilder}
       data:
         followCursorDuringChanneling: 1
         holdToChannel: 1
@@ -68,7 +68,7 @@ MonoBehaviour:
           m_Bits: 64
         forceSuccessOnInterrupt: 1
     - rid: 1062887273389097042
-      type: {class: AbilityChannelProjectileCountBehaviour, ns: , asm: Assembly-CSharp}
+      type: {class: AbilityChannelProjectileCountBehaviour, ns: , asm: DeckBuilder}
       data:
         statKey: 3
         minAdditionalProjectiles: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
           m_PostInfinity: 2
           m_RotationOrder: 4
     - rid: 1062887273389097044
-      type: {class: AbilityPerpendicularProjectileVolleyBehaviour, ns: , asm: Assembly-CSharp}
+      type: {class: AbilityPerpendicularProjectileVolleyBehaviour, ns: , asm: DeckBuilder}
       data:
         projectile: {fileID: 6428266943518908824, guid: b2c2ae026b1ceca4fb60273c6b4e4a17, type: 3}
         projectileCountStat: 3

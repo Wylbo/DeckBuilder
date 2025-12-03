@@ -15,7 +15,7 @@ public class PlayerControlStrategy : ControlStrategy
 	private PlayerInputs playerInput;
 
 	private bool isMoving;
-	private bool InventoryVisible => UiManager != null && UiManager.IsVisible<AbilityInventoryView>();
+	private bool InventoryVisible => UiManager != null && UiManager.IsInventoryVisible;
 
 	public override void Initialize(Controller controller, Character character, IUIManager uiManager = null)
 	{
@@ -76,10 +76,7 @@ public class PlayerControlStrategy : ControlStrategy
 		if (UiManager == null)
 			return;
 
-		if (InventoryVisible)
-			UiManager.Hide<AbilityInventoryView>();
-		else
-			UiManager.Show<AbilityInventoryView>();
+		UiManager.ToggleInventory();
 	}
 
 	private void HandleViewShown(UIView view)
@@ -187,7 +184,7 @@ public class PlayerControlStrategy : ControlStrategy
 
 	private void OpenMenuPerformed(InputAction.CallbackContext context)
 	{
-		UiManager?.Show<MenuScreenView>();
+		UiManager?.ShowMenu();
 	}
 
 
