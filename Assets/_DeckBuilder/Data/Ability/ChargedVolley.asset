@@ -24,7 +24,7 @@ MonoBehaviour:
   stopMovementOnCast: 0
   startCooldownOnCast: 0
   debuffsOnCast:
-  - {fileID: 11400000, guid: 8f7af324beb2e5146881368dbca0bf65, type: 2}
+  - {fileID: 11400000, guid: 97bf038a88127fd4491bf138a7d090b6, type: 2}
   debuffsOnEndCast: []
   tagSet:
     Tags:

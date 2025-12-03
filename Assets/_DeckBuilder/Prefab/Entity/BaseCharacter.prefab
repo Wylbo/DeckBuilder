@@ -251,6 +251,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 764a26df80b1aa54fa9a6f7d4434351b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movementSpeedStatKey: 3
+  globalStatSource: {fileID: 0}
+  modifierManager: {fileID: 0}
   body: {fileID: 1004127752059748463}
   agent: {fileID: 7981525574255834789}
   capsuleCollider: {fileID: 8323667409482397591}
@@ -301,8 +304,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea0ae8e9041e7be45bcaaa1d753690ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activeAbilityModifiers: []
-  activeGlobalModifiers: []
 --- !u!114 &9176447491751950743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,6 +354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 969144b235c051e4cbace73bf48ffbf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  modifierManager: {fileID: 1904220953553573043}
 --- !u!114 &6938576570393643543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -384,7 +386,6 @@ MonoBehaviour:
     Value: 1
   - Key: 2
     Value: 0
-  activeModifiers: []
   modifierProvider: {fileID: 1904220953553573043}
 --- !u!1 &3284660828925175538
 GameObject:

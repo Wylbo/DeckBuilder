@@ -67,19 +67,10 @@ public class DebuffUpdaterEditor : Editor
         }
 
         EditorGUILayout.LabelField("Stacks", debuff.CurrentStacks.ToString());
-        EditorGUILayout.LabelField("Tick Rate", $"{debuff.TickRate:0.###}s");
-        EditorGUILayout.LabelField("Next Tick In", $"{debuff.NextTickIn:0.###}s");
 
         float total = debuff.TotalDuration;
         float remaining = debuff.RemainingDuration;
         EditorGUILayout.LabelField("Duration", total > 0f ? $"{remaining:0.###}s / {total:0.###}s" : "No duration");
-
-        if (total > 0f)
-        {
-            float ratio = Mathf.Clamp01(debuff.ElapsedDurationRatio);
-            Rect rect = GUILayoutUtility.GetRect(18, 18);
-            EditorGUI.ProgressBar(rect, ratio, $"Elapsed {ratio:P0}");
-        }
 
         EditorGUILayout.LabelField("Timer Running", debuff.IsDurationRunning ? "Yes" : "No");
         EditorGUILayout.EndVertical();

@@ -18,10 +18,18 @@ public enum DebuffDurationPolicy
 }
 public class DebuffUpdater : MonoBehaviour, IAbilityDebuffService
 {
+    [SerializeField] private StatsModifierManager modifierManager;
     private readonly Dictionary<ScriptableDebuff, DebuffApplier> debuffs =
      new Dictionary<ScriptableDebuff, DebuffApplier>();
 
     public IEnumerable<DebuffApplier> ActiveDebuffs => debuffs.Values;
+    public StatsModifierManager ModifierManager => modifierManager;
+
+    private void Awake()
+    {
+        if (modifierManager == null)
+            modifierManager = GetComponent<StatsModifierManager>();
+    }
 
     #region Unity messages
     private void Update()
@@ -36,10 +44,15 @@ public class DebuffUpdater : MonoBehaviour, IAbilityDebuffService
     #region DebuffUpdater
     public void AddDebuff(DebuffApplier debuffApplier)
     {
+        if (debuffApplier == null || debuffApplier.Debuff == null)
+            return;
+
         if (debuffs.ContainsKey(debuffApplier.Debuff))
         {
-            debuffs[debuffApplier.Debuff].Activate();
-            debuffs[debuffApplier.Debuff].On_Ended += DebuffApplier_On_Ended;
+            DebuffApplier existingApplier = debuffs[debuffApplier.Debuff];
+            existingApplier.On_Ended -= DebuffApplier_On_Ended;
+            existingApplier.On_Ended += DebuffApplier_On_Ended;
+            existingApplier.Activate();
         }
         else
         {
@@ -54,7 +67,7 @@ public class DebuffUpdater : MonoBehaviour, IAbilityDebuffService
         if (scriptableDebuff == null)
             return;
 
-        AddDebuff(scriptableDebuff.InitDebuff(this));
+        AddDebuff(new DebuffApplier(scriptableDebuff, this));
     }
 
     public void RemoveDebuff(ScriptableDebuff scriptableDebuff)
