@@ -1,0 +1,18 @@
+{
+    "name": "DeckBuilder.AbilityTags.Editor",
+    "references": [
+        "DeckBuilder",
+        "DeckBuilder.Ability.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
