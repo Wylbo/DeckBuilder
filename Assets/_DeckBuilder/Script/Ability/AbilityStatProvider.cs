@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Resolves ability stats by combining ability-defined entries (flat/ratio/copy) with caster globals,
+/// then applies ability modifiers. Per-cast overrides are handled in AbilityExecutor.GetStat.
+/// </summary>
 public sealed class AbilityStatProvider : IAbilityStatProvider
 {
     public Dictionary<AbilityStatKey, float> EvaluateStats(

@@ -179,8 +179,9 @@ public sealed class AbilityExecutor : IAbilityExecutor
 
     public float GetStat(AbilityStatKey key)
     {
-        IReadOnlyList<AbilityModifier> modifiers = ModifierManager != null ? ModifierManager.ActiveModifiers : Array.Empty<AbilityModifier>();
-        Dictionary<GlobalStatKey, float> globalStats = GlobalStatSource != null ? GlobalStatSource.EvaluateGlobalStats() : null;
+        IReadOnlyList<AbilityModifier> modifiers = ModifierManager != null ? ModifierManager.ActiveAbilityModifiers : Array.Empty<AbilityModifier>();
+        IReadOnlyList<GlobalModifier> globalModifiers = ModifierManager != null ? ModifierManager.ActiveGlobalModifiers : null;
+        Dictionary<GlobalStatKey, float> globalStats = GlobalStatSource != null ? GlobalStatSource.EvaluateGlobalStats(globalModifiers) : null;
         Dictionary<AbilityStatKey, float> stats = StatProvider.EvaluateStats(Definition.TagSet, Definition.BaseStats, modifiers, globalStats);
 
         float value = 0f;

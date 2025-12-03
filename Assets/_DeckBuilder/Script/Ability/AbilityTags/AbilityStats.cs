@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 
+// Ability stats are the values an ability consumes at runtime (cooldown, damage, etc.).
+// They can be produced from flat values or derived from caster-wide global stats.
 public enum AbilityStatKey
 {
     Cooldown,
@@ -25,19 +27,22 @@ public enum AbilityStatKey
     VolleyVerticalOffset
 }
 
-// Stats defined on the caster (shared across abilities)
+// Stats defined on the caster (shared across abilities).
 public enum GlobalStatKey
 {
     AttackPower,
     AOEScale,
-    CooldownReduction
+    CooldownReduction,
+    MovementSpeed,
+
 }
 
+// Describes how an ability stat should be sourced.
 public enum AbilityStatSource
 {
-    Flat = 0,
-    RatioToGlobal = 1,
-    CopyGlobal = 2
+    Flat = 0,        // Use the Value as-is.
+    RatioToGlobal = 1, // Multiply Value by the selected GlobalKey.
+    CopyGlobal = 2     // Copy the selected GlobalKey directly.
 }
 
 [Serializable]
@@ -57,6 +62,14 @@ public struct AbilityStatEntry
 public struct GlobalStatEntry
 {
     public GlobalStatKey Key;
+    public float Value;
+}
+
+[Serializable]
+public struct GlobalStatOp
+{
+    public GlobalStatKey Key;
+    public AbilityStatOpType OpType;
     public float Value;
 }
 

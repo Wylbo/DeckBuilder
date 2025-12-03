@@ -26,17 +26,33 @@ MonoBehaviour:
     - ability.cooldown
   baseStats:
   - Key: 0
+    Source: 0
     Value: 1
+    GlobalKey: 0
   - Key: 3
+    Source: 0
     Value: 1
+    GlobalKey: 0
   - Key: 5
+    Source: 0
     Value: 10
+    GlobalKey: 0
   - Key: 6
+    Source: 0
     Value: 45
+    GlobalKey: 0
   - Key: 7
+    Source: 0
     Value: 1
+    GlobalKey: 0
   - Key: 8
+    Source: 0
     Value: 1
+    GlobalKey: 0
+  - Key: 1
+    Source: 1
+    Value: 1
+    GlobalKey: 0
   behaviours:
   - rid: 1062887273389097037
   - rid: 1062887273389097036
@@ -69,5 +85,5 @@ MonoBehaviour:
         projectile: {fileID: 6428266943518908824, guid: 4cd1cddf8287ff2418a3efffacd0adf9, type: 3}
         minDistance: 1
         maxDistance: 5
-        minDamage: 5
-        maxDamage: 30
+        minDamageRatio: 0.2
+        maxDamageRatio: 3
