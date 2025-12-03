@@ -4,7 +4,8 @@
     "references": [
         "DeckBuilder.Framework",
         "DeckBuilder.Core",
-        "DeckBuilder.Utils"
+        "DeckBuilder.Utils",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
