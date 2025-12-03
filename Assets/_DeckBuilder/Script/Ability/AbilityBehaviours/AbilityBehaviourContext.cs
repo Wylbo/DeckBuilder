@@ -10,6 +10,7 @@ public sealed class AbilityBehaviourContext
     public IAbilityExecutor Executor { get; }
     public IAbilityDebuffService DebuffService { get; }
     public IAbilityStatProvider StatProvider { get; }
+    public IGlobalStatSource GlobalStatSource { get; }
 
     public AbilityBehaviourContext(
         Ability ability,
@@ -19,7 +20,8 @@ public sealed class AbilityBehaviourContext
         AbilityModifierManager modifierManager,
         IAbilityExecutor executor,
         IAbilityDebuffService debuffService,
-        IAbilityStatProvider statProvider)
+        IAbilityStatProvider statProvider,
+        IGlobalStatSource globalStatSource)
     {
         Ability = ability;
         Caster = caster;
@@ -29,5 +31,6 @@ public sealed class AbilityBehaviourContext
         Executor = executor;
         DebuffService = debuffService;
         StatProvider = statProvider;
+        GlobalStatSource = globalStatSource;
     }
 }

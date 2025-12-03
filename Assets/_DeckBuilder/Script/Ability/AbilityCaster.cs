@@ -11,12 +11,14 @@ public class AbilityCaster : MonoBehaviour
     [SerializeField]
     private DebuffUpdater debuffUpdater = null;
     [SerializeField] private AbilityModifierManager modifierManager;
+    [SerializeField] private GlobalStatSource globalStatSource;
 
     public SpellSlot[] SpellSlots => spellSlots;
     public SpellSlot DodgeSpellSlot => dodgeSpellSlot;
     public ProjectileLauncher ProjectileLauncher => projectileLauncher;
     public IAbilityDebuffService DebuffService => debuffUpdater;
     public AbilityModifierManager ModifierManager => modifierManager;
+    public IGlobalStatSource GlobalStatSource => globalStatSource;
 
     private void OnEnable()
     {
@@ -31,6 +33,8 @@ public class AbilityCaster : MonoBehaviour
     private void Reset()
     {
         projectileLauncher = GetComponent<ProjectileLauncher>();
+        if (globalStatSource == null)
+            globalStatSource = GetComponent<GlobalStatSource>();
     }
 
     private void Update()

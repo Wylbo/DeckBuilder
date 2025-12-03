@@ -8,8 +8,8 @@ public class AbilityChargedProjectileReleaseBehaviour : AbilityBehaviour
 	[SerializeField] private LinearProjectile projectile;
 	[SerializeField] private float minDistance = 5f;
 	[SerializeField] private float maxDistance = 10f;
-	[SerializeField] private int minDamage = 10;
-	[SerializeField] private int maxDamage = 20;
+	[SerializeField] private float minDamageRatio = 0.2f;
+	[SerializeField] private float maxDamageRatio = 3f;
 
 	public override void OnCastEnded(AbilityCastContext context, bool wasSuccessful)
 	{
@@ -36,7 +36,8 @@ public class AbilityChargedProjectileReleaseBehaviour : AbilityBehaviour
 			Hitbox hitbox = launchedProjectile.GetComponent<Hitbox>();
 			if (hitbox != null)
 			{
-				int damage = Mathf.FloorToInt(Mathf.Lerp(minDamage, maxDamage, context.ChannelRatio));
+				float damageRatio = Mathf.Lerp(minDamageRatio, maxDamageRatio, context.ChannelRatio);
+				int damage = Mathf.RoundToInt(context.GetStat(AbilityStatKey.Damage) * damageRatio);
 				hitbox.SetDamage(damage);
 			}
 		}

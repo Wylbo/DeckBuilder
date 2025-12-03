@@ -109,34 +109,6 @@ public class ProjectileLauncher : MonoBehaviour
 		return results;
 	}
 
-	private float CalculateAdjustedSpreadAngle(int count)
-	{
-		if (count <= 1 || multipleProjectileFireMode != MultipleProjectileFireMode.Fan)
-			return 0f;
-
-		float desiredSpread = spreadAngle * (count - 1);
-		if (desiredSpread > maxSpreadAngle)
-		{
-			return maxSpreadAngle / count;
-		}
-
-		return spreadAngle;
-	}
-
-	private float CalculateStartAngle(int count, float adjustedSpreadAngle)
-	{
-		if (count <= 1 || multipleProjectileFireMode != MultipleProjectileFireMode.Fan)
-			return 0f;
-
-		bool isRing = Mathf.Approximately(adjustedSpreadAngle * count, maxSpreadAngle);
-		if (isRing)
-		{
-			return 0f;
-		}
-
-		float totalSpread = adjustedSpreadAngle * (count - 1);
-		return -totalSpread * 0.5f;
-	}
 	private void GetFanStartAndStep(int count, out float startAngle, out float stepAngle)
 	{
 		startAngle = 0f;

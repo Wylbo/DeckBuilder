@@ -24,11 +24,17 @@ MonoBehaviour:
     - ability.movement.dash
   baseStats:
   - Key: 0
+    Source: 0
     Value: 0.2
+    GlobalKey: 0
   - Key: 10
+    Source: 0
     Value: 10
+    GlobalKey: 0
   - Key: 9
+    Source: 0
     Value: 3
+    GlobalKey: 0
   behaviours:
   - rid: 1062887273389097033
   references:

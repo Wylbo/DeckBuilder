@@ -68,6 +68,16 @@ public class AbilityProjectileLaunchBehaviour : AbilityBehaviour
 			launcher.SetMaxSpreadAngle(context.GetStat(maxSpreadStatKey));
 
 		var launched = launcher.Launch<Projectile>();
+		Hitbox hitbox;
+		foreach (Projectile p in launched)
+		{
+			hitbox = p.GetComponent<Hitbox>();
+			if (hitbox != null)
+			{
+				hitbox.SetDamage(Mathf.RoundToInt(context.GetStat(AbilityStatKey.Damage)));
+			}
+		}
+
 		context.LastLaunchedProjectiles = launched;
 	}
 
