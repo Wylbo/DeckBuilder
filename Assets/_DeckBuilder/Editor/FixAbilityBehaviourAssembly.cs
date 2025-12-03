@@ -25,23 +25,22 @@ public static class FixAbilityBehaviourAssembly
         nameof(AbilityDelayBehaviour),
         nameof(AbilityPerpendicularProjectileVolleyBehaviour),
         nameof(AbilityProjectileLaunchBehaviour),
-        nameof(AbilityRangeIndicatorBehaviour)
+        nameof(AbilityRangeIndicatorBehaviour),
+        // BehaviourTree / blackboard types
+        nameof(GameObjectList),
+        nameof(UseAbility)
     };
 
     [MenuItem("Tools/Fix/Remap Ability Behaviours Assembly")]
     public static void RemapAbilityBehaviours()
     {
-        string[] guids = AssetDatabase.FindAssets("t:Ability");
+        string[] assetPaths = Directory.GetFiles("Assets", "*.asset", SearchOption.AllDirectories);
         int changedAssets = 0;
         int totalReplacements = 0;
         var replacements = BuildReplacements();
 
-        foreach (string guid in guids)
+        foreach (string path in assetPaths)
         {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            if (string.IsNullOrEmpty(path) || !path.EndsWith(".asset"))
-                continue;
-
             string text = File.ReadAllText(path);
             string updated = ReplaceAssemblies(text, replacements, out int replacedInAsset);
 

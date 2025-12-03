@@ -14,7 +14,6 @@ public class Controller : MonoBehaviour
 	[SerializeField]
 	private ControlStrategy controlStrategy;
 
-	[SerializeField]
 	private MonoBehaviour uiManagerComponent;
 
 	// Runtime instance to avoid shared SO state across multiple controllers
@@ -50,7 +49,7 @@ public class Controller : MonoBehaviour
 		if (uiManagerComponent is IUIManager cachedManager)
 			return cachedManager;
 
-		var manager = FindObjectsOfType<MonoBehaviour>()
+		var manager = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
 			.OfType<IUIManager>()
 			.FirstOrDefault();
 

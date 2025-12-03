@@ -16,18 +16,11 @@ MonoBehaviour:
     rid: 4034034895233745088
   nodes:
   - rid: 4034034895233745088
-  - rid: 4034034896503570695
-  - rid: 4034034914912632907
   - rid: 4034034914912632909
-  - rid: 4034034914912632910
   - rid: 4034034914912632912
   - rid: 4034034914912632913
-  - rid: 4034034914912633108
-  - rid: 4034034914912633112
   - rid: 4034034914912633114
   - rid: 4034034914912633115
-  - rid: 4034034914912633116
-  - rid: 1062886943409045573
   - rid: 1062886943409045574
   blackboard:
     keys:
@@ -42,17 +35,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 1062886943409045573
-      type: {class: IsAlive, ns: , asm: Assembly-CSharp}
-      data:
-        started: 0
-        guid: c52007eb91fe10347b7e4e194240754e
-        position: {x: -290, y: 330}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        invert: 0
     - rid: 1062886943409045574
       type: {class: Sequencer, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
@@ -64,8 +46,8 @@ MonoBehaviour:
         description: 
         drawGizmos: 0
         children:
-        - rid: 1062886943409045573
         - rid: 4034034914912632912
+        current: 0
     - rid: 1553831495248904311
       type: {class: IntKey, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
@@ -84,26 +66,8 @@ MonoBehaviour:
         drawGizmos: 0
         child:
           rid: 1062886943409045574
-    - rid: 4034034896503570695
-      type: {class: Patrol, ns: , asm: Assembly-CSharp}
-      data:
-        started: 0
-        guid: 5f97a132088d47d4995c6cd8c2192e2f
-        position: {x: 190, y: 640}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        patrolPoints:
-          reference:
-            rid: 4034034896503570700
-          defaultValue:
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
     - rid: 4034034896503570700
-      type: {class: GameObjectList, ns: , asm: Assembly-CSharp}
+      type: {class: GameObjectList, ns: , asm: DeckBuilder}
       data:
         name: patrolPoints
         typeName: System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule,
@@ -111,16 +75,6 @@ MonoBehaviour:
           Culture=neutral, PublicKeyToken=b77a5c561934e089
         value:
         - {fileID: 0}
-    - rid: 4034034914912632907
-      type: {class: UpdateSensors, ns: , asm: Assembly-CSharp}
-      data:
-        started: 0
-        guid: 8c47ae48a8048f84ba3f05deee5367a7
-        position: {x: 350, y: 640}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
     - rid: 4034034914912632909
       type: {class: Parallel, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
@@ -131,29 +85,8 @@ MonoBehaviour:
           keys: []
         description: 
         drawGizmos: 0
-        children:
-        - rid: 4034034896503570695
-        - rid: 4034034914912632907
+        children: []
         successThreshold: 1
-    - rid: 4034034914912632910
-      type: {class: HasSensedTarget, ns: , asm: Assembly-CSharp}
-      data:
-        started: 0
-        guid: d46a8aa56cf414f4fb62f04834f8b9d2
-        position: {x: -530, y: 640}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        invert: 0
-        sensedTarget:
-          reference:
-            rid: 4034034914912633109
-          defaultValue: {fileID: 0}
-        sensedTargetPosition:
-          reference:
-            rid: 4034034914912633111
-          defaultValue: {x: 0, y: 0, z: 0}
     - rid: 4034034914912632912
       type: {class: Selector, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
@@ -178,31 +111,8 @@ MonoBehaviour:
         description: 
         drawGizmos: 0
         children:
-        - rid: 4034034914912632910
-        - rid: 4034034914912633108
         - rid: 4034034914912633115
-    - rid: 4034034914912633108
-      type: {class: Chase, ns: , asm: Assembly-CSharp}
-      data:
-        started: 0
-        guid: 1040d60d33ecd0b458769274f21a233a
-        position: {x: -350, y: 640}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        maxDistanceFromTarget:
-          reference:
-            rid: -2
-          defaultValue: 10
-        stopDistance:
-          reference:
-            rid: -2
-          defaultValue: 5
-        toChase:
-          reference:
-            rid: 4034034914912633109
-          defaultValue: {fileID: 0}
+        current: 0
     - rid: 4034034914912633109
       type: {class: GameObjectKey, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
@@ -218,7 +128,7 @@ MonoBehaviour:
           PublicKeyToken=null
         value: {x: 0, y: 0, z: 0}
     - rid: 4034034914912633112
-      type: {class: UseAbility, ns: , asm: Assembly-CSharp}
+      type: {class: UseAbility, ns: , asm: DeckBuilder}
       data:
         started: 0
         guid: 754d2fe5f38793c40a1098ebf3400673
@@ -235,6 +145,7 @@ MonoBehaviour:
           reference:
             rid: 4034034914912633111
           defaultValue: {x: 0, y: 0, z: 0}
+        caster: {fileID: 0}
     - rid: 4034034914912633114
       type: {class: Succeed, ns: TheKiwiCoder, asm: thekiwicoder.behaviourtreeeditor}
       data:
@@ -258,24 +169,5 @@ MonoBehaviour:
         description: 
         drawGizmos: 0
         children:
-        - rid: 4034034914912633116
         - rid: 4034034914912633114
-    - rid: 4034034914912633116
-      type: {class: HasSensedTarget, ns: , asm: Assembly-CSharp}
-      data:
-        started: 0
-        guid: c52a7131c96f26c4ba316d41acc95e82
-        position: {x: -240, y: 790}
-        blackboard:
-          keys: []
-        description: 
-        drawGizmos: 0
-        invert: 0
-        sensedTarget:
-          reference:
-            rid: 4034034914912633109
-          defaultValue: {fileID: 0}
-        sensedTargetPosition:
-          reference:
-            rid: 4034034914912633111
-          defaultValue: {x: 0, y: 0, z: 0}
+        current: 0

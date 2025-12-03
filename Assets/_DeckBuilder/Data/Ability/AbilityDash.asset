@@ -25,9 +25,9 @@ MonoBehaviour:
   baseStats:
   - Key: 0
     Value: 0.2
-  - Key: 9
+  - Key: 10
     Value: 10
-  - Key: 8
+  - Key: 9
     Value: 3
   behaviours:
   - rid: 1062887273389097033
@@ -68,5 +68,6 @@ MonoBehaviour:
           blockingMask:
             serializedVersion: 2
             m_Bits: 64
-        dashDistanceStat: 8
-        dashSpeedStat: 9
+          maxWallIterations: 0
+        dashDistanceStat: 9
+        dashSpeedStat: 10
