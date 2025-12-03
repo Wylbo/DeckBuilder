@@ -1,0 +1,23 @@
+{
+    "name": "DeckBuilder.UI.HUD",
+    "rootNamespace": "",
+    "references": [
+        "DeckBuilder.UI.Core",
+        "DeckBuilder.Combat",
+        "DeckBuilder.Ability",
+        "DeckBuilder.Entity",
+        "DeckBuilder.Framework",
+        "DeckBuilder.Core",
+        "DOTween",
+        "DOTween.Modules"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

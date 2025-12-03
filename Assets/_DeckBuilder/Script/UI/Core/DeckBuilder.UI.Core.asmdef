@@ -1,0 +1,19 @@
+{
+    "name": "DeckBuilder.UI.Core",
+    "rootNamespace": "",
+    "references": [
+        "DeckBuilder.Framework",
+        "DeckBuilder.Core",
+        "DeckBuilder.Utils",
+        "DeckBuilder.Input"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

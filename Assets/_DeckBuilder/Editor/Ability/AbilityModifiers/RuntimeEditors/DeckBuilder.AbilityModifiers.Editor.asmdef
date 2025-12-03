@@ -1,0 +1,20 @@
+{
+    "name": "DeckBuilder.AbilityModifiers.Editor",
+    "rootNamespace": "",
+    "references": [
+        "DeckBuilder.Ability",
+        "DeckBuilder.Entity",
+        "DeckBuilder.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

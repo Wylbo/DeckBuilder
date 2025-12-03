@@ -1,0 +1,23 @@
+{
+    "name": "DeckBuilder.Combat.Editor",
+    "rootNamespace": "",
+    "references": [
+        "DeckBuilder.Combat",
+        "DeckBuilder.Ability",
+        "DeckBuilder.Entity",
+        "DeckBuilder.Framework",
+        "DeckBuilder.Core",
+        "DeckBuilder.Utils"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

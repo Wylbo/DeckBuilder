@@ -1,0 +1,30 @@
+{
+    "name": "DeckBuilder.UI.Screens.Tests",
+    "rootNamespace": "",
+    "references": [
+        "DeckBuilder.UI.Screens",
+        "DeckBuilder.UI.Core",
+        "DeckBuilder.Ability",
+        "DeckBuilder.Entity",
+        "DeckBuilder.Framework",
+        "DeckBuilder.Core",
+        "DeckBuilder.Input",
+        "UnityEngine.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

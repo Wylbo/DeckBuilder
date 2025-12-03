@@ -1,0 +1,23 @@
+{
+    "name": "DeckBuilder.UI.Screens",
+    "rootNamespace": "",
+    "references": [
+        "DeckBuilder.UI.Core",
+        "DeckBuilder.Ability",
+        "DeckBuilder.Entity",
+        "DeckBuilder.Framework",
+        "DeckBuilder.Core",
+        "DeckBuilder.Input",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
