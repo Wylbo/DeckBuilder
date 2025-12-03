@@ -6,7 +6,7 @@ public sealed class AbilityBehaviourContext
     public AbilityCaster Caster { get; }
     public IAbilityMovement Movement { get; }
     public ProjectileLauncher ProjectileLauncher { get; }
-    public AbilityModifierManager ModifierManager { get; }
+    public StatsModifierManager ModifierManager { get; }
     public IAbilityExecutor Executor { get; }
     public IAbilityDebuffService DebuffService { get; }
     public IAbilityStatProvider StatProvider { get; }
@@ -17,7 +17,7 @@ public sealed class AbilityBehaviourContext
         AbilityCaster caster,
         IAbilityMovement movement,
         ProjectileLauncher projectileLauncher,
-        AbilityModifierManager modifierManager,
+        StatsModifierManager modifierManager,
         IAbilityExecutor executor,
         IAbilityDebuffService debuffService,
         IAbilityStatProvider statProvider,

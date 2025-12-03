@@ -31,6 +31,8 @@ public class Movement : MonoBehaviour, IAbilityMovement
     }
 
     [SerializeField] private GlobalStatKey movementSpeedStatKey = GlobalStatKey.MovementSpeed;
+    [SerializeField] private GlobalStatSource globalStatSource = null;
+    [SerializeField] private StatsModifierManager modifierManager = null;
     [SerializeField]
     private Rigidbody body = null;
 
@@ -63,12 +65,35 @@ public class Movement : MonoBehaviour, IAbilityMovement
     private void Reset()
     {
         body = GetComponent<Rigidbody>();
+        if (agent == null)
+            agent = GetComponent<NavMeshAgent>();
+        if (globalStatSource == null)
+            globalStatSource = GetComponent<GlobalStatSource>();
+        if (modifierManager == null)
+            modifierManager = GetComponent<StatsModifierManager>();
     }
 
     private void Awake()
     {
-        baseMaxSpeed = agent.speed;
+        if (globalStatSource == null)
+            globalStatSource = GetComponent<GlobalStatSource>();
+        if (modifierManager == null)
+            modifierManager = GetComponent<StatsModifierManager>();
+
+        baseMaxSpeed = agent != null ? agent.speed : 0f;
+        RefreshMovementSpeedFromStats();
         agent.updateRotation = false;
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToModifierChanges();
+        RefreshMovementSpeedFromStats();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromModifierChanges();
     }
 
     private void OnValidate()
@@ -127,7 +152,7 @@ public class Movement : MonoBehaviour, IAbilityMovement
 
     public void ResetSpeed()
     {
-        agent.speed = baseMaxSpeed;
+        RefreshMovementSpeedFromStats();
     }
 
     private void InstantTurn()
@@ -299,6 +324,55 @@ public class Movement : MonoBehaviour, IAbilityMovement
         float segmentFraction = segmentIndex - currentSegment;
 
         return Vector3.Lerp(path[currentSegment], path[nextSegment], segmentFraction);
+    }
+
+    /// <summary>
+    /// Re-evaluates movement speed using the configured global stat. Call this if global modifiers change.
+    /// </summary>
+    public void RefreshMovementSpeedFromStats()
+    {
+        float globalSpeed = GetGlobalMovementSpeed();
+        if (globalSpeed > 0f)
+            baseMaxSpeed = globalSpeed;
+
+        if (agent != null && baseMaxSpeed > 0f)
+            agent.speed = baseMaxSpeed;
+    }
+
+    private float GetGlobalMovementSpeed()
+    {
+        if (globalStatSource == null || agent == null)
+            return 0f;
+
+        var stats = globalStatSource.EvaluateGlobalStats();
+        if (stats != null && stats.TryGetValue(movementSpeedStatKey, out float modified))
+            return modified;
+
+        var raw = globalStatSource.EvaluateGlobalStatsRaw();
+        if (raw != null && raw.TryGetValue(movementSpeedStatKey, out float baseVal))
+            return baseVal;
+
+        return agent.speed;
+    }
+
+    private void SubscribeToModifierChanges()
+    {
+        if (modifierManager != null)
+        {
+            modifierManager.OnGlobalModifiersChanged -= RefreshMovementSpeedFromStats;
+            modifierManager.OnGlobalModifiersChanged += RefreshMovementSpeedFromStats;
+            modifierManager.OnAnyModifiersChanged -= RefreshMovementSpeedFromStats;
+            modifierManager.OnAnyModifiersChanged += RefreshMovementSpeedFromStats;
+        }
+    }
+
+    private void UnsubscribeFromModifierChanges()
+    {
+        if (modifierManager != null)
+        {
+            modifierManager.OnGlobalModifiersChanged -= RefreshMovementSpeedFromStats;
+            modifierManager.OnAnyModifiersChanged -= RefreshMovementSpeedFromStats;
+        }
     }
     #endregion
 }

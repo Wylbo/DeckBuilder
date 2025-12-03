@@ -33,7 +33,7 @@ public interface IAbilityExecutor
     AbilityCaster Caster { get; }
     IAbilityMovement Movement { get; }
     ProjectileLauncher ProjectileLauncher { get; }
-    AbilityModifierManager ModifierManager { get; }
+    StatsModifierManager ModifierManager { get; }
     IAbilityStatProvider StatProvider { get; }
     IGlobalStatSource GlobalStatSource { get; }
     IAbilityDebuffService DebuffService { get; }
@@ -65,7 +65,7 @@ public sealed class AbilityExecutor : IAbilityExecutor
     public AbilityCaster Caster { get; }
     public IAbilityMovement Movement { get; }
     public ProjectileLauncher ProjectileLauncher { get; }
-    public AbilityModifierManager ModifierManager { get; }
+    public StatsModifierManager ModifierManager { get; }
     public IAbilityStatProvider StatProvider { get; }
     public IGlobalStatSource GlobalStatSource { get; }
     public IAbilityDebuffService DebuffService { get; }
@@ -181,7 +181,7 @@ public sealed class AbilityExecutor : IAbilityExecutor
     {
         IReadOnlyList<AbilityModifier> modifiers = ModifierManager != null ? ModifierManager.ActiveAbilityModifiers : Array.Empty<AbilityModifier>();
         IReadOnlyList<GlobalModifier> globalModifiers = ModifierManager != null ? ModifierManager.ActiveGlobalModifiers : null;
-        Dictionary<GlobalStatKey, float> globalStats = GlobalStatSource != null ? GlobalStatSource.EvaluateGlobalStats(globalModifiers) : null;
+        Dictionary<GlobalStatKey, float> globalStats = GlobalStatSource != null ? GlobalStatSource.EvaluateGlobalStats() : null;
         Dictionary<AbilityStatKey, float> stats = StatProvider.EvaluateStats(Definition.TagSet, Definition.BaseStats, modifiers, globalStats);
 
         float value = 0f;
