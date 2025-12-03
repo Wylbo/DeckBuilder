@@ -12,7 +12,9 @@ public class MaterialPropertyRef
     [Required, SerializeField] private Renderer renderer;
 
     [SerializeField, ShowIf(nameof(HasRenderer))]
+#if UNITY_EDITOR
     [ValueDropdown(nameof(GetMaterialIndexOptions))]
+#endif
     private int materialIndex;
 
     [SerializeField, HideInInspector] private string propertyName = "";
@@ -20,8 +22,10 @@ public class MaterialPropertyRef
 
     [ShowIf(nameof(CanPickProperty))]
     [LabelText("Shader Property")]
+#if UNITY_EDITOR
     [ValueDropdown(nameof(GetShaderPropertyOptions))]
     [OnValueChanged(nameof(OnPropertySelectionChanged))]
+#endif
     [ShowInInspector]
     private PropertySelection _selectionProxy;
 
@@ -70,26 +74,34 @@ public class MaterialPropertyRef
 
     [FoldoutGroup("Edit Value")]
     [ShowIf(nameof(IsFloatLike))]
+#if UNITY_EDITOR
     [OnValueChanged(nameof(OnFloatChanged))]
     [PropertyRange(nameof(GetRangeMin), nameof(GetRangeMax))]
+#endif
     [LabelText("Value")]
     public float floatValue;
 
     [FoldoutGroup("Edit Value")]
     [ShowIf(nameof(IsColor))]
+#if UNITY_EDITOR
     [OnValueChanged(nameof(OnColorChanged))]
+#endif
     [LabelText("Color")]
     public Color colorValue = Color.white;
 
     [FoldoutGroup("Edit Value")]
     [ShowIf(nameof(IsVector))]
+#if UNITY_EDITOR
     [OnValueChanged(nameof(OnVectorChanged))]
+#endif
     [LabelText("Vector4")]
     public Vector4 vectorValue = Vector4.zero;
 
     [FoldoutGroup("Edit Value")]
     [ShowIf(nameof(IsTexture))]
+#if UNITY_EDITOR
     [OnValueChanged(nameof(OnTextureChanged))]
+#endif
     [LabelText("Texture")]
     public Texture textureValue;
 
