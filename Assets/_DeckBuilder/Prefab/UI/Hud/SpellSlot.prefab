@@ -93,7 +93,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpellSlotUI
   iconImage: {fileID: 1547221475245575350}
   cooldownFillImage: {fileID: 1078466423173124714}
-  dropHighlight: {fileID: 2651342925317833124}
+  dropHighlight: {fileID: 3154627233618893863}
+  highlightScale: 1.2
+  highlightDuration: 1
   allowAbilityDrops: 1
 --- !u!1 &2651342925317833124
 GameObject:

@@ -1,12 +1,16 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler, ITooltipSource
 {
     [SerializeField] private Image iconImage;
     [SerializeField] private Image cooldownFillImage;
-    [SerializeField] private GameObject dropHighlight;
+    [SerializeField] private RectTransform dropHighlight;
+    [SerializeField] private float highlightScale = 1.2f;
+    [SerializeField] private float highlightDurationIn = 0.2f;
+    [SerializeField] private float highlightDurationOut = 0.1f;
     [SerializeField] private bool allowAbilityDrops = true;
 
     private SpellSlot boundSlot;
@@ -16,6 +20,8 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     private int boundSlotIndex = -1;
     private bool isDodgeSlot;
 
+    private Tween highlightTween;
+
     private void OnEnable()
     {
         HideDropHighlight();
@@ -24,7 +30,7 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     private void OnDisable()
     {
         Unbind();
-        HideDropHighlight();
+        dropHighlight.gameObject.SetActive(false);
         TooltipManager.Instance?.Hide(this);
         boundCaster = null;
         boundSlotIndex = -1;
@@ -128,13 +134,25 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     private void ShowDropHighlight()
     {
         if (dropHighlight != null)
-            dropHighlight.SetActive(true);
+            dropHighlight.gameObject.SetActive(true);
+
+        highlightTween?.Kill();
+        highlightTween = dropHighlight.DOScale(highlightScale, highlightDurationIn)
+            .SetEase(Ease.OutBack)
+            .SetUpdate(true);
     }
 
     private void HideDropHighlight()
     {
-        if (dropHighlight != null)
-            dropHighlight.SetActive(false);
+        highlightTween?.Kill();
+        highlightTween = dropHighlight.DOScale(1f, highlightDurationOut)
+            .SetEase(Ease.OutBack)
+            .SetUpdate(true)
+            .OnComplete(() =>
+            {
+                if (dropHighlight != null)
+                    dropHighlight.gameObject.SetActive(false);
+            });
     }
 
     private void RefreshVisuals(bool resetCooldown = false)
