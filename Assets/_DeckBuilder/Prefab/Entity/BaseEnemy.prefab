@@ -72,6 +72,22 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3826134512517878902, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -2413806693520163455, guid: 4adeaf2d2b1c7417e89f026626d8264f, type: 3}
+    - target: {fileID: 3826134512517878902, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3826134512517878902, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3826134512517878902, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4938447398858601016, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: faction
       value: 1
