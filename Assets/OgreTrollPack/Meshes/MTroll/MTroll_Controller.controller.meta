@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0041b5c6e8e855847a4b0692b9d18709
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314957
+  packageName: Stylized Ogres & Trolls Pack
+  packageVersion: 1.0
+  assetPath: Assets/OgreTrollPack/Meshes/MTroll/MTroll_Controller.controller
+  uploadId: 743126

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ecd1907dabfb8f6438a6b8ba2c07d8d4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314957
+  packageName: Stylized Ogres & Trolls Pack
+  packageVersion: 1.0
+  assetPath: Assets/OgreTrollPack/Meshes/Gremlin/Gremlin_Control.controller
+  uploadId: 743126

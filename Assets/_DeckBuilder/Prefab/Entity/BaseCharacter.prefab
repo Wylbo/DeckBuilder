@@ -252,8 +252,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeedStatKey: 3
-  globalStatSource: {fileID: 0}
-  modifierManager: {fileID: 0}
+  globalStatSource: {fileID: 5097382059795255847}
+  modifierManager: {fileID: 1904220953553573043}
   body: {fileID: 1004127752059748463}
   agent: {fileID: 7981525574255834789}
   capsuleCollider: {fileID: 8323667409482397591}

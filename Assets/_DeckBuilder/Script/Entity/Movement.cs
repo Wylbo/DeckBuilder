@@ -45,7 +45,8 @@ public class Movement : MonoBehaviour, IAbilityMovement
 
     [SerializeField]
     private DashData defaultDashData = new DashData();
-    [SerializeField] private NavMeshQueryFilter navMeshQueryFilter;
+    [SerializeField] private Animator animator = null;
+    [SerializeField] private string movespeedAnimatorParam = "MoveSpeed";
 
     private bool canMove = true;
     private Coroutine dashRoutine;
@@ -108,6 +109,10 @@ public class Movement : MonoBehaviour, IAbilityMovement
     {
         InstantTurn();
         wantedVelocity = agent.velocity;
+        if (animator != null)
+        {
+            animator.SetFloat(movespeedAnimatorParam, agent.velocity.magnitude);
+        }
     }
 
     public bool MoveTo(Vector3 worldTo)
