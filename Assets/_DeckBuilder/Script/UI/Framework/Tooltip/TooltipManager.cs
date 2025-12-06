@@ -81,7 +81,9 @@ public class TooltipManager : MonoBehaviour
         if (source != currentSource)
             return;
 
-        HideImmediate();
+        pendingShow = false;
+        currentSource = null;
+        tooltipView.Hide();
     }
 
     public void HideImmediate()

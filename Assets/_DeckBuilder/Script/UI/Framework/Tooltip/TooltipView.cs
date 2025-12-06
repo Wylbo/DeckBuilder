@@ -1,3 +1,4 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,8 +15,13 @@ public class TooltipView : MonoBehaviour
     [SerializeField] private Vector2 canvasPadding = new Vector2(12f, 12f);
     [SerializeField] private Vector2 cursorOffset = new Vector2(16f, -16f);
 
+    [Header("Tween Settings")]
+    [SerializeField] private AnimationCurve showCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    [SerializeField] private float showDuration = 0.2f;
+
     private RectTransform rectTransform;
     private Canvas rootCanvas;
+    private Tween tween;
 
     private void Awake()
     {
@@ -27,14 +33,20 @@ public class TooltipView : MonoBehaviour
     public void Show(TooltipData data)
     {
         ApplyData(data);
+
         gameObject.SetActive(true);
-        if (canvasGroup != null)
-        {
-            canvasGroup.alpha = 1f;
-            canvasGroup.blocksRaycasts = false;
-        }
+        canvasGroup.alpha = 0f;
+        tween?.Kill();
+        tween = canvasGroup.DOFade(1f, showDuration).SetEase(showCurve).SetUpdate(true);
 
         RefreshLayout();
+    }
+
+    public void Hide()
+    {
+        tween?.Kill();
+        tween = canvasGroup.DOFade(0f, showDuration).SetEase(showCurve).SetUpdate(true)
+            .OnComplete(() => gameObject.SetActive(false));
     }
 
     public void HideImmediate()
@@ -45,6 +57,8 @@ public class TooltipView : MonoBehaviour
             canvasGroup.blocksRaycasts = false;
         }
 
+        tween?.Kill();
+        canvasGroup.alpha = 0f;
         gameObject.SetActive(false);
     }
 
