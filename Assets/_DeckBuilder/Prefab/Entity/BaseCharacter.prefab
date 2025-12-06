@@ -317,31 +317,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dodgeSpellSlot:
-    Ability: {fileID: 0}
+    Ability: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
     cooldown:
       duration: 0
       remaining: 0
   spellSlots:
-  - Ability: {fileID: 0}
+  - Ability: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
     cooldown:
       duration: 0
       remaining: 0
-  - Ability: {fileID: 0}
+  - Ability: {fileID: 11400000, guid: b76cb0aa880a3a24482ae314e0aa9b0d, type: 2}
     cooldown:
       duration: 0
       remaining: 0
-  - Ability: {fileID: 0}
+  - Ability: {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
     cooldown:
       duration: 0
       remaining: 0
-  - Ability: {fileID: 0}
+  - Ability: {fileID: 11400000, guid: be1af21a4381d4849945333216874200, type: 2}
     cooldown:
       duration: 0
       remaining: 0
   projectileLauncher: {fileID: 6938576570393643543}
   debuffUpdater: {fileID: 6244960309705328274}
   modifierManager: {fileID: 1904220953553573043}
-  globalStatSource: {fileID: 0}
+  globalStatSource: {fileID: 5097382059795255847}
 --- !u!114 &6244960309705328274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -386,6 +386,8 @@ MonoBehaviour:
     Value: 1
   - Key: 2
     Value: 0
+  - Key: 3
+    Value: 5
   modifierProvider: {fileID: 1904220953553573043}
 --- !u!1 &3284660828925175538
 GameObject:

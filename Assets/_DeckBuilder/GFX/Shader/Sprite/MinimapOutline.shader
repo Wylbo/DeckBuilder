@@ -9,9 +9,9 @@ Shader "UI/MinimapOutline"
         _GroundColor("Ground Color", Color) = (1,1,1,1)
         _GroundTiling("Ground Tiling", Float) = 1.0
         _GroundWhiteThreshold("Ground Detect Threshold", Range(0,1)) = 0.05
-
         _OutlineTex("Outline Texture", 2D) = "white" {}
         _OutlineColor("Outline Color", Color) = (0,1,0,1)
+        _OutlineTiling("Outline Tiling", Float) = 1.0
         _OutlineThickness("Outline Thickness (px)", Float) = 1.5
         _EdgeThreshold("Edge Threshold", Range(0,1)) = 0.1
     }
@@ -55,6 +55,7 @@ Shader "UI/MinimapOutline"
             float _GroundTiling;
             float _GroundWhiteThreshold;
             fixed4 _OutlineColor;
+            float _OutlineTiling;
             float _OutlineThickness;
             float _EdgeThreshold;
 
@@ -76,7 +77,8 @@ Shader "UI/MinimapOutline"
 
                 // Ground fill (only where alpha > 0)
                 float2 groundUV = (i.uv * _GroundTiling);
-                fixed4 ground = tex2D(_GroundTex, TRANSFORM_TEX(groundUV, _GroundTex)) * _GroundColor;
+                fixed4 groundSample = tex2D(_GroundTex, TRANSFORM_TEX(groundUV, _GroundTex));
+                fixed4 ground = groundSample * _GroundColor;
                 float deviation = max(abs(baseRGB.r - 1), max(abs(baseRGB.g - 1), abs(baseRGB.b - 1)));
                 float groundMask = step(deviation, _GroundWhiteThreshold);
                 fixed4 groundLayer = ground * alpha * groundMask;
@@ -91,11 +93,12 @@ Shader "UI/MinimapOutline"
                 float edge = step(_EdgeThreshold, alpha) * step(_EdgeThreshold, alpha - neighborMin);
 
                 // Outline texture/color
-                fixed4 outlineSample = tex2D(_OutlineTex, TRANSFORM_TEX(i.uv, _OutlineTex));
+                float2 outlineUV = (i.uv * _OutlineTiling);
+                fixed4 outlineSample = tex2D(_OutlineTex, TRANSFORM_TEX(outlineUV, _OutlineTex));
                 fixed4 outline = outlineSample * _OutlineColor;
                 outline.a *= edge; // only on edges
 
-                // Composite: ground only on white, keep icon colors, respect color alphas
+                // Composite: base RT, then ground on white, outline on edges
                 fixed4 col = baseSample;
                 col.rgb = lerp(col.rgb, groundLayer.rgb, groundMask);
                 col.rgb = lerp(col.rgb, outline.rgb, outline.a);

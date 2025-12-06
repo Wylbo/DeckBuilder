@@ -1,21 +1,28 @@
-﻿using System;
-using MG.Extend;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Orchestrates player input by composing small handlers (move, abilities, UI toggles, mode switching).
+/// Keeps lifecycle wiring here so individual concerns stay testable and focused.
+/// </summary>
 [CreateAssetMenu(fileName = nameof(PlayerControlStrategy), menuName = FileName.Controller + nameof(PlayerControlStrategy), order = 0)]
 public class PlayerControlStrategy : ControlStrategy
 {
-	[SerializeField]
-	private LayerMask groundLayerMask;
-	[SerializeField]
-	private GameObject moveClickVFX;
+	[SerializeField] private LayerMask groundLayerMask;
+	[SerializeField] private GameObject moveClickVFX;
+	[SerializeField] private float groundRayDistance = 100f;
 
 	private PlayerInputProvider inputProvider;
 	private PlayerInputs playerInput;
 
-	private bool isMoving;
-	private bool InventoryVisible => UiManager != null && UiManager.IsVisible<AbilityInventoryView>();
+	private MouseGroundRaycaster groundRaycaster;
+	private ClickMoveHandler moveHandler;
+	private AbilityInputHandler abilityHandler;
+	private UiInputModeSwitcher uiModeSwitcher;
+	private UiCancelHandler uiCancelHandler;
+	[SerializeField] private MinimapUIToggle minimapToggle;
+	private readonly List<UIToggleHandler> uiToggleHandlers = new List<UIToggleHandler>();
 
 	public override void Initialize(Controller controller, Character character, IUIManager uiManager = null)
 	{
@@ -25,11 +32,20 @@ public class PlayerControlStrategy : ControlStrategy
 		playerInput = inputProvider.Inputs;
 		inputProvider.ApplySavedBindings();
 
-		RegisterGameplayCallbacks();
-		RegisterUICallbacks();
-		SubscribeToUIManager();
+		groundRaycaster = new MouseGroundRaycaster(groundLayerMask, groundRayDistance);
+		moveHandler = new ClickMoveHandler(playerInput.Gameplay.Move, controller, groundRaycaster, new PoolVfxSpawner(), moveClickVFX);
+		abilityHandler = BuildAbilityHandler(controller);
+		uiModeSwitcher = new UiInputModeSwitcher(playerInput, UiManager, HasAnyBlockingUIVisible, moveHandler.StopContinuousMove);
+		uiCancelHandler = new UiCancelHandler(playerInput.UI.Cancel, UiManager);
 
-		SwitchToGameplayInput();
+		BuildUIToggles();
+
+		moveHandler.Enable();
+		abilityHandler.Enable();
+		uiModeSwitcher.Enable();
+		uiCancelHandler.Enable();
+		EnableUIToggles();
+		RegisterGameplayCallbacks();
 
 		Debug.Log("Player controller strategy initialized");
 	}
@@ -39,9 +55,12 @@ public class PlayerControlStrategy : ControlStrategy
 		if (playerInput == null)
 			return;
 
-		UnsubscribeFromUIManager();
+		moveHandler?.Dispose();
+		abilityHandler?.Dispose();
+		uiModeSwitcher?.Dispose();
+		uiCancelHandler?.Dispose();
+		DisposeUIToggles();
 		UnregisterGameplayCallbacks();
-		UnregisterUICallbacks();
 
 		playerInput.Gameplay.Disable();
 		playerInput.UI.Disable();
@@ -50,235 +69,85 @@ public class PlayerControlStrategy : ControlStrategy
 	// called each frame by the controller
 	public override void Control(float deltaTime)
 	{
-		if (isMoving && GetMousePositionInWorld(out Vector3 worldPos))
-		{
-			controller.TryMove(worldPos);
-		}
+		moveHandler?.Tick();
 	}
 
-	private void Move_performed(InputAction.CallbackContext ctx)
+	private AbilityInputHandler BuildAbilityHandler(Controller controller)
 	{
-		isMoving = true;
-		if (GetMousePositionInWorld(out Vector3 worldPos))
-		{
-			PoolManager.Provide(moveClickVFX, worldPos, Quaternion.identity, null, PoolManager.PoolType.VFX);
-			controller.TryMove(worldPos);
-		}
+		var handler = new AbilityInputHandler(controller, groundRaycaster);
+		handler.AddAbility(playerInput.Gameplay.Ability1, 0);
+		handler.AddAbility(playerInput.Gameplay.Ability2, 1);
+		handler.AddAbility(playerInput.Gameplay.Ability3, 2);
+		handler.AddAbility(playerInput.Gameplay.Ability4, 3);
+		return handler;
 	}
 
-	private void Move_canceled(InputAction.CallbackContext context)
+	private void BuildUIToggles()
 	{
-		isMoving = false;
-	}
-
-	private void ToggleInventory()
-	{
+		uiToggleHandlers.Clear();
 		if (UiManager == null)
 			return;
 
-		if (InventoryVisible)
-			UiManager.Hide<AbilityInventoryView>();
-		else
-			UiManager.Show<AbilityInventoryView>();
+		uiToggleHandlers.Add(CreateToggle<AbilityInventoryView>(playerInput.Gameplay.OpenInventory));
+		uiToggleHandlers.Add(CreateToggle<MenuScreenView>(playerInput.Gameplay.OpenMenu));
+		// Add more toggles here as new UI views become toggleable.
 	}
 
-	private void HandleViewShown(UIView view)
+	private UIToggleHandler CreateToggle<TView>(InputAction action) where TView : UIView
 	{
-		if (ShouldUseUIInput(view))
-			SwitchToUIInput();
+		return new UIToggleHandler(
+			action,
+			() => UiManager != null && UiManager.IsVisible<TView>(),
+			() => UiManager?.Show<TView>(),
+			() => UiManager?.Hide<TView>());
 	}
 
-	private void HandleViewHidden(UIView view)
+	private void EnableUIToggles()
 	{
-		if (ShouldUseUIInput(view) && !HasAnyBlockingUIVisible())
-			SwitchToGameplayInput();
+		for (int i = 0; i < uiToggleHandlers.Count; i++)
+			uiToggleHandlers[i].Enable();
 	}
 
-	private void SwitchToUIInput()
+	private void DisposeUIToggles()
 	{
-		isMoving = false;
-		playerInput.Gameplay.Disable();
-		playerInput.UI.Enable();
-	}
+		for (int i = 0; i < uiToggleHandlers.Count; i++)
+			uiToggleHandlers[i].Dispose();
 
-	private void SwitchToGameplayInput()
-	{
-		playerInput.UI.Disable();
-		playerInput.Gameplay.Enable();
-	}
-
-	private Vector3 GetMousePositionInWorld()
-	{
-		GetMousePositionInWorld(out Vector3 worldPosition);
-		return worldPosition;
-	}
-
-	private bool GetMousePositionInWorld(out Vector3 worldPosition)
-	{
-		worldPosition = new Vector3();
-
-		Vector3 viewportPosition = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-		Ray ray = Camera.main.ViewportPointToRay(viewportPosition);
-
-		if (Physics.Raycast(ray, out RaycastHit info, 100, groundLayerMask))
-		{
-			worldPosition = info.point;
-
-			DebugDrawer.DrawSphere(worldPosition, .3f, Color.cyan, 2f);
-			return true;
-		}
-
-		return false;
-	}
-
-	private void Dodge_canceled(InputAction.CallbackContext context)
-	{
-	}
-
-	private void Dodge_performed(InputAction.CallbackContext context)
-	{
-		controller.PerformDodge(GetMousePositionInWorld());
-	}
-
-	private void Ability4_performed(InputAction.CallbackContext obj)
-	{
-		PerformAbility(3);
-	}
-
-	private void Ability3_performed(InputAction.CallbackContext obj)
-	{
-		PerformAbility(2);
-	}
-
-	private void Ability2_performed(InputAction.CallbackContext obj)
-	{
-		PerformAbility(1);
-	}
-
-	private void Ability1_performed(InputAction.CallbackContext obj)
-	{
-		PerformAbility(0);
-	}
-
-	private void Ability1_canceled(InputAction.CallbackContext obj)
-	{
-		EndHold(0);
-	}
-
-	private void Ability2_canceled(InputAction.CallbackContext obj)
-	{
-		EndHold(1);
-	}
-
-	private void Ability3_canceled(InputAction.CallbackContext obj)
-	{
-		EndHold(2);
-	}
-
-	private void Ability4_canceled(InputAction.CallbackContext obj)
-	{
-		EndHold(3);
-	}
-
-	private void OpenInventory_performed(InputAction.CallbackContext context)
-	{
-		ToggleInventory();
-	}
-
-	private void OpenMenuPerformed(InputAction.CallbackContext context)
-	{
-		UiManager?.Show<MenuScreenView>();
-	}
-
-
-	private void UICancel_performed(InputAction.CallbackContext context)
-	{
-		UiManager?.HideCurrentView();
+		uiToggleHandlers.Clear();
 	}
 
 	private void RegisterGameplayCallbacks()
 	{
-		playerInput.Gameplay.Move.performed += Move_performed;
 		playerInput.Gameplay.Dodge.performed += Dodge_performed;
-		playerInput.Gameplay.Ability1.performed += Ability1_performed;
-		playerInput.Gameplay.Ability2.performed += Ability2_performed;
-		playerInput.Gameplay.Ability3.performed += Ability3_performed;
-		playerInput.Gameplay.Ability4.performed += Ability4_performed;
-
-		playerInput.Gameplay.Move.canceled += Move_canceled;
-		playerInput.Gameplay.Ability1.canceled += Ability1_canceled;
-		playerInput.Gameplay.Ability2.canceled += Ability2_canceled;
-		playerInput.Gameplay.Ability3.canceled += Ability3_canceled;
-		playerInput.Gameplay.Ability4.canceled += Ability4_canceled;
-		playerInput.Gameplay.Dodge.canceled += Dodge_canceled;
-
-		playerInput.Gameplay.OpenInventory.performed += OpenInventory_performed;
-		playerInput.Gameplay.OpenMenu.performed += OpenMenuPerformed;
+		playerInput.Gameplay.ToggleMinimap.performed += ToggleMinimap_performed;
 	}
 
 	private void UnregisterGameplayCallbacks()
 	{
-		playerInput.Gameplay.Move.performed -= Move_performed;
 		playerInput.Gameplay.Dodge.performed -= Dodge_performed;
-		playerInput.Gameplay.Ability1.performed -= Ability1_performed;
-		playerInput.Gameplay.Ability2.performed -= Ability2_performed;
-		playerInput.Gameplay.Ability3.performed -= Ability3_performed;
-		playerInput.Gameplay.Ability4.performed -= Ability4_performed;
-
-		playerInput.Gameplay.Move.canceled -= Move_canceled;
-		playerInput.Gameplay.Ability1.canceled -= Ability1_canceled;
-		playerInput.Gameplay.Ability2.canceled -= Ability2_canceled;
-		playerInput.Gameplay.Ability3.canceled -= Ability3_canceled;
-		playerInput.Gameplay.Ability4.canceled -= Ability4_canceled;
-		playerInput.Gameplay.Dodge.canceled -= Dodge_canceled;
-
-		playerInput.Gameplay.OpenInventory.performed -= OpenInventory_performed;
-		playerInput.Gameplay.OpenMenu.performed -= OpenMenuPerformed;
+		playerInput.Gameplay.ToggleMinimap.performed -= ToggleMinimap_performed;
 	}
 
-	private void RegisterUICallbacks()
+	private void Dodge_performed(InputAction.CallbackContext context)
 	{
-		playerInput.UI.Cancel.performed += UICancel_performed;
+		groundRaycaster.TryGetPoint(out Vector3 worldPos);
+		controller.PerformDodge(worldPos);
 	}
 
-	private void UnregisterUICallbacks()
+	private void ToggleMinimap_performed(InputAction.CallbackContext context)
 	{
-		playerInput.UI.Cancel.performed -= UICancel_performed;
+		var toggle = GetMinimapToggle();
+		toggle?.Toggle();
 	}
 
-	private void SubscribeToUIManager()
+	private MinimapUIToggle GetMinimapToggle()
 	{
-		if (UiManager == null)
-			return;
+		if (minimapToggle == null)
+		{
+			minimapToggle = FindFirstObjectByType<MinimapUIToggle>();
+		}
 
-		UiManager.AfterShow += HandleViewShown;
-		UiManager.AfterHide += HandleViewHidden;
-	}
-
-	private void UnsubscribeFromUIManager()
-	{
-		if (UiManager == null)
-			return;
-
-		UiManager.AfterShow -= HandleViewShown;
-		UiManager.AfterHide -= HandleViewHidden;
-	}
-
-	private void PerformAbility(int index)
-	{
-		GetMousePositionInWorld(out Vector3 worldPos);
-		controller.CastAbility(index, worldPos);
-	}
-
-	private void EndHold(int index)
-	{
-		GetMousePositionInWorld(out Vector3 worldPos);
-		controller.EndHold(index, worldPos);
-	}
-
-	private bool ShouldUseUIInput(UIView view)
-	{
-		return view != null && (view.Layer == UILayer.Screen || view.Layer == UILayer.Popup);
+		return minimapToggle;
 	}
 
 	private bool HasAnyBlockingUIVisible()

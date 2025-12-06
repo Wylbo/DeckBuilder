@@ -8,7 +8,6 @@ using UnityEngine;
 /// </summary>
 public class UIManager : MonoBehaviour, IUIManager
 {
-    [SerializeField] private bool dontDestroyOnLoad = true;
     [SerializeField] private List<UILayerConfig> layerConfigs = new List<UILayerConfig>();
     [SerializeField] private List<UIView> registeredViews = new List<UIView>();
 
@@ -30,9 +29,6 @@ public class UIManager : MonoBehaviour, IUIManager
 
     private void Awake()
     {
-        if (dontDestroyOnLoad)
-            DontDestroyOnLoad(gameObject);
-
         InitializeServices();
     }
 

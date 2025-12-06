@@ -12,7 +12,6 @@ public class GameStateManager : MonoBehaviour
         Paused
     }
 
-    [SerializeField] private bool dontDestroyOnLoad = true;
     [SerializeField] private bool useTimeScale = true;
 
     private readonly HashSet<object> pauseRequesters = new HashSet<object>();
@@ -32,8 +31,6 @@ public class GameStateManager : MonoBehaviour
         }
 
         Instance = this;
-        if (dontDestroyOnLoad)
-            DontDestroyOnLoad(gameObject);
     }
 
     private void Start()

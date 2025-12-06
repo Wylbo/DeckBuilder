@@ -187,26 +187,6 @@ PrefabInstance:
       propertyPath: dodgeAbility
       value: 
       objectReference: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
-    - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-      propertyPath: globalStatSource
-      value: 
-      objectReference: {fileID: 7468932370388430717}
-    - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-      propertyPath: spellSlots.Array.data[0].Ability
-      value: 
-      objectReference: {fileID: 11400000, guid: b9842d0feb135af47b79a01ac52353f6, type: 2}
-    - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-      propertyPath: spellSlots.Array.data[1].Ability
-      value: 
-      objectReference: {fileID: 11400000, guid: bb774449982bd2a4abe182bb32f4f29d, type: 2}
-    - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-      propertyPath: spellSlots.Array.data[2].Ability
-      value: 
-      objectReference: {fileID: 11400000, guid: d9b05b2259061c641b18bb8dda15ebab, type: 2}
-    - target: {fileID: 9176447491751950743, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-      propertyPath: spellSlots.Array.data[3].Ability
-      value: 
-      objectReference: {fileID: 11400000, guid: a7e922be0370557448e9f82aef2c303c, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -246,14 +226,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 369680040252476415, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
   m_PrefabInstance: {fileID: 2385627502197390682}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7468932370388430717 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5097382059795255847, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-  m_PrefabInstance: {fileID: 2385627502197390682}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 718024458411719844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27e1b62d84067324cbd1e56a9be7aa4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GlobalStatSource
