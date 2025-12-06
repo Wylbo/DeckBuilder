@@ -403,7 +403,7 @@ namespace MoreMountains.Feedbacks
 		/// <param name="lifetime"></param>
 		/// <param name="forceColor"></param>
 		/// <param name="animateColorGradient"></param>
-		protected virtual void Spawn(string value, Vector3 position, Vector3 direction, float intensity = 1f,
+		public virtual void Spawn(string value, Vector3 position, Vector3 direction, float intensity = 1f,
 			bool forceLifetime = false, float lifetime = 1f, bool forceColor = false, Gradient animateColorGradient = null, 
 			Transform attachmentTransform = null)
 		{

@@ -72,6 +72,7 @@ namespace MoreMountains.Tools
 		protected Dictionary<AudioSource, Coroutine> _fadeInSoundCoroutines;
 		protected Dictionary<AudioSource, Coroutine> _fadeOutSoundCoroutines;
 		protected Dictionary<MMSoundManagerTracks, Coroutine> _fadeTrackCoroutines;
+		protected Dictionary<MMSoundManagerTracks, bool> _pausedTracks = new Dictionary<MMSoundManagerTracks, bool>();
 
 		#region Initialization
 
@@ -136,7 +137,8 @@ namespace MoreMountains.Tools
 				options.DopplerLevel, options.Spread, options.RolloffMode, options.MinDistance, options.MaxDistance, 
 				options.DoNotAutoRecycleIfNotDonePlaying, options.PlaybackTime, options.PlaybackDuration, options.AttachToTransform,
 				options.UseSpreadCurve, options.SpreadCurve, options.UseCustomRolloffCurve, options.CustomRolloffCurve,
-				options.UseSpatialBlendCurve, options.SpatialBlendCurve, options.UseReverbZoneMixCurve, options.ReverbZoneMixCurve
+				options.UseSpatialBlendCurve, options.SpatialBlendCurve, options.UseReverbZoneMixCurve, options.ReverbZoneMixCurve, 
+				options.AudioResourceToPlay, options.InitialDelay
 			);
 		}
 
@@ -184,11 +186,12 @@ namespace MoreMountains.Tools
 			float dopplerLevel = 1f, int spread = 0, AudioRolloffMode rolloffMode = AudioRolloffMode.Logarithmic, float minDistance = 1f, float maxDistance = 500f,
 			bool doNotAutoRecycleIfNotDonePlaying = false, float playbackTime = 0f, float playbackDuration = 0f, Transform attachToTransform = null,
 			bool useSpreadCurve = false, AnimationCurve spreadCurve = null, bool useCustomRolloffCurve = false, AnimationCurve customRolloffCurve = null,
-			bool useSpatialBlendCurve = false, AnimationCurve spatialBlendCurve = null, bool useReverbZoneMixCurve = false, AnimationCurve reverbZoneMixCurve = null
+			bool useSpatialBlendCurve = false, AnimationCurve spatialBlendCurve = null, bool useReverbZoneMixCurve = false, AnimationCurve reverbZoneMixCurve = null, 
+			AudioResource audioResourceToPlay = null, float initialDelay = 0f
 		)
 		{
 			if (this == null) { return null; }
-			if (!audioClip) { return null; }
+			if (!audioClip && !audioResourceToPlay) { return null; }
             
 			// audio source setup ---------------------------------------------------------------------------------
             
@@ -204,7 +207,8 @@ namespace MoreMountains.Tools
 				{
 					recycleAudioSource = audioSource;
 					// we destroy the host after the clip has played (if it is not tagged for reusability.
-					StartCoroutine(_pool.AutoDisableAudioSource(audioClip.length / Mathf.Abs(pitch), audioSource, audioClip, doNotAutoRecycleIfNotDonePlaying, playbackTime, playbackDuration));
+					float duration = (audioClip != null) ? audioClip.length / Mathf.Abs(pitch) : 1f;
+					StartCoroutine(_pool.AutoDisableAudioSource(duration, audioSource, audioClip, doNotAutoRecycleIfNotDonePlaying, playbackTime, playbackDuration));
 				}
 			}
 
@@ -219,7 +223,14 @@ namespace MoreMountains.Tools
 			// audio source settings ---------------------------------------------------------------------------------
             
 			audioSource.transform.position = location;
-			audioSource.clip = audioClip;
+			if (audioResourceToPlay == null)
+			{
+				audioSource.clip = audioClip;
+			}
+			else
+			{
+				audioSource.resource = audioResourceToPlay;
+			}
 			audioSource.pitch = pitch;
 			audioSource.spatialBlend = spatialBlend;
 			audioSource.panStereo = panStereo;
@@ -234,7 +245,10 @@ namespace MoreMountains.Tools
 			audioSource.rolloffMode = rolloffMode;
 			audioSource.minDistance = minDistance;
 			audioSource.maxDistance = maxDistance;
-			audioSource.time = playbackTime; 
+			if (audioSource.clip != null)
+			{
+				audioSource.time = playbackTime;
+			} 
 			
 			// curves
 			if (useSpreadCurve) { audioSource.SetCustomCurve(AudioSourceCurveType.Spread, spreadCurve); }
@@ -284,7 +298,14 @@ namespace MoreMountains.Tools
 			audioSource.volume = volume;  
             
 			// we start playing the sound
-			audioSource.Play();
+			if (initialDelay > 0f)
+			{
+				audioSource.PlayDelayed(initialDelay);	
+			}
+			else
+			{
+				audioSource.Play();	
+			}
             
 			// we destroy the host after the clip has played if it was a one time AS.
 			if (!loop && !recycleAudioSource)
@@ -394,6 +415,21 @@ namespace MoreMountains.Tools
 		#endregion
         
 		#region TrackControls
+
+		/// <summary>
+		/// Returns true if the specified track is currently paused, false otherwise
+		/// </summary>
+		/// <param name="track"></param>
+		/// <returns></returns>
+		public virtual bool IsPaused(MMSoundManagerTracks track)
+		{
+			if (_pausedTracks.TryGetValue(track, out bool muted))
+			{
+				return muted;
+			}
+
+			return false;
+		}
         
 		/// <summary>
 		/// Mutes an entire track
@@ -479,6 +515,7 @@ namespace MoreMountains.Tools
 		/// <param name="track"></param>
 		public virtual void PauseTrack(MMSoundManagerTracks track)
 		{
+			_pausedTracks[track] = true;
 			foreach (MMSoundManagerSound sound in _sounds)
 			{
 				if (sound.Track == track)
@@ -494,6 +531,7 @@ namespace MoreMountains.Tools
 		/// <param name="track"></param>
 		public virtual void PlayTrack(MMSoundManagerTracks track)
 		{
+			_pausedTracks[track] = false;
 			foreach (MMSoundManagerSound sound in _sounds)
 			{
 				if (sound.Track == track)
@@ -972,7 +1010,7 @@ namespace MoreMountains.Tools
 		{
 			foreach (MMSoundManagerSound sound in _sounds)
 			{
-				if (sound.Source.clip == clip)
+				if ((sound.Source != null) && (sound.Source.clip == clip))
 				{
 					return sound.Source;
 				}
@@ -1258,16 +1296,19 @@ namespace MoreMountains.Tools
 		/// </summary>
 		protected virtual void OnEnable()
 		{
-			MMSfxEvent.Register(OnMMSfxEvent);
-			MMSoundManagerSoundPlayEvent.Register(OnMMSoundManagerSoundPlayEvent);
-			this.MMEventStartListening<MMSoundManagerEvent>();
-			this.MMEventStartListening<MMSoundManagerTrackEvent>();
-			this.MMEventStartListening<MMSoundManagerSoundControlEvent>();
-			this.MMEventStartListening<MMSoundManagerTrackFadeEvent>();
-			this.MMEventStartListening<MMSoundManagerSoundFadeEvent>();
-			this.MMEventStartListening<MMSoundManagerAllSoundsControlEvent>();
-            
-			SceneManager.sceneLoaded += OnSceneLoaded;
+			if (_enabled)
+			{
+				MMSfxEvent.Register(OnMMSfxEvent);
+				MMSoundManagerSoundPlayEvent.Register(OnMMSoundManagerSoundPlayEvent);
+				this.MMEventStartListening<MMSoundManagerEvent>();
+				this.MMEventStartListening<MMSoundManagerTrackEvent>();
+				this.MMEventStartListening<MMSoundManagerSoundControlEvent>();
+				this.MMEventStartListening<MMSoundManagerTrackFadeEvent>();
+				this.MMEventStartListening<MMSoundManagerSoundFadeEvent>();
+				this.MMEventStartListening<MMSoundManagerAllSoundsControlEvent>();
+	            
+				SceneManager.sceneLoaded += OnSceneLoaded;
+			}
 		}
 
 		/// <summary>
