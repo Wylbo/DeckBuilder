@@ -23,7 +23,7 @@ MonoBehaviour:
   operations:
   - Key: 3
     OpType: 0
-    Value: 5
+    Value: 3
   order: 0
   stackGroup: Projectile_Count
   maxStacks: 12

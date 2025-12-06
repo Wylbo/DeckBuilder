@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 6244960309705328274}
   - component: {fileID: 6938576570393643543}
   - component: {fileID: 5097382059795255847}
+  - component: {fileID: 191472792769803370}
   m_Layer: 0
   m_Name: BaseCharacter
   m_TagString: Untagged
@@ -195,9 +196,9 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 5
-  m_Acceleration: 3.4028235e+38
+  m_Acceleration: 1000
   avoidancePriority: 50
-  m_AngularSpeed: 12000000
+  m_AngularSpeed: 500
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -257,6 +258,7 @@ MonoBehaviour:
   body: {fileID: 1004127752059748463}
   agent: {fileID: 7981525574255834789}
   capsuleCollider: {fileID: 8323667409482397591}
+  useInstantTurn: 1
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
@@ -292,6 +294,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 64
     maxWallIterations: 100
+  animationHandler: {fileID: 191472792769803370}
 --- !u!114 &1904220953553573043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -389,6 +392,22 @@ MonoBehaviour:
   - Key: 3
     Value: 5
   modifierProvider: {fileID: 1904220953553573043}
+--- !u!114 &191472792769803370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2949185825831420414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dca755434cd804449d31029bbd31bba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimationHandler
+  animator: {fileID: 0}
+  moveSpeedParam: MoveSpeed
+  forwardParam: Forward
+  rightParam: Right
 --- !u!1 &3284660828925175538
 GameObject:
   m_ObjectHideFlags: 0
