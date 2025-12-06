@@ -181,3 +181,12 @@ MonoBehaviour:
   iconImage: {fileID: 6075190867372839265}
   canvasGroup: {fileID: 8940988193562626811}
   dragAlpha: 0.5
+  dragScale: 0.85
+  dragScaleDuration: 0.2
+  dragScaleEase: 6
+  resetScale: 1
+  resetScaleDuration: 0.15
+  resetScaleEase: 5
+  hoverScale: 1.1
+  hoverScaleDuration: 0.15
+  hoverScaleEase: 5

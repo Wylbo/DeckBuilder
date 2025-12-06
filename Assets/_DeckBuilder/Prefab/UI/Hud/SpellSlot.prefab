@@ -95,7 +95,8 @@ MonoBehaviour:
   cooldownFillImage: {fileID: 1078466423173124714}
   dropHighlight: {fileID: 3154627233618893863}
   highlightScale: 1.2
-  highlightDuration: 1
+  highlightDurationIn: 0.2
+  highlightDurationOut: 0.15
   allowAbilityDrops: 1
 --- !u!1 &2651342925317833124
 GameObject:

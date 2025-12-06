@@ -12,6 +12,7 @@ public class TooltipView : MonoBehaviour
     [SerializeField] private TMP_Text descriptionText;
     [SerializeField] private Image iconImage;
     [SerializeField] private Vector2 canvasPadding = new Vector2(12f, 12f);
+    [SerializeField] private Vector2 cursorOffset = new Vector2(16f, -16f);
 
     private RectTransform rectTransform;
     private Canvas rootCanvas;
@@ -56,8 +57,8 @@ public class TooltipView : MonoBehaviour
         if (canvas != null)
             rootCanvas = canvas;
 
-        RectTransform canvasRect = null;
-        Vector2 localPoint = screenPosition;
+        RectTransform canvasRect;
+        Vector2 localPoint;
 
         if (canvas != null)
         {
@@ -75,7 +76,7 @@ public class TooltipView : MonoBehaviour
             return;
         }
 
-        rectTransform.anchoredPosition = localPoint;
+        rectTransform.anchoredPosition = localPoint + cursorOffset;
         ClampToCanvas(canvasRect);
     }
 
