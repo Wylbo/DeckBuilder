@@ -40,11 +40,13 @@ public class Movement : MonoBehaviour, IAbilityMovement
     private NavMeshAgent agent = null;
     [SerializeField]
     private CapsuleCollider capsuleCollider = null;
+    [SerializeField] private bool useInstantTurn = true;
     [SerializeField]
     private LayerMask groundLayerMask;
-
     [SerializeField]
     private DashData defaultDashData = new DashData();
+
+    [Header("Animation")]
     [SerializeField] private Animator animator = null;
     [SerializeField] private string movespeedAnimatorParam = "MoveSpeed";
 
@@ -83,7 +85,7 @@ public class Movement : MonoBehaviour, IAbilityMovement
 
         baseMaxSpeed = agent != null ? agent.speed : 0f;
         RefreshMovementSpeedFromStats();
-        agent.updateRotation = false;
+        // agent.updateRotation = false;
     }
 
     private void OnEnable()
@@ -107,7 +109,9 @@ public class Movement : MonoBehaviour, IAbilityMovement
 
     private void Update()
     {
-        InstantTurn();
+        if (useInstantTurn)
+            InstantTurn();
+
         wantedVelocity = agent.velocity;
         if (animator != null)
         {
