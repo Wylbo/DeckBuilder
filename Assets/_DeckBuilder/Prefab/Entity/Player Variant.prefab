@@ -135,6 +135,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5426130163700231953}
     - target: {fileID: 191472792769803370, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: upperBodyMask
+      value: 
+      objectReference: {fileID: 31900000, guid: 39c05c2c9512e174f9a686698943a00c, type: 2}
+    - target: {fileID: 191472792769803370, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: orientationTransform
       value: 
       objectReference: {fileID: 2610449079589516965}

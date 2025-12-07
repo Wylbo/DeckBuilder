@@ -71,6 +71,15 @@ MonoBehaviour:
   - rid: 1062887273389097058
   - rid: 1062887273389097060
   - rid: 1062887273389097061
+  animationData:
+    clip: {fileID: 0}
+    body: 1
+    blendInDuration: 0.1
+    blendOutDuration: 0.1
+    playbackSpeed: 1
+    loop: 0
+    applyRootMotion: 0
+    blockAbilityEndForClip: 1
   references:
     version: 2
     RefIds:
@@ -114,7 +123,7 @@ MonoBehaviour:
     - rid: 1062887273389097054
       type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
       data:
-        projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
+        projectile: {fileID: 2481008720800236832, guid: 74f05bef844929c46bfe7f49b7e86246, type: 3}
         launchPosition: 0
         alignWithCasterRotation: 1
         applyScaleStat: 1
@@ -135,7 +144,7 @@ MonoBehaviour:
     - rid: 1062887273389097057
       type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
       data:
-        projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
+        projectile: {fileID: 2481008720800236832, guid: 74f05bef844929c46bfe7f49b7e86246, type: 3}
         launchPosition: 0
         alignWithCasterRotation: 1
         applyScaleStat: 1
@@ -152,7 +161,7 @@ MonoBehaviour:
     - rid: 1062887273389097058
       type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
       data:
-        projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
+        projectile: {fileID: 2481008720800236832, guid: 74f05bef844929c46bfe7f49b7e86246, type: 3}
         launchPosition: 0
         alignWithCasterRotation: 1
         applyScaleStat: 1
@@ -177,7 +186,7 @@ MonoBehaviour:
     - rid: 1062887273389097061
       type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
       data:
-        projectile: {fileID: 2481008720800236832, guid: 03bfec35ecb0a33409bb9316ebcdbd56, type: 3}
+        projectile: {fileID: 2481008720800236832, guid: 74f05bef844929c46bfe7f49b7e86246, type: 3}
         launchPosition: 0
         alignWithCasterRotation: 1
         applyScaleStat: 1

@@ -162,7 +162,7 @@ MonoBehaviour:
   trailRenderers:
   - {fileID: 5955434184048893913}
   - {fileID: 1469851734481941481}
-  maxSpeed: 10
+  maxSpeed: 50
   hasAcceleration: 0
   acceleration: 1000
   accelerationProfile:
@@ -216,6 +216,7 @@ MonoBehaviour:
       blockingMask:
         serializedVersion: 2
         m_Bits: 0
+      maxWallIterations: 0
 --- !u!1001 &4890113143938714327
 PrefabInstance:
   m_ObjectHideFlags: 0
