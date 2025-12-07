@@ -236,7 +236,7 @@ namespace MoreMountains.Tools
 		public float TextValueMultiplier = 1f;
 		/// the format in which the text should display
 		[Tooltip("the format in which the text should display")]
-		public string TextFormat = "{000}";
+		public string TextFormat = "000";
 		/// whether or not to display the total after the current value 
 		[Tooltip("whether or not to display the total after the current value")]
 		public bool DisplayTotal = false;
@@ -519,6 +519,15 @@ namespace MoreMountains.Tools
 			{
 				SetBar01(InitialFillValue);
 			}
+		}
+
+		/// <summary>
+		/// Call this method to set a new initial color at runtime, which will be used as a base for the bump color changes
+		/// </summary>
+		/// <param name="newInitialColor"></param>
+		public virtual void SetInitialColor(Color newInitialColor)
+		{
+			_initialColor = newInitialColor;
 		}
 
 		protected virtual void StoreInitialColor()

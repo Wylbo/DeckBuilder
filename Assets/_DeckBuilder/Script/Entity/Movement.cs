@@ -6,10 +6,16 @@ using UnityEngine.AI;
 using MG.Extend;
 using Unity.Mathematics;
 
+
 /// <summary>
 /// Component allowing an entity to move
 /// </summary>
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(GlobalStatSource))]
+[RequireComponent(typeof(StatsModifierManager))]
+[RequireComponent(typeof(AnimationHandler))]
 public class Movement : MonoBehaviour, IAbilityMovement
 {
     [Serializable]
@@ -40,27 +46,24 @@ public class Movement : MonoBehaviour, IAbilityMovement
     private NavMeshAgent agent = null;
     [SerializeField]
     private CapsuleCollider capsuleCollider = null;
-    [SerializeField] private bool useInstantTurn = true;
     [SerializeField]
     private LayerMask groundLayerMask;
     [SerializeField]
     private DashData defaultDashData = new DashData();
 
     [Header("Animation")]
-    [SerializeField] private Animator animator = null;
-    [SerializeField] private string movespeedAnimatorParam = "MoveSpeed";
+    [SerializeField] private AnimationHandler animationHandler = null;
 
     private bool canMove = true;
     private Coroutine dashRoutine;
-    private Vector3 wantedVelocity = Vector3.zero;
     private float baseMaxSpeed = 0;
 
     public NavMeshAgent Agent => agent;
-    private float agentRadius => NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius;
-    private float stepHeight => NavMesh.GetSettingsByID(agent.agentTypeID).agentClimb;
+    private float AgentRadius => NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius;
+    private float StepHeight => NavMesh.GetSettingsByID(agent.agentTypeID).agentClimb;
     private float HalfHeight => capsuleCollider.height / 2;
     public bool CanMove => canMove;
-    public bool IsMoving => wantedVelocity.magnitude > 0;
+    public bool IsMoving => agent.velocity.magnitude > 0;
     public Rigidbody Body => body;
 
     internal const int DefaultMaxWallIterations = 100;
@@ -74,18 +77,14 @@ public class Movement : MonoBehaviour, IAbilityMovement
             globalStatSource = GetComponent<GlobalStatSource>();
         if (modifierManager == null)
             modifierManager = GetComponent<StatsModifierManager>();
+        if (animationHandler == null)
+            animationHandler = GetComponent<AnimationHandler>();
     }
 
     private void Awake()
     {
-        if (globalStatSource == null)
-            globalStatSource = GetComponent<GlobalStatSource>();
-        if (modifierManager == null)
-            modifierManager = GetComponent<StatsModifierManager>();
-
         baseMaxSpeed = agent != null ? agent.speed : 0f;
         RefreshMovementSpeedFromStats();
-        // agent.updateRotation = false;
     }
 
     private void OnEnable()
@@ -109,14 +108,7 @@ public class Movement : MonoBehaviour, IAbilityMovement
 
     private void Update()
     {
-        if (useInstantTurn)
-            InstantTurn();
-
-        wantedVelocity = agent.velocity;
-        if (animator != null)
-        {
-            animator.SetFloat(movespeedAnimatorParam, agent.velocity.magnitude);
-        }
+        animationHandler?.UpdateMovement(agent.velocity);
     }
 
     public bool MoveTo(Vector3 worldTo)
@@ -124,7 +116,6 @@ public class Movement : MonoBehaviour, IAbilityMovement
         if (!agent.enabled || !CanMove)
             return false;
 
-        body.position = agent.nextPosition;
         return agent.SetDestination(worldTo);
     }
 
@@ -135,7 +126,6 @@ public class Movement : MonoBehaviour, IAbilityMovement
 
         agent.ResetPath();
         agent.velocity = Vector3.zero;
-        wantedVelocity = Vector3.zero;
     }
 
     public void DisableMovement()
@@ -147,34 +137,6 @@ public class Movement : MonoBehaviour, IAbilityMovement
     public void EnableMovement()
     {
         canMove = true;
-    }
-
-    public void SpeedChangePercent(float speedChangeRatio)
-    {
-        agent.speed = baseMaxSpeed * speedChangeRatio;
-    }
-
-    public void SpeedChange(float newSpeed)
-    {
-        agent.speed = newSpeed;
-    }
-
-    public void ResetSpeed()
-    {
-        RefreshMovementSpeedFromStats();
-    }
-
-    private void InstantTurn()
-    {
-        if (!agent.hasPath)
-            return;
-
-        Vector3 direction = agent.path.corners[1] - transform.position;
-        direction.y = 0;
-        direction = direction.normalized;
-
-        Quaternion rotation = quaternion.LookRotation(direction, Vector3.up);
-        transform.rotation = rotation;
     }
 
     #region Dash
@@ -247,7 +209,7 @@ public class Movement : MonoBehaviour, IAbilityMovement
             iterationCount++;
             //Draw normal hit and position
             Debug.DrawRay(forwardHit.position, forwardHit.normal * 2, Color.red, 3f);
-            DebugDrawer.DrawSphere(forwardHit.position, agentRadius, Color.cyan, 3f);
+            DebugDrawer.DrawSphere(forwardHit.position, AgentRadius, Color.cyan, 3f);
 
             dashPositions.Add(forwardHit.position);
 

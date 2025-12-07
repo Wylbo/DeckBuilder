@@ -262,7 +262,7 @@ namespace MoreMountains.Feedbacks
 
 		private void OnDisable()
 		{
-			Undo.undoRedoPerformed += OnUndoRedo;
+			Undo.undoRedoPerformed -= OnUndoRedo;
 			EditorApplication.update -= OnEditorUpdate;
 		}
 
@@ -372,6 +372,16 @@ namespace MoreMountains.Feedbacks
 
 		protected virtual void OnUndoRedo()
 		{
+			if (serializedObject == null)
+			{
+				return;
+			}
+
+			if (serializedObject.targetObject == null)
+			{
+				return;
+			}
+
 			serializedObject.Update();
 			CacheFeedbacksListProperty();
 			RedrawFeedbacksList();
@@ -508,7 +518,7 @@ namespace MoreMountains.Feedbacks
 			DrawDurationAndDirectionContents();
 		}
 
-		protected virtual void DrawDurationAndDirectionContents()
+		public virtual void DrawDurationAndDirectionContents()
 		{
 			_settingsInfo.Clear();
 			VisualElement foldoutLabel = _settingsFoldout.Q<VisualElement>(className: _unityFoldoutTextClassName);
@@ -824,6 +834,10 @@ namespace MoreMountains.Feedbacks
 
 		protected virtual void DrawEmptyListState()
 		{
+			if (_emptyFeedbackListContainer == null)
+			{
+				return;
+			}
 			_emptyFeedbackListContainer.Clear();
 			if ((TargetMmfPlayer.FeedbacksList == null) || (TargetMmfPlayer.FeedbacksList.Count == 0))
 			{
@@ -937,9 +951,12 @@ namespace MoreMountains.Feedbacks
 				// feedback inspector
 				SerializedProperty feedbackProperty = _mmfeedbacksList.GetArrayElementAtIndex(index);
 				MMFInspectorDrawData drawData = new MMFInspectorDrawData();
+				drawData.Index = index;
+				drawData.FeedbackFoldout = foldout;
 				drawData.CurrentProperty = feedbackProperty;
 				drawData.Feedback = TargetMmfPlayer.FeedbacksList[index];
 				drawData.OnAnyValueChanged = OnAnyValueChanged;
+				drawData.PlayerEditor = this;
 				drawData.OnFeedbackFieldValueChanged = OnFeedbackFieldValueChanged;
 				drawData.FeedbackGroupsDictionary = FeedbackGroupsDictionary;
 				drawData.SetupRequiredIcon = SetupRequiredIcon;
@@ -1095,7 +1112,7 @@ namespace MoreMountains.Feedbacks
 			FeedbackGroupsDictionary?.Clear();
 		}
 
-		protected virtual void RedrawAllFeedbackHeaders()
+		public virtual void RedrawAllFeedbackHeaders()
 		{
 			foreach (var feedback in FeedbackHeaderContainersDictionary.Keys)
 			{
@@ -1221,7 +1238,7 @@ namespace MoreMountains.Feedbacks
 			return null;
 		}
 
-		protected virtual string DetermineFeedbackLabel(int index, Type feedbackType)
+		public virtual string DetermineFeedbackLabel(int index, Type feedbackType)
 		{
 			_feedbackLabel = TargetMmfPlayer.FeedbacksList[index].GetLabel();
 			if (TargetMmfPlayer.FeedbacksList[index].Label != TargetMmfPlayer.FeedbacksList[index].OriginalLabel)
@@ -1279,6 +1296,10 @@ namespace MoreMountains.Feedbacks
 
 		protected virtual void RedrawFeedbacksList() 
 		{
+			if (serializedObject == null)
+			{
+				return;
+			}
 			serializedObject.Update();
 			ClearDictionaries();
 			DrawEmptyListState();

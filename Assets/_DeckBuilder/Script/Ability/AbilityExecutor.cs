@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Events;
 
 public interface IAbilityMovement
@@ -60,10 +61,16 @@ public sealed class AbilityExecutor : IAbilityExecutor
     private int pendingStartIndex;
     private bool requiresUpdate;
     private bool blocksAbilityEnd;
+    private bool behaviourBlocksAbilityEnd;
+    private bool abilityAnimationBlocksEnd;
+    private float abilityAnimationTimeRemaining;
+    private bool rotationOverrideActive;
+    private bool cachedAgentRotationUpdate;
 
     public Ability Definition { get; }
     public AbilityCaster Caster { get; }
     public IAbilityMovement Movement { get; }
+    public AnimationHandler AnimationHandler { get; }
     public ProjectileLauncher ProjectileLauncher { get; }
     public StatsModifierManager ModifierManager { get; }
     public IAbilityStatProvider StatProvider { get; }
@@ -79,6 +86,7 @@ public sealed class AbilityExecutor : IAbilityExecutor
         Ability ability,
         AbilityCaster caster,
         IAbilityMovement movement,
+        AnimationHandler animationHandler,
         IAbilityDebuffService debuffService,
         IAbilityStatProvider statProvider,
         IGlobalStatSource globalStatSource)
@@ -86,6 +94,7 @@ public sealed class AbilityExecutor : IAbilityExecutor
         Definition = ability ?? throw new ArgumentNullException(nameof(ability));
         Caster = caster;
         Movement = movement;
+        AnimationHandler = animationHandler;
         DebuffService = debuffService;
         StatProvider = statProvider ?? throw new ArgumentNullException(nameof(statProvider));
         GlobalStatSource = globalStatSource;
@@ -99,6 +108,7 @@ public sealed class AbilityExecutor : IAbilityExecutor
             Definition,
             Caster,
             Movement,
+            AnimationHandler,
             ProjectileLauncher,
             ModifierManager,
             this,
@@ -133,6 +143,8 @@ public sealed class AbilityExecutor : IAbilityExecutor
     {
         if (activeCastContext == null)
             return;
+
+        UpdateAbilityAnimationHold(deltaTime);
 
         if (hasPendingStartSequence)
         {
@@ -206,6 +218,7 @@ public sealed class AbilityExecutor : IAbilityExecutor
 
         Debug.DrawRay(Caster.transform.position, castDirection, Color.yellow, 1f);
         Caster.transform.LookAt(Caster.transform.position + castDirection);
+        ApplyCastRotationLock();
     }
 
     public void Disable()
@@ -227,6 +240,7 @@ public sealed class AbilityExecutor : IAbilityExecutor
         if (Definition.StopMovementOnCast)
             Movement?.StopMovement();
 
+        PlayAbilityAnimation();
         EvaluateBehaviourFlags();
         RunStartBehavioursFromIndex(0);
         RefreshCastingState();
@@ -236,7 +250,7 @@ public sealed class AbilityExecutor : IAbilityExecutor
     private void EvaluateBehaviourFlags()
     {
         requiresUpdate = false;
-        blocksAbilityEnd = false;
+        behaviourBlocksAbilityEnd = false;
 
         foreach (var behaviour in behaviours)
         {
@@ -244,8 +258,13 @@ public sealed class AbilityExecutor : IAbilityExecutor
                 continue;
 
             requiresUpdate |= behaviour.RequiresUpdate;
-            blocksAbilityEnd |= behaviour.BlocksAbilityEnd;
+            behaviourBlocksAbilityEnd |= behaviour.BlocksAbilityEnd;
         }
+
+        var animationData = Definition != null ? Definition.AnimationData : null;
+        abilityAnimationBlocksEnd = animationData != null && animationData.BlockAbilityEndForClip && animationData.Clip != null;
+        abilityAnimationTimeRemaining = abilityAnimationBlocksEnd ? animationData.GetEffectiveDurationSeconds() : 0f;
+        blocksAbilityEnd = behaviourBlocksAbilityEnd || abilityAnimationBlocksEnd;
     }
 
     private void RunStartBehavioursFromIndex(int startIndex)
@@ -310,5 +329,62 @@ public sealed class AbilityExecutor : IAbilityExecutor
         hasPendingStartSequence = false;
         pendingDelayRemaining = 0f;
         pendingStartIndex = 0;
+        abilityAnimationBlocksEnd = false;
+        abilityAnimationTimeRemaining = 0f;
+        RestoreCastRotation();
+        StopAbilityAnimation();
+    }
+
+    private void PlayAbilityAnimation()
+    {
+        var animationData = Definition != null ? Definition.AnimationData : null;
+        if (animationData == null)
+            return;
+
+        AnimationHandler?.PlayAbilityAnimation(animationData);
+    }
+
+    private void StopAbilityAnimation()
+    {
+        var animationData = Definition != null ? Definition.AnimationData : null;
+        AnimationHandler?.StopAbilityAnimation(animationData);
+    }
+
+    private void UpdateAbilityAnimationHold(float deltaTime)
+    {
+        if (!abilityAnimationBlocksEnd)
+            return;
+
+        abilityAnimationTimeRemaining -= deltaTime;
+        if (abilityAnimationTimeRemaining <= 0f)
+        {
+            abilityAnimationBlocksEnd = false;
+            blocksAbilityEnd = behaviourBlocksAbilityEnd;
+            RefreshCastingState();
+        }
+    }
+
+    private void ApplyCastRotationLock()
+    {
+        if (rotationOverrideActive || !Definition.RotatingCasterToCastDirection)
+            return;
+
+        if (Movement is Movement concrete && concrete.Agent != null)
+        {
+            cachedAgentRotationUpdate = concrete.Agent.updateRotation;
+            concrete.Agent.updateRotation = false;
+            rotationOverrideActive = true;
+        }
+    }
+
+    private void RestoreCastRotation()
+    {
+        if (!rotationOverrideActive)
+            return;
+
+        if (Movement is Movement concrete && concrete.Agent != null)
+            concrete.Agent.updateRotation = cachedAgentRotationUpdate;
+
+        rotationOverrideActive = false;
     }
 }

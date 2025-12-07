@@ -30,13 +30,13 @@ MonoBehaviour:
     Source: 0
     Value: 1
     GlobalKey: 0
-  - Key: 8
+  - Key: 10
     Source: 0
     Value: 10
     GlobalKey: 0
   - Key: 9
     Source: 0
-    Value: 10
+    Value: 7
     GlobalKey: 0
   - Key: 2
     Source: 1
@@ -80,7 +80,7 @@ MonoBehaviour:
         dashData:
           dashDistance: 0
           dashSpeed: 0
-          slideOnWalls: 0
+          slideOnWalls: 1
           dashCurve:
             serializedVersion: 2
             m_Curve:
@@ -109,8 +109,8 @@ MonoBehaviour:
             serializedVersion: 2
             m_Bits: 64
           maxWallIterations: 0
-        dashDistanceStat: 8
-        dashSpeedStat: 9
+        dashDistanceStat: 9
+        dashSpeedStat: 10
     - rid: 1062887273389097054
       type: {class: AbilityProjectileLaunchBehaviour, ns: , asm: Assembly-CSharp}
       data:

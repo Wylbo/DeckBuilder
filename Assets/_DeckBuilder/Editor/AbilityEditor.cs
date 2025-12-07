@@ -16,6 +16,7 @@ public class AbilityEditor : Editor
 	private SerializedProperty rotatingCasterToCastDirectionProp;
 	private SerializedProperty stopMovementOnCastProp;
 	private SerializedProperty startCooldownOnCastProp;
+	private SerializedProperty animationDataProp;
 	private static readonly Dictionary<int, int> SelectionPerInstance = new Dictionary<int, int>();
 	private List<Type> abilityBehaviourTypes;
 	private SerializedProperty baseStatsProperty;
@@ -67,6 +68,7 @@ public class AbilityEditor : Editor
 		rotatingCasterToCastDirectionProp = serializedObject.FindProperty("rotatingCasterToCastDirection");
 		stopMovementOnCastProp = serializedObject.FindProperty("stopMovementOnCast");
 		startCooldownOnCastProp = serializedObject.FindProperty("startCooldownOnCast");
+		animationDataProp = serializedObject.FindProperty("animationData");
 		baseStatsProperty = serializedObject.FindProperty("baseStats");
 		debuffsOnCastProperty = serializedObject.FindProperty("debuffsOnCast");
 		debuffsOnEndCastProperty = serializedObject.FindProperty("debuffsOnEndCast");
@@ -74,32 +76,32 @@ public class AbilityEditor : Editor
 		if (baseStatsProperty != null)
 		{
 			baseStatsList = new ReorderableList(serializedObject, baseStatsProperty, true, true, true, true);
-            baseStatsList.drawHeaderCallback = rect =>
-            {
-                EditorGUI.LabelField(rect, "Base Stats");
-            };
-            baseStatsList.drawElementCallback = (rect, index, active, focused) =>
-            {
-                if (index < 0 || index >= baseStatsProperty.arraySize)
-                    return;
+			baseStatsList.drawHeaderCallback = rect =>
+			{
+				EditorGUI.LabelField(rect, "Base Stats");
+			};
+			baseStatsList.drawElementCallback = (rect, index, active, focused) =>
+			{
+				if (index < 0 || index >= baseStatsProperty.arraySize)
+					return;
 
-                var element = baseStatsProperty.GetArrayElementAtIndex(index);
-                if (element == null)
-                    return;
+				var element = baseStatsProperty.GetArrayElementAtIndex(index);
+				if (element == null)
+					return;
 
-                rect.y += 2f;
-                rect.height = EditorGUI.GetPropertyHeight(element, GUIContent.none, true);
-                EditorGUI.PropertyField(rect, element, GUIContent.none, true);
-            };
-            baseStatsList.elementHeightCallback = index =>
-            {
-                if (index < 0 || index >= baseStatsProperty.arraySize)
-                    return EditorGUIUtility.singleLineHeight + 4f;
+				rect.y += 2f;
+				rect.height = EditorGUI.GetPropertyHeight(element, GUIContent.none, true);
+				EditorGUI.PropertyField(rect, element, GUIContent.none, true);
+			};
+			baseStatsList.elementHeightCallback = index =>
+			{
+				if (index < 0 || index >= baseStatsProperty.arraySize)
+					return EditorGUIUtility.singleLineHeight + 4f;
 
-                var element = baseStatsProperty.GetArrayElementAtIndex(index);
-                return EditorGUI.GetPropertyHeight(element, GUIContent.none, true) + 6f;
-            };
-        }
+				var element = baseStatsProperty.GetArrayElementAtIndex(index);
+				return EditorGUI.GetPropertyHeight(element, GUIContent.none, true) + 6f;
+			};
+		}
 
 		if (debuffsOnCastProperty != null)
 		{
@@ -302,13 +304,13 @@ public class AbilityEditor : Editor
 		{
 			int idx = baseStatsProperty.arraySize;
 			baseStatsProperty.arraySize++;
-            var elem = baseStatsProperty.GetArrayElementAtIndex(idx);
-            if (elem == null) continue;
-            elem.FindPropertyRelative("Key").enumValueIndex = (int)key;
-            elem.FindPropertyRelative("Source").enumValueIndex = (int)AbilityStatSource.Flat;
-            elem.FindPropertyRelative("Value").floatValue = 0f;
-            elem.FindPropertyRelative("GlobalKey").enumValueIndex = 0;
-        }
+			var elem = baseStatsProperty.GetArrayElementAtIndex(idx);
+			if (elem == null) continue;
+			elem.FindPropertyRelative("Key").enumValueIndex = (int)key;
+			elem.FindPropertyRelative("Source").enumValueIndex = (int)AbilityStatSource.Flat;
+			elem.FindPropertyRelative("Value").floatValue = 0f;
+			elem.FindPropertyRelative("GlobalKey").enumValueIndex = 0;
+		}
 
 		serializedObject.ApplyModifiedProperties();
 		serializedObject.Update();
@@ -726,6 +728,8 @@ public class AbilityEditor : Editor
 			EditorGUILayout.PropertyField(stopMovementOnCastProp);
 		if (startCooldownOnCastProp != null)
 			EditorGUILayout.PropertyField(startCooldownOnCastProp);
+		if (animationDataProp != null)
+			EditorGUILayout.PropertyField(animationDataProp);
 		EditorGUILayout.EndVertical();
 	}
 

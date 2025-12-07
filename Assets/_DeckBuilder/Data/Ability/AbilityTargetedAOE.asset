@@ -56,6 +56,15 @@ MonoBehaviour:
   behaviours:
   - rid: 1062887273389097035
   - rid: 1062887273389097040
+  animationData:
+    clip: {fileID: -1081622595357128738, guid: c7bcdea1bc4da66479457f38e06cb77f, type: 3}
+    body: 1
+    blendInDuration: 0.15
+    blendOutDuration: 0.15
+    playbackSpeed: 5
+    loop: 0
+    applyRootMotion: 0
+    blockAbilityEndForClip: 1
   references:
     version: 2
     RefIds:
