@@ -6,10 +6,16 @@ using UnityEngine.AI;
 using MG.Extend;
 using Unity.Mathematics;
 
+
 /// <summary>
 /// Component allowing an entity to move
 /// </summary>
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(GlobalStatSource))]
+[RequireComponent(typeof(StatsModifierManager))]
+[RequireComponent(typeof(AnimationHandler))]
 public class Movement : MonoBehaviour, IAbilityMovement
 {
     [Serializable]
@@ -53,8 +59,8 @@ public class Movement : MonoBehaviour, IAbilityMovement
     private float baseMaxSpeed = 0;
 
     public NavMeshAgent Agent => agent;
-    private float agentRadius => NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius;
-    private float stepHeight => NavMesh.GetSettingsByID(agent.agentTypeID).agentClimb;
+    private float AgentRadius => NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius;
+    private float StepHeight => NavMesh.GetSettingsByID(agent.agentTypeID).agentClimb;
     private float HalfHeight => capsuleCollider.height / 2;
     public bool CanMove => canMove;
     public bool IsMoving => agent.velocity.magnitude > 0;
@@ -77,13 +83,6 @@ public class Movement : MonoBehaviour, IAbilityMovement
 
     private void Awake()
     {
-        if (globalStatSource == null)
-            globalStatSource = GetComponent<GlobalStatSource>();
-        if (modifierManager == null)
-            modifierManager = GetComponent<StatsModifierManager>();
-        if (animationHandler == null)
-            animationHandler = GetComponent<AnimationHandler>();
-
         baseMaxSpeed = agent != null ? agent.speed : 0f;
         RefreshMovementSpeedFromStats();
     }
@@ -117,7 +116,6 @@ public class Movement : MonoBehaviour, IAbilityMovement
         if (!agent.enabled || !CanMove)
             return false;
 
-        body.position = agent.nextPosition;
         return agent.SetDestination(worldTo);
     }
 
@@ -211,7 +209,7 @@ public class Movement : MonoBehaviour, IAbilityMovement
             iterationCount++;
             //Draw normal hit and position
             Debug.DrawRay(forwardHit.position, forwardHit.normal * 2, Color.red, 3f);
-            DebugDrawer.DrawSphere(forwardHit.position, agentRadius, Color.cyan, 3f);
+            DebugDrawer.DrawSphere(forwardHit.position, AgentRadius, Color.cyan, 3f);
 
             dashPositions.Add(forwardHit.position);
 

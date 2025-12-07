@@ -5,6 +5,7 @@ public sealed class AbilityBehaviourContext
     public Ability Ability { get; }
     public AbilityCaster Caster { get; }
     public IAbilityMovement Movement { get; }
+    public AnimationHandler AnimationHandler { get; }
     public ProjectileLauncher ProjectileLauncher { get; }
     public StatsModifierManager ModifierManager { get; }
     public IAbilityExecutor Executor { get; }
@@ -16,6 +17,7 @@ public sealed class AbilityBehaviourContext
         Ability ability,
         AbilityCaster caster,
         IAbilityMovement movement,
+        AnimationHandler animationHandler,
         ProjectileLauncher projectileLauncher,
         StatsModifierManager modifierManager,
         IAbilityExecutor executor,
@@ -26,6 +28,7 @@ public sealed class AbilityBehaviourContext
         Ability = ability;
         Caster = caster;
         Movement = movement;
+        AnimationHandler = animationHandler;
         ProjectileLauncher = projectileLauncher;
         ModifierManager = modifierManager;
         Executor = executor;

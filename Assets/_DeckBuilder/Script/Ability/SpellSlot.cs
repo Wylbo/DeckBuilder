@@ -46,6 +46,7 @@ public class SpellSlot
                         var movement = caster.GetComponent<IAbilityMovement>();
                         if (movement == null)
                                 movement = caster.GetComponent<Movement>();
+                        var animationHandler = caster.GetComponent<AnimationHandler>();
 
                         IAbilityDebuffService debuffService = caster.DebuffService;
                         if (debuffService == null)
@@ -53,7 +54,7 @@ public class SpellSlot
                         IGlobalStatSource globalStats = caster.GlobalStatSource;
                         if (globalStats == null)
                                 globalStats = caster.GetComponent<IGlobalStatSource>();
-                        executor = new AbilityExecutor(Ability, caster, movement, debuffService, statProvider, globalStats);
+                        executor = new AbilityExecutor(Ability, caster, movement, animationHandler, debuffService, statProvider, globalStats);
                         return true;
                 }
 

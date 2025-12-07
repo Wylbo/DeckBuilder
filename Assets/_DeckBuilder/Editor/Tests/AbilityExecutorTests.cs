@@ -12,7 +12,7 @@ public class AbilityExecutorTests
         SetDelaySeconds(delay, 0.5f);
         var recorder = new RecordingBehaviour();
         var ability = CreateAbility(delay, recorder);
-        var executor = new AbilityExecutor(ability, null, new FakeMovement(), new FakeDebuffService(), new AbilityStatProvider(), new FakeGlobalStats());
+        var executor = new AbilityExecutor(ability, null, new FakeMovement(), null, new FakeDebuffService(), new AbilityStatProvider(), new FakeGlobalStats());
         int endCalls = 0;
         executor.On_EndCast += _ => endCalls++;
 
@@ -33,7 +33,7 @@ public class AbilityExecutorTests
     {
         var blocking = new BlockingBehaviour();
         var ability = CreateAbility(blocking);
-        var executor = new AbilityExecutor(ability, null, new FakeMovement(), new FakeDebuffService(), new AbilityStatProvider(), new FakeGlobalStats());
+        var executor = new AbilityExecutor(ability, null, new FakeMovement(), null, new FakeDebuffService(), new AbilityStatProvider(), new FakeGlobalStats());
         int endCalls = 0;
         executor.On_EndCast += _ => endCalls++;
 
@@ -53,7 +53,7 @@ public class AbilityExecutorTests
     {
         var updating = new UpdatingBehaviour();
         var ability = CreateAbility(updating);
-        var executor = new AbilityExecutor(ability, null, new FakeMovement(), new FakeDebuffService(), new AbilityStatProvider(), new FakeGlobalStats());
+        var executor = new AbilityExecutor(ability, null, new FakeMovement(), null, new FakeDebuffService(), new AbilityStatProvider(), new FakeGlobalStats());
 
         executor.Cast(Vector3.zero, false);
         executor.Update(0.1f);
