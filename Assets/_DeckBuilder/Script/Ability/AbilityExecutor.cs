@@ -341,13 +341,13 @@ public sealed class AbilityExecutor : IAbilityExecutor
         if (animationData == null)
             return;
 
-        AnimationHandler?.PlayAbilityAnimation(animationData);
+        AnimationHandler?.PlayAnimation(animationData);
     }
 
     private void StopAbilityAnimation()
     {
         var animationData = Definition != null ? Definition.AnimationData : null;
-        AnimationHandler?.StopAbilityAnimation(animationData);
+        AnimationHandler?.StopAnimation(animationData);
     }
 
     private void UpdateAbilityAnimationHold(float deltaTime)

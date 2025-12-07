@@ -5,7 +5,7 @@ using UnityEngine;
 /// Authoring data for an ability animation clip played through the Playables graph.
 /// </summary>
 [Serializable]
-public sealed class AbilityAnimationData
+public sealed class AnimationData
 {
     [SerializeField] private AnimationClip clip = null;
     [SerializeField] private AbilityAnimationBody body = AbilityAnimationBody.UpperBody;

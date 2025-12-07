@@ -67,7 +67,7 @@ public class AbilityCaster : MonoBehaviour
         }
     }
 
-    private void DisableAllAbilities()
+    public void DisableAllAbilities()
     {
         dodgeSpellSlot?.Disable();
         foreach (SpellSlot spellSlot in spellSlots)

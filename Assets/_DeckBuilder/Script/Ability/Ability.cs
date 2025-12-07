@@ -17,7 +17,7 @@ public class Ability : ScriptableObject
     [SerializeReference]
     private List<AbilityBehaviour> behaviours = new List<AbilityBehaviour>();
     [Header("Animation")]
-    [SerializeField] private AbilityAnimationData animationData = null;
+    [SerializeField] private AnimationData animationData = null;
 
     public Sprite Icon => icon;
     public string Tooltip => tooltip;
@@ -29,7 +29,7 @@ public class Ability : ScriptableObject
     public IReadOnlyList<AbilityBehaviour> Behaviours => behaviours;
     public IReadOnlyList<ScriptableDebuff> DebuffsOnCast => debuffsOnCast;
     public IReadOnlyList<ScriptableDebuff> DebuffsOnEndCast => debuffsOnEndCast;
-    public AbilityAnimationData AnimationData => animationData;
+    public AnimationData AnimationData => animationData;
 
     public float GetBaseStatValue(AbilityStatKey key)
     {

@@ -10,7 +10,8 @@ public class AnimationHandler : MonoBehaviour
 {
     private const float MinPlanarVelocitySqr = 0.0001f;
     private const int BaseLayerIndex = 0;
-    private const int AbilityLayerIndex = 1;
+    private const int AnimationLayerIndex = 1;
+    private const int MixerInputCount = 2;
 
     [Header("Animator")]
     [SerializeField] private Animator animator = null;
@@ -29,9 +30,9 @@ public class AnimationHandler : MonoBehaviour
     private AnimationLayerMixerPlayable layerMixer;
     private AnimatorControllerPlayable controllerPlayable;
     private AnimationPlayableOutput playableOutput;
-    private AnimationClipPlayable abilityPlayable;
+    private AnimationClipPlayable playableClip;
     private Coroutine blendRoutine;
-    private AbilityAnimationData activeAbilityData;
+    private AnimationData activeAnimationData;
     private bool graphInitialized;
     private bool initialApplyRootMotion;
 
@@ -64,13 +65,13 @@ public class AnimationHandler : MonoBehaviour
 
     private void OnDisable()
     {
-        StopAbilityAnimationImmediate();
+        StopAnimationImmediate();
         DestroyGraph();
     }
 
     private void OnDestroy()
     {
-        StopAbilityAnimationImmediate();
+        StopAnimationImmediate();
         DestroyGraph();
     }
 
@@ -82,7 +83,7 @@ public class AnimationHandler : MonoBehaviour
     /// <summary>
     /// Plays the provided ability animation clip using the Playables graph.
     /// </summary>
-    public void PlayAbilityAnimation(AbilityAnimationData animationData)
+    public void PlayAnimation(AnimationData animationData)
     {
         if (animationData == null || animationData.Clip == null || animator == null)
             return;
@@ -93,48 +94,48 @@ public class AnimationHandler : MonoBehaviour
         if (blendRoutine != null)
             StopCoroutine(blendRoutine);
 
-        StopAbilityAnimationImmediate();
+        StopAnimationImmediate();
 
-        activeAbilityData = animationData;
+        activeAnimationData = animationData;
         animator.applyRootMotion = animationData.ApplyRootMotion;
 
-        var clip = animationData.Clip;
-        abilityPlayable = AnimationClipPlayable.Create(playableGraph, clip);
-        abilityPlayable.SetSpeed(Mathf.Approximately(animationData.PlaybackSpeed, 0f) ? 1f : animationData.PlaybackSpeed);
-        abilityPlayable.SetApplyFootIK(true);
+        AnimationClip clip = animationData.Clip;
+        playableClip = AnimationClipPlayable.Create(playableGraph, clip);
+        playableClip.SetSpeed(Mathf.Approximately(animationData.PlaybackSpeed, 0f) ? 1f : animationData.PlaybackSpeed);
+        playableClip.SetApplyFootIK(true);
         if (clip != null)
             clip.wrapMode = animationData.Loop ? WrapMode.Loop : WrapMode.Once;
-        abilityPlayable.SetDuration(animationData.Loop ? double.PositiveInfinity : clip.length);
-        abilityPlayable.SetTime(0d);
+        playableClip.SetDuration(animationData.Loop ? double.PositiveInfinity : clip.length);
+        playableClip.SetTime(0d);
 
-        playableGraph.Connect(abilityPlayable, 0, layerMixer, AbilityLayerIndex);
-        layerMixer.SetLayerAdditive(AbilityLayerIndex, false);
+        playableGraph.Connect(playableClip, 0, layerMixer, AnimationLayerIndex);
+        layerMixer.SetLayerAdditive(AnimationLayerIndex, false);
         AvatarMask mask = animationData.Body == AbilityAnimationBody.UpperBody ? upperBodyMask : null;
         if (mask != null)
-            layerMixer.SetLayerMaskFromAvatarMask(AbilityLayerIndex, mask);
+            layerMixer.SetLayerMaskFromAvatarMask(AnimationLayerIndex, mask);
         ApplyLayerWeights(0f);
 
         float blendIn = animationData.BlendInDuration > 0f ? animationData.BlendInDuration : defaultBlendInDuration;
-        blendRoutine = StartCoroutine(BlendAbilityWeight(0f, 1f, blendIn, false));
+        blendRoutine = StartCoroutine(BlendWeight(0f, 1f, blendIn, false));
     }
 
     /// <summary>
     /// Stops the active ability animation with a blend out.
     /// </summary>
-    public void StopAbilityAnimation(AbilityAnimationData animationData = null)
+    public void StopAnimation(AnimationData animationData = null)
     {
-        if (!abilityPlayable.IsValid())
+        if (!playableClip.IsValid() || !gameObject.activeInHierarchy)
             return;
 
         if (blendRoutine != null)
             StopCoroutine(blendRoutine);
 
         float blendOut = animationData?.BlendOutDuration
-                         ?? activeAbilityData?.BlendOutDuration
+                         ?? activeAnimationData?.BlendOutDuration
                          ?? defaultBlendOutDuration;
 
-        blendRoutine = StartCoroutine(BlendAbilityWeight(
-            layerMixer.IsValid() ? layerMixer.GetInputWeight(AbilityLayerIndex) : 0f,
+        blendRoutine = StartCoroutine(BlendWeight(
+            layerMixer.IsValid() ? layerMixer.GetInputWeight(AnimationLayerIndex) : 0f,
             0f,
             blendOut,
             true));
@@ -193,10 +194,10 @@ public class AnimationHandler : MonoBehaviour
 
         playableGraph = PlayableGraph.Create($"{name}_AnimationGraph");
         controllerPlayable = AnimatorControllerPlayable.Create(playableGraph, animator.runtimeAnimatorController);
-        layerMixer = AnimationLayerMixerPlayable.Create(playableGraph, 2);
+        layerMixer = AnimationLayerMixerPlayable.Create(playableGraph, MixerInputCount);
         playableGraph.Connect(controllerPlayable, 0, layerMixer, BaseLayerIndex);
         layerMixer.SetInputWeight(BaseLayerIndex, 1f);
-        layerMixer.SetInputWeight(AbilityLayerIndex, 0f);
+        layerMixer.SetInputWeight(AnimationLayerIndex, 0f);
 
         playableOutput = AnimationPlayableOutput.Create(playableGraph, "AnimationHandlerOutput", animator);
         playableOutput.SetSourcePlayable(layerMixer);
@@ -215,7 +216,7 @@ public class AnimationHandler : MonoBehaviour
         graphInitialized = false;
     }
 
-    private IEnumerator BlendAbilityWeight(float from, float to, float duration, bool destroyOnComplete)
+    private IEnumerator BlendWeight(float from, float to, float duration, bool destroyOnComplete)
     {
         float elapsed = 0f;
         float clampedDuration = Mathf.Max(0f, duration);
@@ -232,7 +233,7 @@ public class AnimationHandler : MonoBehaviour
         ApplyLayerWeights(to);
 
         if (destroyOnComplete)
-            StopAbilityAnimationImmediate();
+            StopAnimationImmediate();
     }
 
     private void ApplyLayerWeights(float abilityWeight)
@@ -241,27 +242,27 @@ public class AnimationHandler : MonoBehaviour
             return;
 
         float clamped = Mathf.Clamp01(abilityWeight);
-        float baseWeight = activeAbilityData != null && activeAbilityData.Body == AbilityAnimationBody.FullBody
+        float baseWeight = activeAnimationData != null && activeAnimationData.Body == AbilityAnimationBody.FullBody
             ? 1f - clamped
             : 1f;
 
         layerMixer.SetInputWeight(BaseLayerIndex, baseWeight);
-        layerMixer.SetInputWeight(AbilityLayerIndex, clamped);
+        layerMixer.SetInputWeight(AnimationLayerIndex, clamped);
     }
 
-    private void StopAbilityAnimationImmediate()
+    private void StopAnimationImmediate()
     {
-        if (layerMixer.IsValid() && layerMixer.GetInputCount() > AbilityLayerIndex)
-            layerMixer.DisconnectInput(AbilityLayerIndex);
+        if (layerMixer.IsValid() && layerMixer.GetInputCount() > AnimationLayerIndex)
+            layerMixer.DisconnectInput(AnimationLayerIndex);
 
-        if (abilityPlayable.IsValid())
+        if (playableClip.IsValid())
         {
-            abilityPlayable.Destroy();
-            abilityPlayable = default;
+            playableClip.Destroy();
+            playableClip = default;
         }
 
         ApplyLayerWeights(0f);
-        activeAbilityData = null;
+        activeAnimationData = null;
         if (animator != null)
             animator.applyRootMotion = initialApplyRootMotion;
     }

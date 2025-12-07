@@ -331,6 +331,16 @@ MonoBehaviour:
   health: {fileID: 8917544956100770672}
   hurtbox: {fileID: 5301469400233989028}
   faction: 0
+  animationHandler: {fileID: 191472792769803370}
+  animationDataDeath:
+    clip: {fileID: 0}
+    body: 1
+    blendInDuration: 0.1
+    blendOutDuration: 0.1
+    playbackSpeed: 1
+    loop: 0
+    applyRootMotion: 0
+    blockAbilityEndForClip: 1
 --- !u!114 &7480439906567705019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -823,8 +833,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9af19efe3e0d6244a9c04a53afdd6fdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DissolveProperties: []
-  dissolveDuration: 1
+  dissolveParent: {fileID: 0}
+  dissolvePropertyName: _Dissolve
+  dissolveDuration: 0.5
   waitBeforeDissolve: 0.5
   dissolveCurve:
     serializedVersion: 2
@@ -832,8 +843,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0

@@ -9,6 +9,8 @@ public class Character : Entity, IFactionOwner
     [SerializeField] private Health health;
     [SerializeField] private Hurtbox hurtbox;
     [SerializeField] private Faction faction;
+    [SerializeField] private AnimationHandler animationHandler;
+    [SerializeField] private AnimationData animationDataDeath;
 
     private bool isDead;
 
@@ -83,6 +85,10 @@ public class Character : Entity, IFactionOwner
         isDead = true;
         Debug.Log($"[{nameof(Character)}] {name} died");
         On_Died?.Invoke();
+
+        movement.DisableMovement();
+        abilityCaster.DisableAllAbilities();
+        animationHandler.PlayAnimation(animationDataDeath);
 
         if (characterVisual != null)
         {
