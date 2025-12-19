@@ -1,45 +1,107 @@
 using UnityEngine;
+using UnityEngine.Serialization;
+
 public class CameraController : MonoBehaviour
 {
-	[SerializeField]
-	private Camera _camera;
-	[SerializeField]
-	private Transform targetToFollow;
-	[SerializeField]
-	private Transform lookAtTarget;
-	[SerializeField]
-	private float cameraLag;
+    #region Fields
+    [FormerlySerializedAs("_camera")]
+    [SerializeField] private Camera cameraComponent;
+    [SerializeField] private Transform targetToFollow;
+    [SerializeField] private Transform lookAtTarget;
+    [SerializeField] private float cameraLag;
+    #endregion
 
-	public Camera Camera => _camera;
+    #region Private Members
+    private Vector3 offsetFromTarget = Vector3.zero;
+    private Vector3 cameraPosition = Vector3.zero;
+    #endregion
 
-	private Vector3 offsetFromTarget = default;
-	private Vector3 cameraPosition = default;
+    #region Getters
+    public Camera Camera => cameraComponent;
+    #endregion
 
-	private void Awake()
-	{
-		UnityEngine.Camera.SetupCurrent(Camera);
+    #region Unity Message Methods
+    private void Awake()
+    {
+        ValidateSerializedReferences();
+        CacheInitialCameraState();
+    }
 
-		offsetFromTarget = transform.position - targetToFollow.position;
-		cameraPosition = transform.position;
-	}
+    private void OnValidate()
+    {
+        ValidateSerializedReferences();
+    }
 
-	private void LateUpdate()
-	{
-		FollowTarget();
-		// LookAtTarget();
-	}
+    private void LateUpdate()
+    {
+        FollowTarget();
+        LookAtTarget();
+    }
+    #endregion
 
-	private void FollowTarget()
-	{
-		Vector3 wantedPos = offsetFromTarget + targetToFollow.position;
-		Vector3 smoothedPos = Vector3.Lerp(cameraPosition, wantedPos, Time.deltaTime * cameraLag);
+    #region Public Methods
+    #endregion
 
-		transform.position = smoothedPos;
-		cameraPosition = smoothedPos;
-	}
+    #region Private Methods
+    private void ValidateSerializedReferences()
+    {
+        if (cameraComponent == null)
+        {
+            cameraComponent = GetComponent<Camera>();
+        }
 
-	private void LookAtTarget()
-	{
-		Camera.transform.LookAt(lookAtTarget, Vector3.up);
-	}
+        if (targetToFollow == null)
+        {
+            Debug.LogError($"{nameof(CameraController)} requires a target to follow.", this);
+            enabled = false;
+            return;
+        }
+
+        if (cameraComponent == null)
+        {
+            Debug.LogError($"{nameof(CameraController)} requires a {nameof(Camera)} reference.", this);
+            enabled = false;
+            return;
+        }
+
+        enabled = true;
+    }
+
+    private void CacheInitialCameraState()
+    {
+        if (!enabled)
+        {
+            return;
+        }
+
+        Camera.SetupCurrent(cameraComponent);
+
+        offsetFromTarget = transform.position - targetToFollow.position;
+        cameraPosition = transform.position;
+    }
+
+    private void FollowTarget()
+    {
+        if (!enabled || targetToFollow == null)
+        {
+            return;
+        }
+
+        Vector3 desiredPosition = targetToFollow.position + offsetFromTarget;
+        Vector3 smoothedPosition = Vector3.Lerp(cameraPosition, desiredPosition, Time.deltaTime * cameraLag);
+
+        transform.position = smoothedPosition;
+        cameraPosition = smoothedPosition;
+    }
+
+    private void LookAtTarget()
+    {
+        if (!enabled || cameraComponent == null || lookAtTarget == null)
+        {
+            return;
+        }
+
+        cameraComponent.transform.LookAt(lookAtTarget, Vector3.up);
+    }
+    #endregion
 }

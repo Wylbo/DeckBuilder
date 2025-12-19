@@ -1,57 +1,106 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public static class GlobalModifierRuntime
 {
-    public static Dictionary<GlobalStatKey, float> Evaluate(IEnumerable<GlobalStatEntry> baseStats, IEnumerable<GlobalModifier> activeModifiers)
+    #region Fields
+    #endregion
+
+    #region Private Members
+    #endregion
+
+    #region Getters
+    #endregion
+
+    #region Unity Message Methods
+    #endregion
+
+    #region Public Methods
+    public static Dictionary<GlobalStatKey, float> Evaluate(
+        IEnumerable<GlobalStatEntry> baseStats,
+        IEnumerable<GlobalModifier> activeModifiers)
     {
-        var result = new Dictionary<GlobalStatKey, float>();
+        Dictionary<GlobalStatKey, float> result = new Dictionary<GlobalStatKey, float>();
 
         if (baseStats != null)
         {
-            foreach (var s in baseStats)
-                result[s.Key] = s.Value;
+            foreach (GlobalStatEntry stat in baseStats)
+            {
+                result[stat.Key] = stat.Value;
+            }
         }
 
-        var modifiers = activeModifiers?.Where(m => m != null).ToList() ?? new List<GlobalModifier>();
+        List<GlobalModifier> modifiers = new List<GlobalModifier>();
+        if (activeModifiers != null)
+        {
+            foreach (GlobalModifier modifier in activeModifiers)
+            {
+                if (modifier != null)
+                {
+                    modifiers.Add(modifier);
+                }
+            }
+        }
+
         if (modifiers.Count == 0)
-            return result;
-
-        // Handle stacking and ordering
-        var expanded = new List<GlobalModifier>();
-        var groups = modifiers.GroupBy(m => m.StackGroup);
-
-        foreach (var g in groups)
         {
-            if (string.IsNullOrEmpty(g.Key))
+            return result;
+        }
+
+        List<GlobalModifier> expanded = new List<GlobalModifier>();
+        Dictionary<string, List<GlobalModifier>> grouped = new Dictionary<string, List<GlobalModifier>>();
+
+        foreach (GlobalModifier modifier in modifiers)
+        {
+            string stackGroup = modifier.StackGroup ?? string.Empty;
+            if (!grouped.TryGetValue(stackGroup, out List<GlobalModifier> groupList))
             {
-                expanded.AddRange(g);
+                groupList = new List<GlobalModifier>();
+                grouped[stackGroup] = groupList;
             }
-            else
+
+            groupList.Add(modifier);
+        }
+
+        foreach (KeyValuePair<string, List<GlobalModifier>> groupEntry in grouped)
+        {
+            List<GlobalModifier> groupModifiers = groupEntry.Value;
+            groupModifiers.Sort((first, second) => first.Order.CompareTo(second.Order));
+
+            if (string.IsNullOrEmpty(groupEntry.Key))
             {
-                int count = Mathf.Min(g.Count(), Mathf.Max(1, g.First().MaxStacks));
-                expanded.AddRange(g.Take(count));
+                expanded.AddRange(groupModifiers);
+                continue;
+            }
+
+            int stackLimit = Mathf.Min(groupModifiers.Count, Mathf.Max(1, groupModifiers[0].MaxStacks));
+            for (int i = 0; i < stackLimit; i++)
+            {
+                expanded.Add(groupModifiers[i]);
             }
         }
 
-        expanded.Sort((a, b) => a.Order.CompareTo(b.Order));
+        expanded.Sort((first, second) => first.Order.CompareTo(second.Order));
 
-        foreach (var mod in expanded)
+        foreach (GlobalModifier modifier in expanded)
         {
-            foreach (var op in mod.Operations)
+            foreach (GlobalStatOp operation in modifier.Operations)
             {
-                Apply(ref result, op);
+                Apply(ref result, operation);
             }
         }
 
         return result;
     }
+    #endregion
 
+    #region Private Methods
     private static void Apply(ref Dictionary<GlobalStatKey, float> result, GlobalStatOp op)
     {
         if (!result.TryGetValue(op.Key, out float value))
+        {
             value = 0f;
+        }
 
         switch (op.OpType)
         {
@@ -74,4 +123,5 @@ public static class GlobalModifierRuntime
 
         result[op.Key] = value;
     }
+    #endregion
 }

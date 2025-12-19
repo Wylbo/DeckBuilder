@@ -53,6 +53,7 @@ public interface IAbilityExecutor
 
 public sealed class AbilityExecutor : IAbilityExecutor
 {
+    #region Fields
     private readonly List<AbilityBehaviour> behaviours;
     private AbilityBehaviourContext behaviourContext;
     private AbilityCastContext activeCastContext;
@@ -67,6 +68,14 @@ public sealed class AbilityExecutor : IAbilityExecutor
     private bool rotationOverrideActive;
     private bool cachedAgentRotationUpdate;
 
+    public event UnityAction<Ability> On_StartCast;
+    public event UnityAction<bool> On_EndCast;
+    #endregion
+
+    #region Private Members
+    #endregion
+
+    #region Getters
     public Ability Definition { get; }
     public AbilityCaster Caster { get; }
     public IAbilityMovement Movement { get; }
@@ -78,10 +87,12 @@ public sealed class AbilityExecutor : IAbilityExecutor
     public IAbilityDebuffService DebuffService { get; }
     public bool IsCasting { get; private set; }
     public float Cooldown => GetStat(AbilityStatKey.Cooldown);
+    #endregion
 
-    public event UnityAction<Ability> On_StartCast;
-    public event UnityAction<bool> On_EndCast;
+    #region Unity Message Methods
+    #endregion
 
+    #region Public Methods
     public AbilityExecutor(
         Ability ability,
         AbilityCaster caster,
@@ -116,8 +127,10 @@ public sealed class AbilityExecutor : IAbilityExecutor
             StatProvider,
             GlobalStatSource);
 
-        foreach (var behaviour in behaviours)
+        foreach (AbilityBehaviour behaviour in behaviours)
+        {
             behaviour?.Initialize(behaviourContext);
+        }
     }
 
     public void Cast(Vector3 worldPos, bool isHeld)
@@ -131,18 +144,24 @@ public sealed class AbilityExecutor : IAbilityExecutor
     public void EndHold(Vector3 worldPos)
     {
         if (activeCastContext == null)
+        {
             return;
+        }
 
         activeCastContext.UpdateHoldState(false);
 
-        foreach (var behaviour in behaviours)
+        foreach (AbilityBehaviour behaviour in behaviours)
+        {
             behaviour?.OnHoldEnded(activeCastContext);
+        }
     }
 
     public void Update(float deltaTime)
     {
         if (activeCastContext == null)
+        {
             return;
+        }
 
         UpdateAbilityAnimationHold(deltaTime);
 
@@ -159,13 +178,15 @@ public sealed class AbilityExecutor : IAbilityExecutor
 
         if (IsCasting && requiresUpdate)
         {
-            foreach (var behaviour in behaviours)
+            foreach (AbilityBehaviour behaviour in behaviours)
             {
-                if (behaviour?.RequiresUpdate == true)
+                if (behaviour != null && behaviour.RequiresUpdate)
                 {
                     behaviour.OnCastUpdated(activeCastContext, deltaTime);
                     if (activeCastContext == null)
+                    {
                         break;
+                    }
                 }
             }
         }
@@ -176,14 +197,18 @@ public sealed class AbilityExecutor : IAbilityExecutor
     public void EndCast(Vector3 worldPos, bool isSuccessful = true)
     {
         if (activeCastContext == null)
+        {
             return;
+        }
 
         AbilityCastContext context = activeCastContext;
         StopCastingState();
         activeCastContext = null;
 
         foreach (AbilityBehaviour behaviour in behaviours)
+        {
             behaviour?.OnCastEnded(context, isSuccessful);
+        }
 
         ApplyDebuffs(Definition.DebuffsOnEndCast);
         On_EndCast?.Invoke(isSuccessful);
@@ -198,10 +223,14 @@ public sealed class AbilityExecutor : IAbilityExecutor
 
         float value = 0f;
         if (stats != null && stats.TryGetValue(key, out float result))
+        {
             value = result;
+        }
 
         if (activeCastContext != null && activeCastContext.TryGetSharedStatOverride(key, out float overrideValue))
+        {
             value = overrideValue;
+        }
 
         return value;
     }
@@ -209,12 +238,16 @@ public sealed class AbilityExecutor : IAbilityExecutor
     public void LookAtCastDirection(Vector3 worldPos)
     {
         if (Caster == null)
+        {
             return;
+        }
 
         Vector3 castDirection = worldPos - Caster.transform.position;
         castDirection.y = 0f;
         if (castDirection == Vector3.zero)
+        {
             return;
+        }
 
         Debug.DrawRay(Caster.transform.position, castDirection, Color.yellow, 1f);
         Caster.transform.LookAt(Caster.transform.position + castDirection);
@@ -226,19 +259,27 @@ public sealed class AbilityExecutor : IAbilityExecutor
         StopCastingState();
         activeCastContext = null;
 
-        foreach (var behaviour in behaviours)
+        foreach (AbilityBehaviour behaviour in behaviours)
+        {
             behaviour?.OnAbilityDisabled(behaviourContext);
+        }
     }
+    #endregion
 
+    #region Private Methods
     private void StartCast(Vector3 worldPos)
     {
         On_StartCast?.Invoke(Definition);
 
         if (Definition.RotatingCasterToCastDirection)
+        {
             LookAtCastDirection(worldPos);
+        }
 
         if (Definition.StopMovementOnCast)
+        {
             Movement?.StopMovement();
+        }
 
         PlayAbilityAnimation();
         EvaluateBehaviourFlags();
@@ -252,16 +293,18 @@ public sealed class AbilityExecutor : IAbilityExecutor
         requiresUpdate = false;
         behaviourBlocksAbilityEnd = false;
 
-        foreach (var behaviour in behaviours)
+        foreach (AbilityBehaviour behaviour in behaviours)
         {
             if (behaviour == null)
+            {
                 continue;
+            }
 
             requiresUpdate |= behaviour.RequiresUpdate;
             behaviourBlocksAbilityEnd |= behaviour.BlocksAbilityEnd;
         }
 
-        var animationData = Definition != null ? Definition.AnimationData : null;
+        AnimationData animationData = Definition != null ? Definition.AnimationData : null;
         abilityAnimationBlocksEnd = animationData != null && animationData.BlockAbilityEndForClip && animationData.Clip != null;
         abilityAnimationTimeRemaining = abilityAnimationBlocksEnd ? animationData.GetEffectiveDurationSeconds() : 0f;
         blocksAbilityEnd = behaviourBlocksAbilityEnd || abilityAnimationBlocksEnd;
@@ -270,16 +313,20 @@ public sealed class AbilityExecutor : IAbilityExecutor
     private void RunStartBehavioursFromIndex(int startIndex)
     {
         if (behaviours == null || activeCastContext == null)
+        {
             return;
+        }
 
         hasPendingStartSequence = false;
         pendingDelayRemaining = 0f;
 
         for (int i = startIndex; i < behaviours.Count; i++)
         {
-            var behaviour = behaviours[i];
+            AbilityBehaviour behaviour = behaviours[i];
             if (behaviour == null)
+            {
                 continue;
+            }
 
             if (behaviour is AbilityDelayBehaviour delay && delay.DelaySeconds > 0f)
             {
@@ -306,10 +353,14 @@ public sealed class AbilityExecutor : IAbilityExecutor
     private void TryAutoEnd()
     {
         if (activeCastContext == null)
+        {
             return;
+        }
 
         if (blocksAbilityEnd || requiresUpdate || hasPendingStartSequence)
+        {
             return;
+        }
 
         EndCast(activeCastContext.TargetPoint, true);
     }
@@ -317,10 +368,14 @@ public sealed class AbilityExecutor : IAbilityExecutor
     private void ApplyDebuffs(IReadOnlyList<ScriptableDebuff> scriptableDebuffs)
     {
         if (DebuffService == null || scriptableDebuffs == null)
+        {
             return;
+        }
 
         foreach (ScriptableDebuff debuff in scriptableDebuffs)
+        {
             DebuffService.AddDebuff(debuff);
+        }
     }
 
     private void StopCastingState()
@@ -337,23 +392,27 @@ public sealed class AbilityExecutor : IAbilityExecutor
 
     private void PlayAbilityAnimation()
     {
-        var animationData = Definition != null ? Definition.AnimationData : null;
+        AnimationData animationData = Definition != null ? Definition.AnimationData : null;
         if (animationData == null)
+        {
             return;
+        }
 
         AnimationHandler?.PlayAnimation(animationData);
     }
 
     private void StopAbilityAnimation()
     {
-        var animationData = Definition != null ? Definition.AnimationData : null;
+        AnimationData animationData = Definition != null ? Definition.AnimationData : null;
         AnimationHandler?.StopAnimation(animationData);
     }
 
     private void UpdateAbilityAnimationHold(float deltaTime)
     {
         if (!abilityAnimationBlocksEnd)
+        {
             return;
+        }
 
         abilityAnimationTimeRemaining -= deltaTime;
         if (abilityAnimationTimeRemaining <= 0f)
@@ -367,7 +426,9 @@ public sealed class AbilityExecutor : IAbilityExecutor
     private void ApplyCastRotationLock()
     {
         if (rotationOverrideActive || !Definition.RotatingCasterToCastDirection)
+        {
             return;
+        }
 
         if (Movement is Movement concrete && concrete.Agent != null)
         {
@@ -380,11 +441,16 @@ public sealed class AbilityExecutor : IAbilityExecutor
     private void RestoreCastRotation()
     {
         if (!rotationOverrideActive)
+        {
             return;
+        }
 
         if (Movement is Movement concrete && concrete.Agent != null)
+        {
             concrete.Agent.updateRotation = cachedAgentRotationUpdate;
+        }
 
         rotationOverrideActive = false;
     }
+    #endregion
 }

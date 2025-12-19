@@ -1,11 +1,12 @@
-using UnityEngine;
 using System;
 using System.Collections;
 using Unity.Cinemachine;
+using UnityEngine;
 
 [Serializable]
 public struct CameraShakeData
 {
+    #region Fields
     [SerializeField] private float duration;
     [SerializeField] private NoiseSettings noiseSettings;
     [SerializeField] private Vector3 pivotOffset;
@@ -13,7 +14,12 @@ public struct CameraShakeData
     [SerializeField] private AnimationCurve amplitudeOverTime;
     [SerializeField] private float frequencyGain;
     [SerializeField] private AnimationCurve frequencyOverTime;
+    #endregion
 
+    #region Private Members
+    #endregion
+
+    #region Getters
     public float Duration => duration;
     public NoiseSettings NoiseSettings => noiseSettings;
     public Vector3 PivotOffset => pivotOffset;
@@ -21,16 +27,50 @@ public struct CameraShakeData
     public AnimationCurve AmplitudeOverTime => amplitudeOverTime;
     public float FrequencyGain => frequencyGain;
     public AnimationCurve FrequencyOverTime => frequencyOverTime;
+    #endregion
+
+    #region Unity Message Methods
+    #endregion
+
+    #region Public Methods
+    #endregion
+
+    #region Private Methods
+    #endregion
 }
 
 public class CameraEffectManager : MonoBehaviour
 {
+    #region Fields
     [SerializeField] private CinemachineBrain cineBrain;
     [SerializeField] private CameraShakeData defaultShakeData;
+    #endregion
 
-    public CinemachineCamera ActiveCam => cineBrain.ActiveVirtualCamera as CinemachineCamera;
-    public CinemachineBasicMultiChannelPerlin noise => ActiveCam.GetComponent<CinemachineBasicMultiChannelPerlin>();
+    #region Private Members
+    private CinemachineCamera activeCamera;
+    private CinemachineBasicMultiChannelPerlin noiseComponent;
+    private Coroutine activeShakeRoutine;
+    #endregion
 
+    #region Getters
+    public CinemachineCamera ActiveCamera => activeCamera;
+    public CinemachineBasicMultiChannelPerlin NoiseComponent => noiseComponent;
+    #endregion
+
+    #region Unity Message Methods
+    private void Awake()
+    {
+        ValidateSerializedReferences();
+        InitializeCameraEffects();
+    }
+
+    private void OnValidate()
+    {
+        ValidateSerializedReferences();
+    }
+    #endregion
+
+    #region Public Methods
     public void ScreenShake()
     {
         ScreenShake(defaultShakeData);
@@ -38,36 +78,104 @@ public class CameraEffectManager : MonoBehaviour
 
     public void ScreenShake(CameraShakeData shakeData)
     {
-        StartCoroutine(Shake_Routine(shakeData));
+        if (!TryPrepareNoiseComponent())
+        {
+            return;
+        }
+
+        if (activeShakeRoutine != null)
+        {
+            StopCoroutine(activeShakeRoutine);
+        }
+
+        activeShakeRoutine = StartCoroutine(ShakeRoutine(shakeData));
+    }
+    #endregion
+
+    #region Private Methods
+    private void ValidateSerializedReferences()
+    {
+        if (cineBrain == null)
+        {
+            cineBrain = GetComponent<CinemachineBrain>();
+        }
     }
 
-    private IEnumerator Shake_Routine(CameraShakeData shakeData)
+    private void InitializeCameraEffects()
     {
-        float elapsed = 0;
-        float normalizedTime;
-        float curveValueFreq;
-        float curveValueAmp;
-
-        noise.NoiseProfile = shakeData.NoiseSettings;
-        noise.PivotOffset = shakeData.PivotOffset;
-        noise.AmplitudeGain = 0;
-        noise.FrequencyGain = 0;
-
-        while (elapsed < shakeData.Duration)
+        if (cineBrain == null)
         {
-            normalizedTime = elapsed / shakeData.Duration;
-            elapsed += Time.deltaTime;
+            Debug.LogError($"{nameof(CameraEffectManager)} requires a {nameof(CinemachineBrain)} reference.", this);
+            enabled = false;
+            return;
+        }
 
-            curveValueAmp = shakeData.AmplitudeOverTime.Evaluate(normalizedTime);
-            curveValueFreq = shakeData.FrequencyOverTime.Evaluate(normalizedTime);
+        UpdateActiveCameraReferences();
+    }
 
-            noise.AmplitudeGain = shakeData.AmplitudeGain * curveValueAmp;
-            noise.FrequencyGain = shakeData.FrequencyGain * curveValueFreq;
+    private bool TryPrepareNoiseComponent()
+    {
+        if (cineBrain == null)
+        {
+            Debug.LogError($"{nameof(CameraEffectManager)} requires a {nameof(CinemachineBrain)} reference.", this);
+            return false;
+        }
+
+        UpdateActiveCameraReferences();
+
+        if (activeCamera == null)
+        {
+            Debug.LogWarning("No active CinemachineCamera found for screen shake.", this);
+            return false;
+        }
+
+        if (noiseComponent == null)
+        {
+            Debug.LogWarning("No CinemachineBasicMultiChannelPerlin component found on the active camera.", this);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void UpdateActiveCameraReferences()
+    {
+        activeCamera = cineBrain.ActiveVirtualCamera as CinemachineCamera;
+        noiseComponent = activeCamera != null ? activeCamera.GetComponent<CinemachineBasicMultiChannelPerlin>() : null;
+    }
+
+    private IEnumerator ShakeRoutine(CameraShakeData shakeData)
+    {
+        ResetNoise();
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime < shakeData.Duration)
+        {
+            float normalizedTime = elapsedTime / shakeData.Duration;
+            elapsedTime += Time.deltaTime;
+
+            float amplitudeRatio = shakeData.AmplitudeOverTime.Evaluate(normalizedTime);
+            float frequencyRatio = shakeData.FrequencyOverTime.Evaluate(normalizedTime);
+
+            noiseComponent.AmplitudeGain = shakeData.AmplitudeGain * amplitudeRatio;
+            noiseComponent.FrequencyGain = shakeData.FrequencyGain * frequencyRatio;
 
             yield return null;
         }
 
-        noise.AmplitudeGain = 0;
-        noise.FrequencyGain = 0;
+        ResetNoise();
     }
+
+    private void ResetNoise()
+    {
+        if (noiseComponent == null)
+        {
+            return;
+        }
+
+        noiseComponent.AmplitudeGain = 0f;
+        noiseComponent.FrequencyGain = 0f;
+    }
+    #endregion
 }

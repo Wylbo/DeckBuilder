@@ -1,64 +1,108 @@
 using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework.Internal.Commands;
-using Unity.Mathematics;
 using UnityEngine;
 
 public static class AbilityModifierRuntime
 {
-    public static Dictionary<AbilityStatKey, float> Evaluate(GTagSet set, IReadOnlyDictionary<AbilityStatKey, float> baseStats, IEnumerable<AbilityModifier> activeModifiers)
+    #region Fields
+    #endregion
+
+    #region Private Members
+    #endregion
+
+    #region Getters
+    #endregion
+
+    #region Unity Message Methods
+    #endregion
+
+    #region Public Methods
+    public static Dictionary<AbilityStatKey, float> Evaluate(
+        GTagSet set,
+        IReadOnlyDictionary<AbilityStatKey, float> baseStats,
+        IEnumerable<AbilityModifier> activeModifiers)
     {
-        var result = new Dictionary<AbilityStatKey, float>();
+        Dictionary<AbilityStatKey, float> result = new Dictionary<AbilityStatKey, float>();
 
         if (baseStats != null)
         {
-            foreach (var kvp in baseStats)
+            foreach (KeyValuePair<AbilityStatKey, float> kvp in baseStats)
+            {
                 result[kvp.Key] = kvp.Value;
+            }
         }
 
-        var abilityTags = set;
+        GTagSet abilityTags = set;
 
-
-        var matching = activeModifiers.Where(mod => mod && mod.Query.Matches(abilityTags.AsTags())).ToList();
-
-        // Handle stacking
-        var expanded = new List<AbilityModifier>();
-        var groups = matching.GroupBy(m => m.StackGroup);
-
-        foreach (var g in groups)
+        List<AbilityModifier> matchingModifiers = new List<AbilityModifier>();
+        if (activeModifiers != null)
         {
-            if (string.IsNullOrEmpty(g.Key))
+            foreach (AbilityModifier modifier in activeModifiers)
             {
-                // No stacking group
-                expanded.AddRange(g);
-            }
-            else
-            {
-                // else stack 
-                int count = Mathf.Min(g.Count(), Mathf.Max(1, g.First().MaxStacks));
-                expanded.AddRange(g.Take(count));
-            }
+                if (modifier == null)
+                {
+                    continue;
+                }
 
-            // Sort by order
-            expanded.Sort((a, b) => a.Order.CompareTo(b.Order));
+                if (modifier.Query.Matches(abilityTags.AsTags()))
+                {
+                    matchingModifiers.Add(modifier);
+                }
+            }
         }
 
-        // Apply operations
-        foreach (var mod in expanded)
+        List<AbilityModifier> expanded = new List<AbilityModifier>();
+        Dictionary<string, List<AbilityModifier>> grouped = new Dictionary<string, List<AbilityModifier>>();
+
+        foreach (AbilityModifier modifier in matchingModifiers)
         {
-            foreach (var op in mod.Operations)
+            string stackGroup = modifier.StackGroup ?? string.Empty;
+
+            if (!grouped.TryGetValue(stackGroup, out List<AbilityModifier> groupList))
             {
-                Apply(ref result, op);
+                groupList = new List<AbilityModifier>();
+                grouped[stackGroup] = groupList;
+            }
+
+            groupList.Add(modifier);
+        }
+
+        foreach (KeyValuePair<string, List<AbilityModifier>> groupEntry in grouped)
+        {
+            List<AbilityModifier> groupModifiers = groupEntry.Value;
+            groupModifiers.Sort((first, second) => first.Order.CompareTo(second.Order));
+
+            if (string.IsNullOrEmpty(groupEntry.Key))
+            {
+                expanded.AddRange(groupModifiers);
+                continue;
+            }
+
+            int stackLimit = Mathf.Min(groupModifiers.Count, Mathf.Max(1, groupModifiers[0].MaxStacks));
+            for (int i = 0; i < stackLimit; i++)
+            {
+                expanded.Add(groupModifiers[i]);
+            }
+        }
+
+        foreach (AbilityModifier modifier in expanded)
+        {
+            foreach (AbilityStatOp operation in modifier.Operations)
+            {
+                Apply(ref result, operation);
             }
         }
 
         return result;
     }
+    #endregion
 
+    #region Private Methods
     private static void Apply(ref Dictionary<AbilityStatKey, float> result, AbilityStatOp op)
     {
         if (!result.TryGetValue(op.Key, out float value))
+        {
             value = 0f;
+        }
 
         switch (op.OpType)
         {
@@ -81,4 +125,5 @@ public static class AbilityModifierRuntime
 
         result[op.Key] = value;
     }
+    #endregion
 }

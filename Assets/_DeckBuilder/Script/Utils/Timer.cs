@@ -5,91 +5,109 @@ using UnityEngine.Events;
 [Serializable]
 public class Timer
 {
-	[SerializeField]
-	private float duration;
+    #region Fields
+    [SerializeField] private float duration;
+    [SerializeField] private float remaining = 0f;
+    #endregion
 
-	public event UnityAction On_Started;
-	public event UnityAction On_Ended;
-	public event UnityAction On_Canceled;
+    #region Private Members
+    #endregion
 
-	[SerializeField]
-	private float remaining = 0;
+    #region Getters
+    public float TotalTime => duration;
+    public float Remaining => remaining;
+    public float ElapsedTime => duration - remaining;
+    public float ElapsedRatio => duration <= Mathf.Epsilon ? 0f : ElapsedTime / duration;
+    public bool IsRunning => Remaining > 0f;
+    #endregion
 
-	public float TotalTime => duration;
-	public float Remaining => remaining;
-	public float ElapsedTime => duration - remaining;
-        public float ElapsedRatio => duration <= Mathf.Epsilon ? 0f : ElapsedTime / duration;
-	public bool IsRunning => Remaining > 0;
+    #region Unity Message Methods
+    #endregion
 
-	public Timer()
-	{
-		duration = 0f;
-	}
+    #region Public Methods
+    public event UnityAction On_Started;
+    public event UnityAction On_Ended;
+    public event UnityAction On_Canceled;
 
-	public Timer(float duration)
-	{
-		this.duration = duration;
-	}
+    public Timer()
+    {
+        duration = 0f;
+    }
 
-	public Timer(Timer timer)
-	{
-		duration = timer.duration;
-	}
+    public Timer(float duration)
+    {
+        this.duration = duration;
+    }
 
-	public void Start()
-	{
-		Start(duration);
-	}
+    public Timer(Timer timer)
+    {
+        duration = timer.duration;
+    }
 
-        public void Start(float duration)
+    public void Start()
+    {
+        Start(duration);
+    }
+
+    public void Start(float duration)
+    {
+        if (IsRunning)
         {
-                if (IsRunning)
-                        return;
-
-                if (duration <= Mathf.Epsilon)
-                {
-                        Debug.LogWarning("Timer duration must be greater than zero.");
-                        return;
-                }
-
-                this.duration = duration;
-                remaining = duration;
-
-                On_Started?.Invoke();
+            return;
         }
 
-	public void Update(float deltaTime)
-	{
-		if (!IsRunning)
-			return;
+        if (duration <= Mathf.Epsilon)
+        {
+            Debug.LogWarning("Timer duration must be greater than zero.");
+            return;
+        }
 
-		remaining -= deltaTime;
+        this.duration = duration;
+        remaining = duration;
 
-		if (remaining <= 0)
-			Stop();
+        On_Started?.Invoke();
+    }
 
-	}
+    public void Update(float deltaTime)
+    {
+        if (!IsRunning)
+        {
+            return;
+        }
 
-	public void Cancel()
-	{
-		remaining = 0f;
-		On_Canceled?.Invoke();
-	}
+        remaining -= deltaTime;
 
-	public void Stop()
-	{
-		remaining = 0;
-		On_Ended?.Invoke();
-	}
+        if (remaining <= 0f)
+        {
+            Stop();
+        }
+    }
 
-	public void AddTime(Timer addedTimer)
-	{
-		duration += addedTimer.duration;
-		remaining += addedTimer.duration;
-	}
-	public void AddTime(float addedTime)
-	{
-		duration += addedTime;
-		remaining += addedTime;
-	}
+    public void Cancel()
+    {
+        remaining = 0f;
+        On_Canceled?.Invoke();
+    }
+
+    public void Stop()
+    {
+        remaining = 0f;
+        On_Ended?.Invoke();
+    }
+
+    public void AddTime(Timer addedTimer)
+    {
+        duration += addedTimer.duration;
+        remaining += addedTimer.duration;
+    }
+
+    public void AddTime(float addedTime)
+    {
+        duration += addedTime;
+        remaining += addedTime;
+    }
+    #endregion
+
+    #region Private Methods
+    #endregion
 }
