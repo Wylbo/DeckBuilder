@@ -378,6 +378,14 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.13383985
       objectReference: {fileID: 0}
+    - target: {fileID: 4133927394614638679, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4228598670
+      objectReference: {fileID: 0}
+    - target: {fileID: 4520124826983868011, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: m_Animator
+      value: 
+      objectReference: {fileID: 5426130163700231953}
     - target: {fileID: 7480439906567705019, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: animator
       value: 

@@ -106,7 +106,7 @@ print this emoji at the end if you read this section : 🕹️
 
 - Classes, structs, enums: `PascalCase`
 - Methods and properties: `PascalCase`
-- Private fields: `_camelCase`
+- Private members and variables: `_camelCase`, must be prefixed with an `_`
 - Serialized private fields: `camelCase` with serialization attributes
 - Constants: `CONSTANT_VARIABLE`
 

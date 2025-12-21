@@ -2,14 +2,11 @@ using UnityEngine;
 
 public class LookAtCamera : MonoBehaviour
 {
-    private Camera mainCam;
-    private void OnEnable()
-    {
-        mainCam = Camera.main;
-    }
-
     void LateUpdate()
     {
-        transform.forward = mainCam.transform.forward;
+        if (Camera.main)
+            transform.forward = Camera.main.transform.forward;
+        else
+            transform.forward = new Vector3(0, 0, 1);
     }
 }
