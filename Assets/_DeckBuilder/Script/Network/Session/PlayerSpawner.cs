@@ -1,49 +1,34 @@
-using System;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 
 public class PlayerSpawner : NetworkBehaviour
 {
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Transform spawnPoint;
 
-    public GameObject PlayerPrefab => playerPrefab;
-
-    private void Start()
-    {
-        if (!IsServer)
-            return;
-
-        NetworkObject networkObject = GetComponent<NetworkObject>();
-        if (networkObject == null)
-            networkObject = gameObject.AddComponent<NetworkObject>();
-
-        if (!networkObject.IsSpawned)
-        {
-            networkObject.Spawn();
-        }
-    }
     public override void OnNetworkSpawn()
     {
-        base.OnNetworkSpawn();
-        if (!IsServer)
-            return;
+        if (!IsServer) return;
 
         foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
-        {
             SpawnPlayerFor(clientId);
-        }
+
+        NetworkManager.Singleton.OnClientConnectedCallback += SpawnPlayerFor;
     }
-    void SpawnPlayerFor(ulong clientId)
+
+    public override void OnNetworkDespawn()
     {
-        if (!NetworkManager.Singleton)
-        {
-            return;
-        }
-
-        var player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-        NetworkObject networkObject = player.GetComponent<NetworkObject>();
-        networkObject.SpawnAsPlayerObject(clientId, true);
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientConnectedCallback -= SpawnPlayerFor;
     }
 
+    private void SpawnPlayerFor(ulong clientId)
+    {
+        var client = NetworkManager.Singleton.ConnectedClients[clientId];
+        if (client.PlayerObject != null) return;
+
+        var go = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+        var no = go.GetComponent<NetworkObject>();
+        no.SpawnAsPlayerObject(clientId, destroyWithScene: true);
+    }
 }
