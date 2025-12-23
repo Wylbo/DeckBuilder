@@ -191,6 +191,7 @@ GameObject:
   - component: {fileID: 8323667409482397591}
   - component: {fileID: 1004127752059748463}
   - component: {fileID: 7981525574255834789}
+  - component: {fileID: 4133927394614638679}
   - component: {fileID: 1894128029507834091}
   - component: {fileID: 4938447398858601016}
   - component: {fileID: 7480439906567705019}
@@ -200,7 +201,6 @@ GameObject:
   - component: {fileID: 6938576570393643543}
   - component: {fileID: 5097382059795255847}
   - component: {fileID: 191472792769803370}
-  - component: {fileID: 4133927394614638679}
   - component: {fileID: 5590197116553997273}
   - component: {fileID: 6955822107361440141}
   - component: {fileID: 4520124826983868011}
@@ -302,6 +302,31 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &4133927394614638679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2949185825831420414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1383331372
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &1894128029507834091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -314,9 +339,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a9bc3334822ee64882ee0bbf5c19ec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   character: {fileID: 4938447398858601016}
   controlStrategy: {fileID: 0}
   uiManager: {fileID: 0}
+  allowServerAuthority: 1
 --- !u!114 &4938447398858601016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,6 +356,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 800ebce851b6251419815832f03e758d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   characterVisual: {fileID: 7730702775260507590}
   movement: {fileID: 7480439906567705019}
   abilityCaster: {fileID: 9176447491751950743}
@@ -357,11 +385,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 764a26df80b1aa54fa9a6f7d4434351b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   movementSpeedStatKey: 3
   globalStatSource: {fileID: 5097382059795255847}
   modifierManager: {fileID: 1904220953553573043}
   body: {fileID: 1004127752059748463}
-  agent: {fileID: 7981525574255834789}
+  serverAgent: {fileID: 7981525574255834789}
   capsuleCollider: {fileID: 8323667409482397591}
   groundLayerMask:
     serializedVersion: 2
@@ -399,6 +428,7 @@ MonoBehaviour:
       m_Bits: 64
     maxWallIterations: 100
   animationHandler: {fileID: 191472792769803370}
+  predictedNavVisual: {fileID: 0}
 --- !u!114 &1904220953553573043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -508,6 +538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dca755434cd804449d31029bbd31bba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnimationHandler
+  ShowTopMostFoldoutHeaderGroup: 1
   animator: {fileID: 0}
   orientationTransform: {fileID: 0}
   moveSpeedParam: MoveSpeed
@@ -516,31 +547,6 @@ MonoBehaviour:
   upperBodyMask: {fileID: 0}
   defaultBlendInDuration: 0.1
   defaultBlendOutDuration: 0.1
---- !u!114 &4133927394614638679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2949185825831420414}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 0
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &5590197116553997273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -847,6 +853,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b2ac9f09bff67d48a4c1aeb90c0d29d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   maxHealth: 100
 --- !u!114 &5301469400233989028
 MonoBehaviour:

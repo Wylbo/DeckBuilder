@@ -5,6 +5,7 @@ public class PlayerSpawner : NetworkBehaviour
 {
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Transform spawnPoint;
+    [SerializeField] private Transform spawnParent;
 
     public override void OnNetworkSpawn()
     {
@@ -34,7 +35,7 @@ public class PlayerSpawner : NetworkBehaviour
         if (client.PlayerObject != null) return;
 
 
-        var go = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+        var go = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation, spawnParent);
         var no = go.GetComponent<NetworkObject>();
         no.SpawnAsPlayerObject(clientId);
     }

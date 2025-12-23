@@ -384,7 +384,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4133927394614638679, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1609444572
+      value: 4228598670
       objectReference: {fileID: 0}
     - target: {fileID: 4133927394614638679, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
@@ -407,6 +407,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: SyncRotAngleX
       value: 1
       objectReference: {fileID: 0}
@@ -422,6 +426,10 @@ PrefabInstance:
       propertyPath: animator
       value: 
       objectReference: {fileID: 5426130163700231953}
+    - target: {fileID: 7480439906567705019, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: serverAgent
+      value: 
+      objectReference: {fileID: 5755425132362746879}
     - target: {fileID: 7657718530847626762, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -485,6 +493,11 @@ MonoBehaviour:
 --- !u!4 &2610449079589516965 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 369680040252476415, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+  m_PrefabInstance: {fileID: 2385627502197390682}
+  m_PrefabAsset: {fileID: 0}
+--- !u!195 &5755425132362746879 stripped
+NavMeshAgent:
+  m_CorrespondingSourceObject: {fileID: 7981525574255834789, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
   m_PrefabInstance: {fileID: 2385627502197390682}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &6756117044282900120 stripped
