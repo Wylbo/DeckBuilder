@@ -60,6 +60,21 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     private Coroutine dashRoutine;
     private float baseMaxSpeed = 0;
 
+    // Netcode General
+    private NetworkTimer networkTimer;
+    const float SERVER_TICK_RATE = 60f;
+    const int BUFFER_SIZE = 1024;
+
+    // Netcode client specific
+    private CircularBuffer<StatePayload> _clientStateBuffer;
+    private CircularBuffer<InputPayload> _clientInputBuffer;
+    private StatePayload _lastServerState;
+    private InputPayload _lastProcessedInput;
+
+    // Netcode server specific
+    private CircularBuffer<StatePayload> _serverStateBuffer;
+    private Queue<InputPayload> _serverInputQueue;
+
     public NavMeshAgent Agent => serverAgent;
     private float AgentRadius => NavMesh.GetSettingsByID(serverAgent.agentTypeID).agentRadius;
     private float StepHeight => NavMesh.GetSettingsByID(serverAgent.agentTypeID).agentClimb;
@@ -102,6 +117,12 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     {
         baseMaxSpeed = serverAgent != null ? serverAgent.speed : 0f;
         RefreshMovementSpeedFromStats();
+
+        networkTimer = new NetworkTimer(SERVER_TICK_RATE);
+        _clientStateBuffer = new CircularBuffer<StatePayload>(BUFFER_SIZE);
+        _clientInputBuffer = new CircularBuffer<InputPayload>(BUFFER_SIZE);
+        _serverStateBuffer = new CircularBuffer<StatePayload>(BUFFER_SIZE);
+        _serverInputQueue = new Queue<InputPayload>();
     }
 
     private void OnEnable()
@@ -125,7 +146,68 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
     private void Update()
     {
+        networkTimer.Update(Time.deltaTime);
         animationHandler?.UpdateMovement(serverAgent.velocity);
+    }
+
+    private void FixedUpdate()
+    {
+        if (!IsOwner)
+            return;
+
+        while (networkTimer.ShouldTick())
+        {
+            // Process movement prediction here
+            HandleClientTick();
+            HandleServerTick();
+        }
+    }
+
+    private void HandleClientTick()
+    {
+        if (!IsClient)
+            return;
+
+        int currentTick = networkTimer.CurrentTick;
+        int bufferIndex = currentTick % BUFFER_SIZE;
+
+        InputPayload inputPayload = new InputPayload
+        {
+            tick = currentTick,
+            moveTo = Vector3.zero // Placeholder for actual input
+        };
+
+        _clientInputBuffer.Add(inputPayload, bufferIndex);
+        SendTo_ServerRpc(inputPayload);
+
+        StatePayload statePayload = ProcessMove(inputPayload);
+        _clientStateBuffer.Add(statePayload, bufferIndex);
+
+        //HandleServerReconciliation();
+    }
+
+    private void HandleServerTick()
+    {
+    }
+
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    private void SendTo_ServerRpc(InputPayload inputPayload)
+    {
+
+    }
+
+    private StatePayload ProcessMove(InputPayload inputPayload)
+    {
+        MoveTo(inputPayload.moveTo);
+        return new StatePayload
+        {
+            tick = networkTimer.CurrentTick,
+            position = serverAgent.transform.position,
+            rotation = serverAgent.transform.rotation,
+            velocity = serverAgent.velocity,
+            angularVelocity = Vector3.zero // NavMeshAgent does not provide angular velocity
+        };
     }
 
     public bool MoveTo(Vector3 worldTo)
