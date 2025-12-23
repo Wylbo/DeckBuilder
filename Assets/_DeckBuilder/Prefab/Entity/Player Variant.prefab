@@ -442,10 +442,6 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 7981525574255834789, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-      propertyPath: avoidancePriority
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8917544956100770672, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: maxHealth
       value: 2147483647
