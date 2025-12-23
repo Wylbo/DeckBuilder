@@ -8,11 +8,13 @@ public class LobbyPresenter : MonoBehaviour
     [SerializeField] private LobbyMenuView lobbyMenuView;
     [SerializeField] private LobbyPlayerListView lobbyPlayerListView;
     [SerializeField] private SessionManager sessionManager;
+    [SerializeField] private SceneController sceneController;
     #endregion
 
     #region Private Members
     private string lastGeneratedJoinCode = string.Empty;
     private bool hasValidDependencies;
+    private const string GAMEPLAY_SCENE_NAME = "GameplaySceneTest";
     #endregion
 
     #region Getters
@@ -22,6 +24,7 @@ public class LobbyPresenter : MonoBehaviour
     private void Awake()
     {
         ResolveSessionManager();
+        ResolveSceneController();
         hasValidDependencies = ValidateDependencies();
         if (!hasValidDependencies)
         {
@@ -84,8 +87,9 @@ public class LobbyPresenter : MonoBehaviour
     {
         bool hasUiManager = uiManager != null;
         bool hasSessionManager = sessionManager != null;
+        bool hasSceneController = sceneController != null;
 
-        if (!hasUiManager || !hasSessionManager)
+        if (!hasUiManager || !hasSessionManager || !hasSceneController)
         {
             Debug.LogError("LobbyPresenter missing required references.", this);
             return false;
@@ -124,6 +128,7 @@ public class LobbyPresenter : MonoBehaviour
         {
             lobbyPlayerListView.BindCopyCodeAction(HandleCopyCodeClicked);
             lobbyPlayerListView.BindLeaveLobbyAction(HandleLeaveLobbyClicked);
+            lobbyPlayerListView.BindStartGameAction(HandleStartGameClicked);
         }
     }
 
@@ -139,6 +144,7 @@ public class LobbyPresenter : MonoBehaviour
         {
             lobbyPlayerListView.BindCopyCodeAction(null);
             lobbyPlayerListView.BindLeaveLobbyAction(null);
+            lobbyPlayerListView.BindStartGameAction(null);
         }
     }
 
@@ -150,6 +156,7 @@ public class LobbyPresenter : MonoBehaviour
         sessionManager.StatusChanged += HandleStatusUpdated;
         sessionManager.JoinCodeChanged += HandleJoinCodeGenerated;
         sessionManager.PlayersChanged += HandlePlayersChanged;
+        sessionManager.GameplaySceneChanged += HandleGameplaySceneChanged;
     }
 
     private void UnsubscribeFromSessionManagerEvents()
@@ -160,6 +167,7 @@ public class LobbyPresenter : MonoBehaviour
         sessionManager.StatusChanged -= HandleStatusUpdated;
         sessionManager.JoinCodeChanged -= HandleJoinCodeGenerated;
         sessionManager.PlayersChanged -= HandlePlayersChanged;
+        sessionManager.GameplaySceneChanged -= HandleGameplaySceneChanged;
     }
 
     private void HandleStatusUpdated(string status)
@@ -184,6 +192,22 @@ public class LobbyPresenter : MonoBehaviour
 
         IReadOnlyList<string> playerNames = sessionManager != null ? sessionManager.GetPlayerNames(playerIds) : playerIds;
         lobbyPlayerListView.ShowPlayers(playerNames);
+    }
+
+    private void HandleGameplaySceneChanged(string sceneName)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+            return;
+
+        if (sceneController == null)
+        {
+            Debug.LogError("Cannot load gameplay scene because no SceneController is available.", this);
+            return;
+        }
+
+        bool loaded = sceneController.LoadScene(sceneName);
+        if (!loaded && lobbyMenuView != null)
+            lobbyMenuView.SetStatus("Unable to load gameplay scene.");
     }
 
     private async void HandleCreateLobbyClicked()
@@ -230,6 +254,35 @@ public class LobbyPresenter : MonoBehaviour
             lobbyMenuView.SetStatus("Join code copied.");
     }
 
+    private async void HandleStartGameClicked()
+    {
+        if (!ValidateStartGame())
+            return;
+
+        bool started = await sessionManager.LoadScene(GAMEPLAY_SCENE_NAME);
+
+        if (!started && lobbyMenuView != null)
+            lobbyMenuView.SetStatus("Unable to start gameplay.");
+    }
+
+    private bool ValidateStartGame()
+    {
+        if (sessionManager == null || !sessionManager.HasActiveSession)
+        {
+            if (lobbyMenuView != null)
+                lobbyMenuView.SetStatus("Create or join a lobby before starting the game.");
+            return false;
+        }
+
+        if (sceneController == null)
+        {
+            Debug.LogError("Cannot start gameplay because no SceneController is available.", this);
+            return false;
+        }
+
+        return true;
+    }
+
     private void ResetJoinCodeLabel()
     {
         lastGeneratedJoinCode = string.Empty;
@@ -265,6 +318,16 @@ public class LobbyPresenter : MonoBehaviour
             sessionManager = SessionManager.Instance;
     }
 
+    private void ResolveSceneController()
+    {
+        if (sceneController != null)
+            return;
+
+        sceneController = SceneController.Instance;
+        if (sceneController == null)
+            sceneController = FindFirstObjectByType<SceneController>();
+    }
+
     private void SyncExistingSessionState()
     {
         if (sessionManager == null)
@@ -279,11 +342,23 @@ public class LobbyPresenter : MonoBehaviour
         if (sessionManager != null && sessionManager.HasActiveSession)
         {
             ShowRosterScreen();
+            UpdateStartButtonState(true);
             return;
         }
 
         ShowMenuScreen();
         ResetJoinCodeLabel();
+        UpdateStartButtonState(false);
+    }
+
+    private void UpdateStartButtonState(bool hasActiveSession)
+    {
+        if (lobbyPlayerListView == null)
+            return;
+
+        bool isHost = sessionManager != null && sessionManager.ActiveSession != null && sessionManager.ActiveSession.IsHost;
+        bool canStart = hasActiveSession && isHost && sceneController != null && !sceneController.IsLoading;
+        lobbyPlayerListView.SetStartButtonInteractable(canStart);
     }
     #endregion
 }

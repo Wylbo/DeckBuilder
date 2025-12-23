@@ -13,6 +13,7 @@ public class LobbyPlayerListView : UIView
     [SerializeField] private Button copyCodeButton;
     [SerializeField] private TMP_Text joinCodeLabel;
     [SerializeField] private Button leaveLobbyButton;
+    [SerializeField] private Button startGameButton;
     #endregion
 
     #region Private Members
@@ -27,6 +28,7 @@ public class LobbyPlayerListView : UIView
     {
         ClearItems();
         SetJoinCode(string.Empty);
+        SetStartButtonInteractable(false);
     }
     #endregion
 
@@ -84,6 +86,19 @@ public class LobbyPlayerListView : UIView
     public void BindLeaveLobbyAction(UnityAction action)
     {
         BindButton(leaveLobbyButton, action);
+    }
+
+    public void BindStartGameAction(UnityAction action)
+    {
+        BindButton(startGameButton, action);
+    }
+
+    public void SetStartButtonInteractable(bool canStart)
+    {
+        if (startGameButton == null)
+            return;
+
+        startGameButton.interactable = canStart;
     }
     #endregion
 

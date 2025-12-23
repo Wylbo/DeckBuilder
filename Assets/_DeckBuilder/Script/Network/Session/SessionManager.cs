@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Multiplayer;
@@ -15,6 +16,7 @@ public class SessionManager : MonoBehaviour
     public event Action<string> StatusChanged;
     public event Action<string> JoinCodeChanged;
     public event Action<IReadOnlyList<string>> PlayersChanged;
+    public event Action<string> GameplaySceneChanged;
     #endregion
 
     #region Private Members
@@ -23,6 +25,7 @@ public class SessionManager : MonoBehaviour
     private bool isInitializingServices;
     private bool hasInitializedServices;
     private const string PLAYER_NAME_PROPERTY_KEY = "PlayerName";
+    private string lastReceivedGameplayScene = string.Empty;
     #endregion
 
     #region Getters
@@ -175,6 +178,7 @@ public class SessionManager : MonoBehaviour
             RaiseJoinCode(string.Empty);
             RaisePlayersChanged(Array.Empty<string>());
             RaiseStatus("Left lobby.");
+            lastReceivedGameplayScene = string.Empty;
         }
     }
 
@@ -199,6 +203,33 @@ public class SessionManager : MonoBehaviour
         }
 
         return playerNames;
+    }
+
+    public async Task<bool> LoadScene(string sceneName)
+    {
+        if (activeSession == null || !activeSession.IsHost)
+        {
+            RaiseStatus("Only the host can start the game.");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            RaiseStatus("Invalid gameplay scene name.");
+            return false;
+        }
+
+        try
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            RaiseStatus($"Failed to set gameplay scene: {exception.Message}");
+            Debug.LogError($"Failed to save gameplay scene property: {exception}");
+            return false;
+        }
     }
     #endregion
 
@@ -253,10 +284,12 @@ public class SessionManager : MonoBehaviour
 
         UnsubscribeFromSessionEvents();
         activeSession = session;
+        lastReceivedGameplayScene = string.Empty;
         SubscribeToSessionEvents();
 
         RaiseJoinCode(activeSession.Code);
         RaisePlayersChanged(GetPlayerIds());
+        HandleSessionPropertiesChanged();
     }
 
     private Dictionary<string, string> BuildPlayerNameLookup()
@@ -306,6 +339,7 @@ public class SessionManager : MonoBehaviour
         activeSession.PlayerJoined += HandlePlayerJoined;
         activeSession.PlayerHasLeft += HandlePlayerHasLeft;
         activeSession.Changed += HandleSessionChanged;
+        activeSession.SessionPropertiesChanged += HandleSessionPropertiesChanged;
     }
 
     private void UnsubscribeFromSessionEvents()
@@ -316,12 +350,14 @@ public class SessionManager : MonoBehaviour
         activeSession.PlayerJoined -= HandlePlayerJoined;
         activeSession.PlayerHasLeft -= HandlePlayerHasLeft;
         activeSession.Changed -= HandleSessionChanged;
+        activeSession.SessionPropertiesChanged -= HandleSessionPropertiesChanged;
     }
 
     private void HandleSessionChanged()
     {
         RaisePlayersChanged(GetPlayerIds());
         RaiseJoinCode(activeSession != null ? activeSession.Code : string.Empty);
+        HandleSessionPropertiesChanged();
     }
 
     private void HandlePlayerJoined(string playerId)
@@ -334,6 +370,11 @@ public class SessionManager : MonoBehaviour
     {
         RaisePlayersChanged(GetPlayerIds());
         RaiseStatus($"Player left: {playerId}");
+    }
+
+    private void HandleSessionPropertiesChanged()
+    {
+
     }
 
     private void RaiseStatus(string message)
@@ -353,5 +394,6 @@ public class SessionManager : MonoBehaviour
         if (PlayersChanged != null)
             PlayersChanged.Invoke(players);
     }
+
     #endregion
 }

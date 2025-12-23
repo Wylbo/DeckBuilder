@@ -1,74 +1,159 @@
-using System;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
-/// Base class allowing to controll a character
+/// Base class allowing to control a character.
+/// Supports player control on the owning client and optional server authority for AI.
 /// </summary>
 [RequireComponent(typeof(Character))]
-public class Controller : MonoBehaviour
+public class Controller : NetworkBehaviour
 {
-	[SerializeField]
-	private Character character;
+    #region Fields
+    [SerializeField] private Character character;
+    [SerializeField] private ControlStrategy controlStrategy;
+    [SerializeField] private UIManager uiManager;
+    [SerializeField] private bool allowServerAuthority = true;
+    #endregion
 
-	[SerializeField]
-	private ControlStrategy controlStrategy;
+    #region Private Members
+    private ControlStrategy runtimeControlStrategy;
+    #endregion
 
-	[SerializeField]
-	private UIManager uiManager;
+    #region Getters
+    #endregion
 
-	// Runtime instance to avoid shared SO state across multiple controllers
-	private ControlStrategy runtimeControlStrategy;
+    #region Unity Message Methods
+    public override void OnNetworkSpawn()
+    {
+        InitializeControlStrategy();
+    }
 
-	protected virtual void Start()
-	{
-		if (controlStrategy != null)
-		{
-			// Instantiate a per-controller copy so per-instance fields aren't shared
-			runtimeControlStrategy = Instantiate(controlStrategy);
-			runtimeControlStrategy.Initialize(this, character, ResolveUIManager());
-		}
-	}
+    public override void OnNetworkDespawn()
+    {
+        DisableControlStrategy();
+    }
 
-	protected virtual void Update()
-	{
-		runtimeControlStrategy?.Control(Time.deltaTime);
-	}
+    public override void OnGainedOwnership()
+    {
+        InitializeControlStrategy();
+    }
 
-	protected virtual void OnDestroy()
-	{
-		runtimeControlStrategy?.Disable();
-	}
+    public override void OnLostOwnership()
+    {
+        DisableControlStrategy();
+    }
 
-	private void Reset()
-	{
-		character = GetComponent<Character>();
-	}
+    protected virtual void Update()
+    {
+        if (!HasControlAuthority())
+        {
+            if (runtimeControlStrategy != null)
+                DisableControlStrategy();
+            return;
+        }
 
-	private IUIManager ResolveUIManager()
-	{
-		if (uiManager == null)
-			uiManager = FindFirstObjectByType<UIManager>();
+        runtimeControlStrategy?.Control(Time.deltaTime);
+    }
 
-		return uiManager;
-	}
+    public override void OnDestroy()
+    {
+        DisableControlStrategy();
+    }
 
-	public bool TryMove(Vector3 worldTo)
-	{
-		return character.MoveTo(worldTo);
-	}
+    private void Reset()
+    {
+        character = GetComponent<Character>();
+    }
+    #endregion
 
-	public void CastAbility(int index, Vector3 worldPos)
-	{
-		character.CastAbility(index, worldPos);
-	}
+    #region Public Methods
+    public bool TryMove(Vector3 worldTo)
+    {
+        if (!HasControlAuthority() || runtimeControlStrategy == null || !CanControlCharacter())
+            return false;
 
-	public void EndHold(int index, Vector3 worldPos)
-	{
-		character.EndHold(index, worldPos);
-	}
+        return character.MoveTo(worldTo);
+    }
 
-	public void PerformDodge(Vector3 worldPos)
-	{
-		character.PerformDodge(worldPos);
-	}
+    public void CastAbility(int index, Vector3 worldPos)
+    {
+        if (!HasControlAuthority() || !CanControlCharacter())
+            return;
+
+        character.CastAbility(index, worldPos);
+    }
+
+    public void EndHold(int index, Vector3 worldPos)
+    {
+        if (!HasControlAuthority() || !CanControlCharacter())
+            return;
+
+        character.EndHold(index, worldPos);
+    }
+
+    public void PerformDodge(Vector3 worldPos)
+    {
+        if (!HasControlAuthority() || !CanControlCharacter())
+            return;
+
+        character.PerformDodge(worldPos);
+    }
+    #endregion
+
+    #region Private Methods
+    private void InitializeControlStrategy()
+    {
+        if (!HasControlAuthority())
+            return;
+
+        if (runtimeControlStrategy != null)
+            return;
+
+        if (controlStrategy == null || character == null)
+        {
+            Debug.LogError($"[{nameof(Controller)}] Cannot initialize control strategy because required references are missing.", this);
+            return;
+        }
+
+        runtimeControlStrategy = Instantiate(controlStrategy);
+        runtimeControlStrategy.Initialize(this, character, ResolveUIManager());
+    }
+
+    private void DisableControlStrategy()
+    {
+        runtimeControlStrategy?.Disable();
+        runtimeControlStrategy = null;
+    }
+
+    private IUIManager ResolveUIManager()
+    {
+        if (uiManager == null && IsOwner)
+            uiManager = FindFirstObjectByType<UIManager>();
+
+        return uiManager;
+    }
+
+    private bool CanControlCharacter()
+    {
+        if (character != null)
+            return true;
+
+        Debug.LogError($"[{nameof(Controller)}] Cannot forward control because the character reference is missing.", this);
+        return false;
+    }
+
+    private bool HasControlAuthority()
+    {
+        if (!IsSpawned)
+            return true;
+
+        if (IsOwner)
+            return true;
+
+        if (allowServerAuthority && IsServer && NetworkObject != null && NetworkObject.OwnerClientId == NetworkManager.ServerClientId)
+            return true;
+
+        return false;
+    }
+    #endregion
 }

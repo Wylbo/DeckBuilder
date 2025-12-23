@@ -6,12 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_DeckBuilder/Scenes/SampleScene.unity
+    path: Assets/_DeckBuilder/Scenes/GameplaySceneTest.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
     path: Assets/_DeckBuilder/Scenes/MultiplayerLobby.unity
     guid: 3043eb27b9489ec468a27fe1d34737b8
-  - enabled: 1
+  - enabled: 0
     path: Assets/Widgets/Scenes/WidgetsQuickstart.unity
     guid: b433a2b9c50057942aa3a4d6cab6cf7b
   m_configObjects:
