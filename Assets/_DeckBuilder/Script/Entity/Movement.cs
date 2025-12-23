@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using MG.Extend;
-using Unity.Mathematics;
 using Unity.Netcode;
 
 
@@ -44,7 +43,7 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     private Rigidbody body = null;
 
     [SerializeField]
-    private NavMeshAgent agent = null;
+    private NavMeshAgent serverAgent = null;
     [SerializeField]
     private CapsuleCollider capsuleCollider = null;
     [SerializeField]
@@ -55,16 +54,18 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     [Header("Animation")]
     [SerializeField] private AnimationHandler animationHandler = null;
 
+    [Header("Movement prediction")]
+
     private bool canMove = true;
     private Coroutine dashRoutine;
     private float baseMaxSpeed = 0;
 
-    public NavMeshAgent Agent => agent;
-    private float AgentRadius => NavMesh.GetSettingsByID(agent.agentTypeID).agentRadius;
-    private float StepHeight => NavMesh.GetSettingsByID(agent.agentTypeID).agentClimb;
+    public NavMeshAgent Agent => serverAgent;
+    private float AgentRadius => NavMesh.GetSettingsByID(serverAgent.agentTypeID).agentRadius;
+    private float StepHeight => NavMesh.GetSettingsByID(serverAgent.agentTypeID).agentClimb;
     private float HalfHeight => capsuleCollider.height / 2;
     public bool CanMove => canMove;
-    public bool IsMoving => agent.velocity.magnitude > 0;
+    public bool IsMoving => serverAgent.velocity.magnitude > 0;
     public Rigidbody Body => body;
 
     internal const int DefaultMaxWallIterations = 100;
@@ -72,8 +73,8 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     private void Reset()
     {
         body = GetComponent<Rigidbody>();
-        if (agent == null)
-            agent = GetComponent<NavMeshAgent>();
+        if (serverAgent == null)
+            serverAgent = GetComponent<NavMeshAgent>();
         if (globalStatSource == null)
             globalStatSource = GetComponent<GlobalStatSource>();
         if (modifierManager == null)
@@ -82,9 +83,24 @@ public class Movement : NetworkBehaviour, IAbilityMovement
             animationHandler = GetComponent<AnimationHandler>();
     }
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        // bool isServer = IsServer;
+        // serverAgent.enabled = isServer;
+
+        // Ensure the visual agent is only active for the owner on clients.
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+    }
+
     private void Awake()
     {
-        baseMaxSpeed = agent != null ? agent.speed : 0f;
+        baseMaxSpeed = serverAgent != null ? serverAgent.speed : 0f;
         RefreshMovementSpeedFromStats();
     }
 
@@ -109,24 +125,33 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
     private void Update()
     {
-        animationHandler?.UpdateMovement(agent.velocity);
+        animationHandler?.UpdateMovement(serverAgent.velocity);
     }
 
     public bool MoveTo(Vector3 worldTo)
     {
-        if (!agent.enabled || !CanMove)
+        if (!IsOwner)
             return false;
 
-        return agent.SetDestination(worldTo);
+        // predictedNavVisual?.PredictMove(worldTo);
+        // RequestMoveTo_ServerRpc(worldTo);
+        Move_Internal(worldTo);
+        return true;
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    private void RequestMoveTo_ServerRpc(Vector3 worldTo)
+    {
+        Move_Internal(worldTo);
     }
 
     public void StopMovement()
     {
-        if (!agent.enabled)
+        if (!serverAgent.enabled)
             return;
 
-        agent.ResetPath();
-        agent.velocity = Vector3.zero;
+        serverAgent.ResetPath();
+        serverAgent.velocity = Vector3.zero;
     }
 
     public void DisableMovement()
@@ -138,6 +163,14 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     public void EnableMovement()
     {
         canMove = true;
+    }
+
+    private void Move_Internal(Vector3 worldTo)
+    {
+        if (!serverAgent.enabled || !CanMove)
+            return;
+
+        serverAgent.SetDestination(worldTo);
     }
 
     #region Dash
@@ -202,7 +235,7 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
         Vector3 remaining = wantedPosition - dashPositions[^1];
 
-        bool forwardCheck = agent.Raycast(wantedPosition, out NavMeshHit forwardHit);
+        bool forwardCheck = serverAgent.Raycast(wantedPosition, out NavMeshHit forwardHit);
         int iterationCount = 0;
         int maxIterations = dashData.maxWallIterations > 0 ? dashData.maxWallIterations : DefaultMaxWallIterations;
         while (forwardCheck && iterationCount < maxIterations)
@@ -228,7 +261,7 @@ public class Movement : NetworkBehaviour, IAbilityMovement
             wantedDirection = wantedPosition - dashPositions[^1];
             wantedDirection = wantedDirection.normalized;
 
-            forwardCheck = NavMesh.Raycast(agent.nextPosition, wantedPosition, out forwardHit, NavMesh.AllAreas);
+            forwardCheck = NavMesh.Raycast(serverAgent.nextPosition, wantedPosition, out forwardHit, NavMesh.AllAreas);
         }
 
         if (forwardCheck && iterationCount >= maxIterations)
@@ -266,12 +299,12 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
             curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
             nextPosition = InterpolatePath(dashPosition, curvePosition);
-            agent.nextPosition = nextPosition;
+            serverAgent.nextPosition = nextPosition;
 
             yield return null;
         }
 
-        agent.enabled = true;
+        serverAgent.enabled = true;
         canMove = true;
     }
 
@@ -307,13 +340,13 @@ public class Movement : NetworkBehaviour, IAbilityMovement
         if (globalSpeed > 0f)
             baseMaxSpeed = globalSpeed;
 
-        if (agent != null && baseMaxSpeed > 0f)
-            agent.speed = baseMaxSpeed;
+        if (serverAgent != null && baseMaxSpeed > 0f)
+            serverAgent.speed = baseMaxSpeed;
     }
 
     private float GetGlobalMovementSpeed()
     {
-        if (globalStatSource == null || agent == null)
+        if (globalStatSource == null || serverAgent == null)
             return 0f;
 
         var stats = globalStatSource.EvaluateGlobalStats();
@@ -324,7 +357,7 @@ public class Movement : NetworkBehaviour, IAbilityMovement
         if (raw != null && raw.TryGetValue(movementSpeedStatKey, out float baseVal))
             return baseVal;
 
-        return agent.speed;
+        return serverAgent.speed;
     }
 
     private void SubscribeToModifierChanges()
