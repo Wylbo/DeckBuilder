@@ -784,7 +784,7 @@ MonoBehaviour:
   layer: 0
   deactivateOnHide: 1
   moveToTopOnShow: 1
-  pauseGame: 1
+  pauseGame: 0
   canvasGroup: {fileID: 2414961446634469307}
   animator: {fileID: 1896439860820796109}
   openAnimClip: {fileID: 7400000, guid: 0125635a18c4b9849a9d6bcdfe038c8a, type: 2}

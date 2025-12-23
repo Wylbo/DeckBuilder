@@ -396,23 +396,27 @@ PrefabInstance:
       objectReference: {fileID: 5426130163700231953}
     - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: SyncScaleX
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: SyncScaleY
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: SyncScaleZ
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: SyncRotAngleX
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: SyncRotAngleZ
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6841453337792729967, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
+      propertyPath: m_Name
+      value: MinimapIcon
       objectReference: {fileID: 0}
     - target: {fileID: 7480439906567705019, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: animator
@@ -434,7 +438,8 @@ PrefabInstance:
       propertyPath: dodgeAbility
       value: 
       objectReference: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4520124826983868011, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1447579852168475844, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
     - {fileID: 3695981659665789756, guid: f534bcd483e19f148988e322285f8bc8, type: 3}

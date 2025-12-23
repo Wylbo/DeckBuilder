@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using MG.Extend;
 using Unity.Mathematics;
+using Unity.Netcode;
 
 
 /// <summary>
@@ -16,7 +17,7 @@ using Unity.Mathematics;
 [RequireComponent(typeof(GlobalStatSource))]
 [RequireComponent(typeof(StatsModifierManager))]
 [RequireComponent(typeof(AnimationHandler))]
-public class Movement : MonoBehaviour, IAbilityMovement
+public class Movement : NetworkBehaviour, IAbilityMovement
 {
     [Serializable]
     public struct DashData

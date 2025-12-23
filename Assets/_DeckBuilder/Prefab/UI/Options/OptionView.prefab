@@ -1387,11 +1387,13 @@ MonoBehaviour:
   layer: 0
   deactivateOnHide: 1
   moveToTopOnShow: 1
-  pauseGame: 1
+  pauseGame: 0
   canvasGroup: {fileID: 1092348852277144189}
+  animator: {fileID: 0}
+  openAnimClip: {fileID: 0}
+  closeAnimClip: {fileID: 0}
   tabGroup: {fileID: 6226867235875234155}
   defaultTabId: {fileID: 752582036922410368}
-  selectDefaultTabOnShow: 1
 --- !u!114 &6226867235875234155
 MonoBehaviour:
   m_ObjectHideFlags: 0
