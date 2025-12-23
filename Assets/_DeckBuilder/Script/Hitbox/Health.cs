@@ -48,9 +48,9 @@ public class Health : NetworkBehaviour
         networkCurrentHealth.OnValueChanged -= NetworkCurrentHealth_OnValueChanged;
     }
 
-    public void AddOrRemoveHealth(int damage)
+    public void AddOrRemoveHealth(int delta)
     {
-        UpdateHealth_ServerRpc(damage);
+        UpdateHealth_ServerRpc(delta);
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
