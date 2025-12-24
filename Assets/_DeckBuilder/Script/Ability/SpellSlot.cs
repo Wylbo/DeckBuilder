@@ -5,158 +5,196 @@ using UnityEngine;
 [Serializable]
 public class SpellSlot
 {
-	[SerializeField, InlineEditor]
-	public Ability Ability;
+    #region Fields
+    [SerializeField, InlineEditor] public Ability Ability;
+    [ReadOnly] public Timer cooldown = new Timer();
+    #endregion
 
-        [ReadOnly]
-        public Timer cooldown = new Timer();
+    #region Private Members
+    private bool isHeld = false;
+    private AbilityCaster caster = null;
+    private bool hasEndCastSubscription = false;
+    private bool ownsAbilityInstance = false;
+    private IAbilityExecutor executor;
+    private readonly IAbilityStatProvider statProvider = new AbilityStatProvider();
+    #endregion
 
-        private bool isHeld = false;
-        private AbilityCaster caster = null;
-        private bool hasEndCastSubscription = false;
-        private bool ownsAbilityInstance = false;
-        private IAbilityExecutor executor;
-        private readonly IAbilityStatProvider statProvider = new AbilityStatProvider();
+    #region Getters
+    public bool HasAbility => Ability != null;
+    public bool CanCast => executor != null && (cooldown == null || !cooldown.IsRunning);
+    public IAbilityExecutor Executor => executor;
+    #endregion
 
-	public bool HasAbility => Ability != null;
-	public bool CanCast => executor != null && (cooldown == null || !cooldown.IsRunning);
-        public IAbilityExecutor Executor => executor;
+    #region Unity Message Methods
+    #endregion
 
-	public bool Initialize(AbilityCaster caster)
-	{
-		return SetAbility(Ability, caster);
-	}
+    #region Public Methods
+    public bool Initialize(AbilityCaster caster)
+    {
+        return SetAbility(Ability, caster);
+    }
 
-        public bool SetAbility(Ability ability, AbilityCaster caster)
+    public bool SetAbility(Ability ability, AbilityCaster caster)
+    {
+        bool reusingOwnedAbilityInstance = ownsAbilityInstance && ReferenceEquals(Ability, ability);
+
+        CleanupAbilityInstance(!reusingOwnedAbilityInstance);
+
+        Ability = ability != null ? UnityEngine.Object.Instantiate(ability) : null;
+        if (reusingOwnedAbilityInstance && ability != null)
         {
-                bool reusingOwnedAbilityInstance = ownsAbilityInstance && ReferenceEquals(Ability, ability);
-
-                CleanupAbilityInstance(!reusingOwnedAbilityInstance);
-
-                Ability = ability != null ? UnityEngine.Object.Instantiate(ability) : null;
-                if (reusingOwnedAbilityInstance && ability != null)
-                        UnityEngine.Object.Destroy(ability);
-                ownsAbilityInstance = Ability != null;
-                hasEndCastSubscription = false;
-                this.caster = caster;
-                ResetCooldown();
-
-                if (Ability != null && caster != null)
-                {
-                        var movement = caster.GetComponent<IAbilityMovement>();
-                        if (movement == null)
-                                movement = caster.GetComponent<Movement>();
-                        var animationHandler = caster.GetComponent<AnimationHandler>();
-
-                        IAbilityDebuffService debuffService = caster.DebuffService;
-                        if (debuffService == null)
-                                debuffService = caster.GetComponent<IAbilityDebuffService>();
-                        IGlobalStatSource globalStats = caster.GlobalStatSource;
-                        if (globalStats == null)
-                                globalStats = caster.GetComponent<IGlobalStatSource>();
-                        executor = new AbilityExecutor(Ability, caster, movement, animationHandler, debuffService, statProvider, globalStats);
-                        return true;
-                }
-
-                return false;
-	}
-
-	public void Cast(AbilityCaster caster, Vector3 worldPos)
-	{
-		if (executor == null)
-			return;
-
-                this.caster = caster;
-
-                isHeld = true;
-                UnsubscribeFromEndCast();
-                SubscribeToEndCast();
-                executor.Cast(worldPos, isHeld);
-
-                if (Ability != null && Ability.StartCooldownOnCast)
-                        StartCooldown();
+            UnityEngine.Object.Destroy(ability);
         }
 
-	public void EndHold(AbilityCaster caster, Vector3 worldPos)
-	{
-		if (executor == null)
-			return;
+        ownsAbilityInstance = Ability != null;
+        hasEndCastSubscription = false;
+        this.caster = caster;
+        ResetCooldown();
 
-		this.caster = caster;
-		isHeld = false;
-		executor.EndHold(worldPos);
-	}
-
-	public void UpdateCooldown(float dt)
-	{
-		if (cooldown == null)
-			cooldown = new Timer();
-
-		cooldown.Update(dt);
-                executor?.Update(dt);
-	}
-
-        public void Disable()
+        if (Ability != null && caster != null)
         {
-                UnsubscribeFromEndCast();
-                executor?.Disable();
-	}
+            IAbilityMovement movement = caster.GetComponent<IAbilityMovement>();
+            if (movement == null)
+            {
+                movement = caster.GetComponent<Movement>();
+            }
 
-        private void ResetCooldown()
-        {
-                UnsubscribeFromEndCast();
+            AnimationHandler animationHandler = caster.GetComponent<AnimationHandler>();
 
-                cooldown = new Timer();
+            IAbilityDebuffService debuffService = caster.DebuffService;
+            if (debuffService == null)
+            {
+                debuffService = caster.GetComponent<IAbilityDebuffService>();
+            }
+
+            IGlobalStatSource globalStats = caster.GlobalStatSource;
+            if (globalStats == null)
+            {
+                globalStats = caster.GetComponent<IGlobalStatSource>();
+            }
+
+            executor = new AbilityExecutor(Ability, caster, movement, animationHandler, debuffService, statProvider, globalStats);
+            return true;
         }
 
-        private void Ability_OnEndCast(bool isSucessful)
+        return false;
+    }
+
+    public void Cast(AbilityCaster caster, Vector3 worldPos, bool isHeldRequest)
+    {
+        if (executor == null)
         {
-                UnsubscribeFromEndCast();
-
-                if (!isSucessful || Ability == null)
-                        return;
-
-		if (!Ability.StartCooldownOnCast)
-			StartCooldown();
-	}
-
-        private void StartCooldown()
-        {
-                float duration = executor != null ? executor.Cooldown : 0f;
-                cooldown = new Timer(duration);
-                cooldown.Start();
+            return;
         }
 
-        private void SubscribeToEndCast()
-        {
-                if (executor == null || hasEndCastSubscription)
-                        return;
+        this.caster = caster;
+        isHeld = isHeldRequest;
 
-                executor.On_EndCast += Ability_OnEndCast;
-                hasEndCastSubscription = true;
+        UnsubscribeFromEndCast();
+        SubscribeToEndCast();
+        executor.Cast(worldPos, isHeld);
+
+        if (Ability != null && Ability.StartCooldownOnCast)
+        {
+            StartCooldown();
+        }
+    }
+
+    public void EndHold(AbilityCaster caster, Vector3 worldPos)
+    {
+        if (executor == null)
+        {
+            return;
         }
 
-        private void UnsubscribeFromEndCast()
-        {
-                if (executor == null || !hasEndCastSubscription)
-                        return;
+        this.caster = caster;
+        isHeld = false;
+        executor.EndHold(worldPos);
+    }
 
-                executor.On_EndCast -= Ability_OnEndCast;
-                hasEndCastSubscription = false;
+    public void UpdateCooldown(float dt)
+    {
+        if (cooldown == null)
+        {
+            cooldown = new Timer();
         }
 
-        private void CleanupAbilityInstance(bool destroyAbilityInstance = true)
+        cooldown.Update(dt);
+        executor?.Update(dt);
+    }
+
+    public void Disable()
+    {
+        UnsubscribeFromEndCast();
+        executor?.Disable();
+    }
+    #endregion
+
+    #region Private Methods
+    private void ResetCooldown()
+    {
+        UnsubscribeFromEndCast();
+
+        cooldown = new Timer();
+    }
+
+    private void Ability_OnEndCast(bool isSucessful)
+    {
+        UnsubscribeFromEndCast();
+
+        if (!isSucessful || Ability == null)
         {
-                UnsubscribeFromEndCast();
-
-                executor?.Disable();
-                executor = null;
-
-                if (destroyAbilityInstance && Ability != null && ownsAbilityInstance)
-                {
-                        UnityEngine.Object.Destroy(Ability);
-                }
-
-                ownsAbilityInstance = false;
+            return;
         }
+
+        if (!Ability.StartCooldownOnCast)
+        {
+            StartCooldown();
+        }
+    }
+
+    private void StartCooldown()
+    {
+        float duration = executor != null ? executor.Cooldown : 0f;
+        cooldown = new Timer(duration);
+        cooldown.Start();
+    }
+
+    private void SubscribeToEndCast()
+    {
+        if (executor == null || hasEndCastSubscription)
+        {
+            return;
+        }
+
+        executor.On_EndCast += Ability_OnEndCast;
+        hasEndCastSubscription = true;
+    }
+
+    private void UnsubscribeFromEndCast()
+    {
+        if (executor == null || !hasEndCastSubscription)
+        {
+            return;
+        }
+
+        executor.On_EndCast -= Ability_OnEndCast;
+        hasEndCastSubscription = false;
+    }
+
+    private void CleanupAbilityInstance(bool destroyAbilityInstance = true)
+    {
+        UnsubscribeFromEndCast();
+
+        executor?.Disable();
+        executor = null;
+
+        if (destroyAbilityInstance && Ability != null && ownsAbilityInstance)
+        {
+            UnityEngine.Object.Destroy(Ability);
+        }
+
+        ownsAbilityInstance = false;
+    }
+    #endregion
 }
