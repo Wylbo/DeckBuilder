@@ -8,6 +8,10 @@ public class SpellSlot
     #region Fields
     [SerializeField, InlineEditor] public Ability Ability;
     [ReadOnly] public Timer cooldown = new Timer();
+    public event Action<SpellSlot, float> OnCooldownStarted;
+    public event Action<SpellSlot> OnCooldownEnded;
+    public event Action<SpellSlot, bool> OnCastStateChanged;
+    public event Action<SpellSlot> OnAbilityChanged;
     #endregion
 
     #region Private Members
@@ -74,9 +78,11 @@ public class SpellSlot
             }
 
             executor = new AbilityExecutor(Ability, caster, movement, animationHandler, debuffService, statProvider, globalStats);
+            OnAbilityChanged?.Invoke(this);
             return true;
         }
 
+        OnAbilityChanged?.Invoke(this);
         return false;
     }
 
@@ -93,6 +99,7 @@ public class SpellSlot
         UnsubscribeFromEndCast();
         SubscribeToEndCast();
         executor.Cast(worldPos, isHeld);
+        OnCastStateChanged?.Invoke(this, true);
 
         if (Ability != null && Ability.StartCooldownOnCast)
         {
@@ -127,6 +134,7 @@ public class SpellSlot
     {
         UnsubscribeFromEndCast();
         executor?.Disable();
+        OnCastStateChanged?.Invoke(this, false);
     }
     #endregion
 
@@ -135,7 +143,9 @@ public class SpellSlot
     {
         UnsubscribeFromEndCast();
 
+        DetachCooldownCallbacks();
         cooldown = new Timer();
+        OnCooldownEnded?.Invoke(this);
     }
 
     private void Ability_OnEndCast(bool isSucessful)
@@ -151,13 +161,24 @@ public class SpellSlot
         {
             StartCooldown();
         }
+
+        OnCastStateChanged?.Invoke(this, false);
     }
 
     private void StartCooldown()
     {
         float duration = executor != null ? executor.Cooldown : 0f;
+        DetachCooldownCallbacks();
         cooldown = new Timer(duration);
+        cooldown.On_Ended += HandleCooldownEnded;
         cooldown.Start();
+        OnCooldownStarted?.Invoke(this, duration);
+    }
+
+    private void HandleCooldownEnded()
+    {
+        OnCooldownEnded?.Invoke(this);
+        cooldown.On_Ended -= HandleCooldownEnded;
     }
 
     private void SubscribeToEndCast()
@@ -188,6 +209,7 @@ public class SpellSlot
 
         executor?.Disable();
         executor = null;
+        DetachCooldownCallbacks();
 
         if (destroyAbilityInstance && Ability != null && ownsAbilityInstance)
         {
@@ -195,6 +217,16 @@ public class SpellSlot
         }
 
         ownsAbilityInstance = false;
+        OnCastStateChanged?.Invoke(this, false);
+        OnCooldownEnded?.Invoke(this);
+    }
+
+    private void DetachCooldownCallbacks()
+    {
+        if (cooldown != null)
+        {
+            cooldown.On_Ended -= HandleCooldownEnded;
+        }
     }
     #endregion
 }
