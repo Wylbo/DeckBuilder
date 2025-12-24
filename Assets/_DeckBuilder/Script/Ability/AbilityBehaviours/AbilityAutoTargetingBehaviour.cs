@@ -38,7 +38,7 @@ public class AbilityAutoTargetingBehaviour : AbilityBehaviour
 			}
 		}
 
-		context.Target = closest;
+		context.SetTarget(closest);
 		if (closest != null)
 		{
 			context.SetAimPoint(closest.transform.position);

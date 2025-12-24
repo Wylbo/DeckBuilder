@@ -47,6 +47,8 @@ public class AbilityCaster : NetworkBehaviour
     [SerializeField] private DebuffUpdater debuffUpdater = null;
     [SerializeField] private StatsModifierManager modifierManager;
     [SerializeField] private GlobalStatSource globalStatSource;
+    [SerializeField] private AnimationHandler animationHandler;
+    private AbilityCastPresenter castPresenter;
     private NetworkList<NetworkSpellSlotState> slotStates;
     #endregion
 
@@ -67,6 +69,8 @@ public class AbilityCaster : NetworkBehaviour
     #region Unity Message Methods
     private void Awake()
     {
+        EnsureAnimationHandler();
+        EnsureCastPresenter();
         InitializeSlotStateList();
     }
 
@@ -87,6 +91,7 @@ public class AbilityCaster : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        EnsureCastPresenter();
         EnsureSlotStateListSize();
         SyncAllSlotStates();
     }
@@ -97,6 +102,10 @@ public class AbilityCaster : NetworkBehaviour
         if (globalStatSource == null)
         {
             globalStatSource = GetComponent<GlobalStatSource>();
+        }
+        if (animationHandler == null)
+        {
+            animationHandler = GetComponent<AnimationHandler>();
         }
     }
 
@@ -160,17 +169,17 @@ public class AbilityCaster : NetworkBehaviour
 
     public bool Cast(int index, Vector3 worldPos)
     {
-        return RequestCastSlot(index, worldPos, false, true);
+        return RequestCastSlot(index, worldPos, worldPos, false, false);
     }
 
     public bool StartHold(int index, Vector3 worldPos)
     {
-        return RequestCastSlot(index, worldPos, false, true);
+        return RequestCastSlot(index, worldPos, worldPos, false, true);
     }
 
     public bool CastDodge(Vector3 worldPos)
     {
-        return RequestCastSlot(InvalidSlotIndex, worldPos, true, true);
+        return RequestCastSlot(InvalidSlotIndex, worldPos, worldPos, true, false);
     }
 
     public void EndHold(int index, Vector3 worldPos)
@@ -197,17 +206,17 @@ public class AbilityCaster : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
-    private void RequestCast_ServerRpc(int slotIndex, Vector3 worldPos, bool isDodgeSlot, bool isHeldRequest, RpcParams rpcParams = default)
+    private void RequestCast_ServerRpc(int slotIndex, Vector3 targetPoint, Vector3 aimPoint, bool isDodgeSlot, bool isHeldRequest, RpcParams rpcParams = default)
     {
         ulong senderClientId = rpcParams.Receive.SenderClientId;
-        TryProcessCast(slotIndex, worldPos, isDodgeSlot, isHeldRequest, senderClientId);
+        TryProcessCast(slotIndex, targetPoint, aimPoint, isDodgeSlot, isHeldRequest, senderClientId);
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
-    private void RequestStartHold_ServerRpc(int slotIndex, Vector3 worldPos, bool isDodgeSlot, RpcParams rpcParams = default)
+    private void RequestStartHold_ServerRpc(int slotIndex, Vector3 targetPoint, Vector3 aimPoint, bool isDodgeSlot, RpcParams rpcParams = default)
     {
         ulong senderClientId = rpcParams.Receive.SenderClientId;
-        TryProcessCast(slotIndex, worldPos, isDodgeSlot, true, senderClientId);
+        TryProcessCast(slotIndex, targetPoint, aimPoint, isDodgeSlot, true, senderClientId);
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
@@ -215,6 +224,28 @@ public class AbilityCaster : NetworkBehaviour
     {
         ulong senderClientId = rpcParams.Receive.SenderClientId;
         TryProcessEndHold(slotIndex, worldPos, isDodgeSlot, senderClientId);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void NotifyCastStarted_ClientRpc(int slotIndex, bool isDodgeSlot, Vector3 worldPos, FixedString64Bytes abilityId)
+    {
+        if (castPresenter == null)
+        {
+            return;
+        }
+
+        castPresenter.HandleCastStarted(slotIndex, isDodgeSlot, worldPos, abilityId.ToString());
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void NotifyCastEnded_ClientRpc(int slotIndex, bool isDodgeSlot)
+    {
+        if (castPresenter == null)
+        {
+            return;
+        }
+
+        castPresenter.HandleCastEnded(slotIndex, isDodgeSlot);
     }
     #endregion
 
@@ -290,6 +321,8 @@ public class AbilityCaster : NetworkBehaviour
         slot.OnCooldownStarted += HandleSlotCooldownStarted;
         slot.OnCooldownEnded -= HandleSlotCooldownEnded;
         slot.OnCooldownEnded += HandleSlotCooldownEnded;
+        slot.OnCastStarted -= HandleSlotCastStarted;
+        slot.OnCastStarted += HandleSlotCastStarted;
         slot.OnCastStateChanged -= HandleSlotCastingChanged;
         slot.OnCastStateChanged += HandleSlotCastingChanged;
     }
@@ -304,24 +337,25 @@ public class AbilityCaster : NetworkBehaviour
         slot.OnAbilityChanged -= HandleSlotAbilityChanged;
         slot.OnCooldownStarted -= HandleSlotCooldownStarted;
         slot.OnCooldownEnded -= HandleSlotCooldownEnded;
+        slot.OnCastStarted -= HandleSlotCastStarted;
         slot.OnCastStateChanged -= HandleSlotCastingChanged;
     }
 
-    private bool RequestCastSlot(int slotIndex, Vector3 worldPos, bool isDodgeSlot, bool isHeldRequest)
+    private bool RequestCastSlot(int slotIndex, Vector3 targetPoint, Vector3 aimPoint, bool isDodgeSlot, bool isHeldRequest)
     {
         bool isServerInstance = IsServer || !IsSpawned;
         if (isServerInstance)
         {
-            return TryProcessCast(slotIndex, worldPos, isDodgeSlot, isHeldRequest, ResolveServerClientId());
+            return TryProcessCast(slotIndex, targetPoint, aimPoint, isDodgeSlot, isHeldRequest, ResolveServerClientId());
         }
 
         if (isHeldRequest)
         {
-            RequestStartHold_ServerRpc(slotIndex, worldPos, isDodgeSlot);
+            RequestStartHold_ServerRpc(slotIndex, targetPoint, aimPoint, isDodgeSlot);
         }
         else
         {
-            RequestCast_ServerRpc(slotIndex, worldPos, isDodgeSlot, isHeldRequest);
+            RequestCast_ServerRpc(slotIndex, targetPoint, aimPoint, isDodgeSlot, isHeldRequest);
         }
 
         return true;
@@ -339,7 +373,7 @@ public class AbilityCaster : NetworkBehaviour
         RequestEndHold_ServerRpc(slotIndex, worldPos, isDodgeSlot);
     }
 
-    private bool TryProcessCast(int slotIndex, Vector3 worldPos, bool isDodgeSlot, bool isHeldRequest, ulong senderClientId)
+    private bool TryProcessCast(int slotIndex, Vector3 targetPoint, Vector3 aimPoint, bool isDodgeSlot, bool isHeldRequest, ulong senderClientId)
     {
         SpellSlot targetSlot = ResolveSpellSlot(slotIndex, isDodgeSlot);
         if (!ValidateCastRequest(targetSlot, slotIndex, isDodgeSlot, senderClientId))
@@ -347,7 +381,7 @@ public class AbilityCaster : NetworkBehaviour
             return false;
         }
 
-        targetSlot.Cast(this, worldPos, isHeldRequest);
+        targetSlot.Cast(this, targetPoint, aimPoint, isHeldRequest);
         return true;
     }
 
@@ -654,6 +688,23 @@ public class AbilityCaster : NetworkBehaviour
         slotStates[stateIndex] = state;
     }
 
+    private void HandleSlotCastStarted(SpellSlot slot, Vector3 worldPos)
+    {
+        if (!IsServer && IsSpawned)
+        {
+            return;
+        }
+
+        if (!TryResolveSlotIndex(slot, out int slotIndex, out bool isDodgeSlot))
+        {
+            return;
+        }
+
+        FixedString64Bytes abilityId = new FixedString64Bytes(GetAbilityId(slot != null ? slot.Ability : null));
+        EnsureCastPresenter();
+        NotifyCastStarted_ClientRpc(slotIndex, isDodgeSlot, worldPos, abilityId);
+    }
+
     private void HandleSlotCastingChanged(SpellSlot slot, bool isCasting)
     {
         if (!CanWriteNetworkState())
@@ -676,6 +727,12 @@ public class AbilityCaster : NetworkBehaviour
         NetworkSpellSlotState state = slotStates[stateIndex];
         state.IsCasting = isCasting;
         slotStates[stateIndex] = state;
+
+        if (!isCasting && (IsServer || !IsSpawned))
+        {
+            EnsureCastPresenter();
+            NotifyCastEnded_ClientRpc(slotIndex, isDodgeSlot);
+        }
     }
 
     private bool TryResolveSlotIndex(SpellSlot slot, out int slotIndex, out bool isDodgeSlot)
@@ -749,6 +806,27 @@ public class AbilityCaster : NetworkBehaviour
     private string GetAbilityId(Ability ability)
     {
         return ability != null ? ability.name : string.Empty;
+    }
+
+    private void EnsureCastPresenter()
+    {
+        if (castPresenter != null)
+        {
+            return;
+        }
+
+        EnsureAnimationHandler();
+        castPresenter = new AbilityCastPresenter(animationHandler, this);
+    }
+
+    private void EnsureAnimationHandler()
+    {
+        if (animationHandler != null)
+        {
+            return;
+        }
+
+        animationHandler = GetComponent<AnimationHandler>();
     }
 
     private void UpdateSpellSlotsCooldowns()

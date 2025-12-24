@@ -11,6 +11,7 @@ public class SpellSlot
     public event Action<SpellSlot, float> OnCooldownStarted;
     public event Action<SpellSlot> OnCooldownEnded;
     public event Action<SpellSlot, bool> OnCastStateChanged;
+    public event Action<SpellSlot, Vector3> OnCastStarted;
     public event Action<SpellSlot> OnAbilityChanged;
     #endregion
 
@@ -86,7 +87,7 @@ public class SpellSlot
         return false;
     }
 
-    public void Cast(AbilityCaster caster, Vector3 worldPos, bool isHeldRequest)
+    public void Cast(AbilityCaster caster, Vector3 targetPoint, Vector3 aimPoint, bool isHeldRequest)
     {
         if (executor == null)
         {
@@ -98,7 +99,8 @@ public class SpellSlot
 
         UnsubscribeFromEndCast();
         SubscribeToEndCast();
-        executor.Cast(worldPos, isHeld);
+        executor.Cast(targetPoint, aimPoint, isHeld);
+        OnCastStarted?.Invoke(this, targetPoint);
         OnCastStateChanged?.Invoke(this, true);
 
         if (Ability != null && Ability.StartCooldownOnCast)
