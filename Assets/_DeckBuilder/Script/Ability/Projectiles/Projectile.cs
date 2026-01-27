@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
-public class Projectile : MonoBehaviour, IOwnable
+[RequireComponent(typeof(NetworkObject))]
+public class Projectile : NetworkBehaviour, IOwnable
 {
 	[SerializeField]
 	protected float lifeTime = 0.0f;
@@ -18,10 +21,18 @@ public class Projectile : MonoBehaviour, IOwnable
 	private Hitbox hitbox;
 	private Vector3 baseScale;
 	private Coroutine trailResetRoutine;
+	private NetworkObject networkObject;
+	private NetworkTransform networkTransform;
 
 	private void Awake()
 	{
 		baseScale = transform.localScale;
+		networkObject = GetComponent<NetworkObject>();
+		networkTransform = GetComponent<NetworkTransform>();
+		if (networkTransform == null)
+		{
+			networkTransform = gameObject.AddComponent<NetworkTransform>();
+		}
 	}
 
 	protected virtual void OnEnable()
@@ -44,6 +55,9 @@ public class Projectile : MonoBehaviour, IOwnable
 
 	protected virtual void Update()
 	{
+		if (IsSpawned && !IsServer)
+			return;
+
 		if (lifeTime <= 0)
 			return;
 
@@ -63,7 +77,14 @@ public class Projectile : MonoBehaviour, IOwnable
 	protected virtual void Kill()
 	{
 		ClearTrails();
-		PoolManager.Release(gameObject);
+		if (networkObject != null && networkObject.IsSpawned && NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+		{
+			networkObject.Despawn();
+		}
+		else
+		{
+			PoolManager.Release(gameObject);
+		}
 	}
 
 	private void RestartTrails()

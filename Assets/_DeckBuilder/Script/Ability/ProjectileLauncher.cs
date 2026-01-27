@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 public class ProjectileLauncher : MonoBehaviour
 {
@@ -95,8 +96,6 @@ public class ProjectileLauncher : MonoBehaviour
 
 		var results = new T[count];
 
-		// float adjustedSpreadAngle = CalculateAdjustedSpreadAngle(count);
-		// float startAngle = CalculateStartAngle(count, adjustedSpreadAngle);
 		float startAngle, stepAngle;
 		GetFanStartAndStep(count, out startAngle, out stepAngle);
 		for (int i = 0; i < count; i++)
@@ -137,7 +136,11 @@ public class ProjectileLauncher : MonoBehaviour
 		Quaternion shotRot = CalculateProjectileRotation(index, startAngle, adjustedSpreadAngle);
 		Vector3 shotPosition = CalculateProjectilePosition(index);
 
-		var proj = PoolManager.Provide<T>(projectile.gameObject, shotPosition, shotRot);
+		T proj = SpawnProjectileInstance<T>(shotPosition, shotRot);
+		if (proj == null)
+		{
+			return null;
+		}
 
 		AssignOwner(proj);
 		proj.SetScale(scaleFactor);
@@ -196,5 +199,26 @@ public class ProjectileLauncher : MonoBehaviour
 	private void Awake()
 	{
 		Reset();
+	}
+
+	private T SpawnProjectileInstance<T>(Vector3 position, Quaternion rotation) where T : Projectile
+	{
+		Unity.Netcode.NetworkManager manager = Unity.Netcode.NetworkManager.Singleton;
+		if (manager != null)
+		{
+			if (!manager.IsServer)
+				return null;
+
+			GameObject spawned = Object.Instantiate(projectile.gameObject, position, rotation);
+			var netObj = spawned.GetComponent<Unity.Netcode.NetworkObject>();
+			if (netObj != null)
+			{
+				netObj.Spawn(true);
+			}
+
+			return spawned.GetComponent<T>();
+		}
+
+		return PoolManager.Provide<T>(projectile.gameObject, position, rotation);
 	}
 }

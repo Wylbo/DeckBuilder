@@ -428,7 +428,6 @@ MonoBehaviour:
       m_Bits: 64
     maxWallIterations: 100
   animationHandler: {fileID: 191472792769803370}
-  predictedNavVisual: {fileID: 0}
 --- !u!114 &1904220953553573043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453,6 +452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ce012af7a44014984138bac5877c67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   dodgeSpellSlot:
     Ability: {fileID: 11400000, guid: 2b25bf341f1218144b3b8f1317563416, type: 2}
     cooldown:
@@ -479,6 +479,7 @@ MonoBehaviour:
   debuffUpdater: {fileID: 6244960309705328274}
   modifierManager: {fileID: 1904220953553573043}
   globalStatSource: {fileID: 5097382059795255847}
+  animationHandler: {fileID: 0}
 --- !u!114 &6244960309705328274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -562,13 +563,13 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
   AutoOwnerAuthorityTickOffset: 1
-  PositionInterpolationType: 2
-  RotationInterpolationType: 2
-  ScaleInterpolationType: 2
+  PositionInterpolationType: 0
+  RotationInterpolationType: 0
+  ScaleInterpolationType: 0
   PositionLerpSmoothing: 1
-  PositionMaxInterpolationTime: 0.1
+  PositionMaxInterpolationTime: 0.33
   RotationLerpSmoothing: 1
-  RotationMaxInterpolationTime: 0.1
+  RotationMaxInterpolationTime: 0.33
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 1
@@ -586,7 +587,7 @@ MonoBehaviour:
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
+  UseQuaternionSynchronization: 1
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
