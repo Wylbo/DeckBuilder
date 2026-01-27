@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Hitbox : MonoBehaviour, IDamager, IOwnable
@@ -17,6 +18,12 @@ public class Hitbox : MonoBehaviour, IDamager, IOwnable
     private void OnTriggerEnter(Collider other)
     {
         if (Owner == null)
+        {
+            return;
+        }
+
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager != null && !networkManager.IsServer)
         {
             return;
         }

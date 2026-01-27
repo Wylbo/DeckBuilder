@@ -26,7 +26,7 @@ public class AbilityChargedProjectileReleaseBehaviour : AbilityBehaviour
 			.SetMaxSpreadAngle(context.GetStat(AbilityStatKey.ProjectileMaxSpreadAngle))
 			.Launch<LinearProjectile>();
 
-		context.LastLaunchedProjectiles = launchedProjectiles;
+		context.SetLastLaunchedProjectiles(launchedProjectiles);
 
 		float distanceToTravel = Mathf.Lerp(minDistance, maxDistance, context.ChannelRatio);
 		foreach (var launchedProjectile in launchedProjectiles)

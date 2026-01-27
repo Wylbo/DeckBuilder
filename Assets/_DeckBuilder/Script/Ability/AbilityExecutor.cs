@@ -42,7 +42,7 @@ public interface IAbilityExecutor
     event UnityAction<bool> On_EndCast;
     float Cooldown { get; }
     bool IsCasting { get; }
-    void Cast(Vector3 worldPos, bool isHeld);
+    void Cast(Vector3 targetPoint, Vector3 aimPoint, bool isHeld);
     void EndHold(Vector3 worldPos);
     void EndCast(Vector3 worldPos, bool isSuccessful = true);
     void Update(float deltaTime);
@@ -135,9 +135,14 @@ public sealed class AbilityExecutor : IAbilityExecutor
 
     public void Cast(Vector3 worldPos, bool isHeld)
     {
+        Cast(worldPos, worldPos, isHeld);
+    }
+
+    public void Cast(Vector3 targetPoint, Vector3 aimPoint, bool isHeld)
+    {
         StopCastingState();
-        activeCastContext = new AbilityCastContext(behaviourContext, worldPos, isHeld);
-        StartCast(worldPos);
+        activeCastContext = new AbilityCastContext(behaviourContext, targetPoint, aimPoint, isHeld);
+        StartCast(targetPoint);
         ApplyDebuffs(Definition.DebuffsOnCast);
     }
 

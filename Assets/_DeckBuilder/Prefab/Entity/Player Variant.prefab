@@ -384,7 +384,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4133927394614638679, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 4228598670
+      value: 1609444572
       objectReference: {fileID: 0}
     - target: {fileID: 4133927394614638679, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
@@ -428,18 +428,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
       propertyPath: UseUnreliableDeltas
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-      propertyPath: PositionInterpolationType
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-      propertyPath: RotationInterpolationType
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5590197116553997273, guid: f534bcd483e19f148988e322285f8bc8, type: 3}
-      propertyPath: UseQuaternionSynchronization
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6841453337792729967, guid: f534bcd483e19f148988e322285f8bc8, type: 3}

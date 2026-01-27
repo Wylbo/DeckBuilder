@@ -8,10 +8,13 @@ public class AbilityDamageTargetBehaviour : AbilityBehaviour
 
 	public override void OnCastStarted(AbilityCastContext context)
 	{
-		if (context?.Target == null)
+		if (context == null)
 			return;
 
-		Character character = context.Target.Character;
+		if (!context.TryGetTarget(out Targetable target))
+			return;
+
+		Character character = target.Character;
 		if (character != null)
 		{
 			int dmg = Mathf.RoundToInt(context.GetStat(damageStat));

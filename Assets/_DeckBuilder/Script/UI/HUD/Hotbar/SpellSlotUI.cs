@@ -1,3 +1,5 @@
+using System;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -5,6 +7,7 @@ using DG.Tweening;
 
 public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler, ITooltipSource
 {
+    #region Fields
     [SerializeField] private Image iconImage;
     [SerializeField] private Image cooldownFillImage;
     [SerializeField] private RectTransform dropHighlight;
@@ -19,9 +22,17 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     private AbilityCaster boundCaster;
     private int boundSlotIndex = -1;
     private bool isDodgeSlot;
-
     private Tween highlightTween;
+    #endregion
 
+    #region Private Members
+    #endregion
+
+    #region Getters
+    public RectTransform TooltipAnchor => iconImage != null ? iconImage.rectTransform : transform as RectTransform;
+    #endregion
+
+    #region Unity Message Methods
     private void OnEnable()
     {
         HideDropHighlight();
@@ -30,7 +41,11 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     private void OnDisable()
     {
         Unbind();
-        dropHighlight.gameObject.SetActive(false);
+        if (dropHighlight != null)
+        {
+            dropHighlight.gameObject.SetActive(false);
+        }
+
         TooltipManager.Instance?.Hide(this);
         boundCaster = null;
         boundSlotIndex = -1;
@@ -39,10 +54,11 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
 
     private void Update()
     {
-        if (boundSlot != null)
-            UpdateCooldownFill();
+        UpdateCooldownFill();
     }
+    #endregion
 
+    #region Public Methods
     public void Bind(SpellSlot slot, AbilityCaster caster = null, int slotIndex = -1, bool isDodgeSlot = false)
     {
         bool sameSlot = ReferenceEquals(boundSlot, slot);
@@ -96,17 +112,22 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
         TooltipManager.Instance?.Hide(this);
 
         if (!allowAbilityDrops || isDodgeSlot || boundCaster == null || boundSlotIndex < 0)
+        {
             return;
+        }
 
         if (!AbilityDragContext.HasPayload)
+        {
             return;
+        }
 
-        var ability = AbilityDragContext.DraggedAbility;
+        Ability ability = AbilityDragContext.DraggedAbility;
         if (ability == null)
+        {
             return;
+        }
 
         boundCaster.AssignAbilityToSlot(boundSlotIndex, ability);
-        // Rebind to pick up the new ability instance and events
         Bind(boundSlot, boundCaster, boundSlotIndex, isDodgeSlot);
         AbilityDragContext.EndDrag();
     }
@@ -114,10 +135,14 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (CanAcceptDrop())
+        {
             ShowDropHighlight();
+        }
 
         if (boundAbility != null && !AbilityDragContext.HasPayload)
+        {
             TooltipManager.Instance?.Show(this, eventData);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -126,6 +151,14 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
         TooltipManager.Instance?.Hide(this);
     }
 
+    public bool TryGetTooltipData(out TooltipData data)
+    {
+        data = TooltipData.FromAbility(boundAbility);
+        return data.HasContent;
+    }
+    #endregion
+
+    #region Private Methods
     private bool CanAcceptDrop()
     {
         return allowAbilityDrops && boundCaster != null && boundSlotIndex >= 0 && AbilityDragContext.HasPayload;
@@ -134,7 +167,9 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     private void ShowDropHighlight()
     {
         if (dropHighlight != null)
+        {
             dropHighlight.gameObject.SetActive(true);
+        }
 
         highlightTween?.Kill();
         highlightTween = dropHighlight.DOScale(highlightScale, highlightDurationIn)
@@ -151,7 +186,9 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
             .OnComplete(() =>
             {
                 if (dropHighlight != null)
+                {
                     dropHighlight.gameObject.SetActive(false);
+                }
             });
     }
 
@@ -164,36 +201,75 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
     private void RefreshIcon()
     {
         if (iconImage == null)
-            return;
-
-        if (boundAbility != null && boundAbility.Icon != null)
         {
-            iconImage.enabled = true;
-            iconImage.sprite = boundAbility.Icon;
+            return;
         }
-        else
+
+        string abilityId = ResolveAbilityId();
+        bool hasAbility = !string.IsNullOrEmpty(abilityId);
+
+        if (!hasAbility)
         {
             iconImage.enabled = false;
             iconImage.sprite = null;
+            return;
         }
+
+        if (boundAbility != null && boundAbility.Icon != null)
+        {
+            bool idMatches = string.IsNullOrEmpty(abilityId) || string.Equals(boundAbility.name, abilityId, StringComparison.OrdinalIgnoreCase);
+            if (idMatches)
+            {
+                iconImage.enabled = true;
+                iconImage.sprite = boundAbility.Icon;
+                return;
+            }
+        }
+
+        iconImage.enabled = false;
+        iconImage.sprite = null;
     }
 
     private void UpdateCooldownFill(bool forceReset = false)
     {
         if (cooldownFillImage == null)
+        {
             return;
+        }
 
-        bool onCooldown = !forceReset && boundSlot != null &&
-                          boundSlot.cooldown != null &&
-                          boundSlot.cooldown.TotalTime > 0f &&
-                          boundSlot.cooldown.IsRunning;
+        NetworkSpellSlotState state;
+        if (forceReset)
+        {
+            cooldownFillImage.fillAmount = 0f;
+            cooldownFillImage.enabled = false;
+            return;
+        }
 
-        float fillAmount = onCooldown
+        bool hasNetworkState = TryGetNetworkSlotState(out state);
+        if (hasNetworkState)
+        {
+            float remaining = Mathf.Max(0f, state.CooldownEndTime - ResolveServerTime());
+            bool onCooldown = state.CooldownDuration > 0f && remaining > 0f;
+            float fillAmount = onCooldown && state.CooldownDuration > Mathf.Epsilon
+                ? Mathf.Clamp01(remaining / state.CooldownDuration)
+                : 0f;
+
+            cooldownFillImage.fillAmount = fillAmount;
+            cooldownFillImage.enabled = onCooldown;
+            return;
+        }
+
+        bool localCooldown = boundSlot != null &&
+                             boundSlot.cooldown != null &&
+                             boundSlot.cooldown.TotalTime > 0f &&
+                             boundSlot.cooldown.IsRunning;
+
+        float localFill = localCooldown
             ? Mathf.Clamp01(boundSlot.cooldown.Remaining / boundSlot.cooldown.TotalTime)
             : 0f;
 
-        cooldownFillImage.fillAmount = fillAmount;
-        cooldownFillImage.enabled = onCooldown;
+        cooldownFillImage.fillAmount = localFill;
+        cooldownFillImage.enabled = localCooldown;
     }
 
     private void HandleAbilityStarted(Ability ability)
@@ -205,11 +281,42 @@ public class SpellSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IP
         UpdateCooldownFill();
     }
 
-    public RectTransform TooltipAnchor => iconImage != null ? iconImage.rectTransform : transform as RectTransform;
-
-    public bool TryGetTooltipData(out TooltipData data)
+    private bool TryGetNetworkSlotState(out NetworkSpellSlotState state)
     {
-        data = TooltipData.FromAbility(boundAbility);
-        return data.HasContent;
+        if (boundCaster != null)
+        {
+            return boundCaster.TryGetSlotState(boundSlotIndex, isDodgeSlot, out state);
+        }
+
+        state = NetworkSpellSlotState.Empty;
+        return false;
     }
+
+    private float ResolveServerTime()
+    {
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager != null)
+        {
+            return (float)networkManager.ServerTime.Time;
+        }
+
+        return Time.time;
+    }
+
+    private string ResolveAbilityId()
+    {
+        NetworkSpellSlotState state;
+        if (TryGetNetworkSlotState(out state))
+        {
+            if (state.AbilityId.Length > 0)
+            {
+                return state.AbilityId.ToString();
+            }
+
+            return string.Empty;
+        }
+
+        return boundAbility != null ? boundAbility.name : string.Empty;
+    }
+    #endregion
 }

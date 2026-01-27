@@ -78,7 +78,7 @@ public class AbilityProjectileLaunchBehaviour : AbilityBehaviour
 			}
 		}
 
-		context.LastLaunchedProjectiles = launched;
+		context.SetLastLaunchedProjectiles(launched);
 	}
 
 }
