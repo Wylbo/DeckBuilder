@@ -9,13 +9,14 @@ using Unity.Netcode;
 /// <summary>
 /// Component allowing an entity to move with client-side prediction and server reconciliation.
 /// Handles NavMeshAgent-based pathfinding with network synchronization.
+/// Coordinates between specialized handlers for prediction, reconciliation, dash, and visual smoothing.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(GlobalStatSource))]
 [RequireComponent(typeof(StatsModifierManager))]
 [RequireComponent(typeof(AnimationHandler))]
-public class Movement : NetworkBehaviour, IAbilityMovement
+public class Movement : NetworkBehaviour, IAbilityMovement, IInputReplayer
 {
     #region Fields
 
@@ -51,39 +52,48 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
     /// <summary>The stat key used to determine movement speed.</summary>
     [SerializeField]
+    [Tooltip("The GlobalStatKey used to evaluate movement speed from stats.")]
     private GlobalStatKey movementSpeedStatKey = GlobalStatKey.MovementSpeed;
 
     /// <summary>Reference to the global stat source for speed evaluation.</summary>
     [SerializeField]
+    [Tooltip("Reference to the GlobalStatSource component for speed evaluation.")]
     private GlobalStatSource globalStatSource;
 
     /// <summary>Reference to the stats modifier manager.</summary>
     [SerializeField]
+    [Tooltip("Reference to the StatsModifierManager for speed modifier events.")]
     private StatsModifierManager modifierManager;
 
     /// <summary>Reference to the rigidbody for physics interactions.</summary>
     [SerializeField]
+    [Tooltip("Reference to the Rigidbody component for physics interactions.")]
     private Rigidbody body;
 
     /// <summary>Reference to the NavMeshAgent for pathfinding.</summary>
     [SerializeField]
+    [Tooltip("Reference to the NavMeshAgent component for pathfinding.")]
     private NavMeshAgent serverAgent;
 
     /// <summary>Reference to the capsule collider for collision detection.</summary>
     [SerializeField]
+    [Tooltip("Reference to the CapsuleCollider for collision bounds.")]
     private CapsuleCollider capsuleCollider;
 
     /// <summary>Layer mask for ground detection.</summary>
     [SerializeField]
+    [Tooltip("Layer mask used for ground detection during dash.")]
     private LayerMask groundLayerMask;
 
     /// <summary>Default dash configuration.</summary>
     [SerializeField]
+    [Tooltip("Default dash configuration used when no specific data is provided.")]
     private DashData defaultDashData = new DashData();
 
     [Header("Animation")]
     /// <summary>Reference to the animation handler for movement animations.</summary>
     [SerializeField]
+    [Tooltip("Reference to the AnimationHandler for movement animations.")]
     private AnimationHandler animationHandler;
 
     [Header("Network Prediction")]
@@ -108,9 +118,9 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     private float stateBroadcastInterval = 0.05f;
 
     internal const int DEFAULT_MAX_WALL_ITERATIONS = 100;
-    private const int MAX_PENDING_INPUTS = 64;
-    private const int MAX_CONSECUTIVE_LARGE_CORRECTIONS = 5;
     private const float LARGE_ERROR_THRESHOLD = 1f;
+    private const int MAX_CONSECUTIVE_LARGE_CORRECTIONS = 5;
+    private const float MIN_ERROR_THRESHOLD = 0.01f;
 
     #endregion
 
@@ -120,20 +130,19 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     private Coroutine _dashRoutine;
     private float _baseMaxSpeed;
     private bool _isDashing;
-
-    private uint _nextSequenceNumber;
-    private readonly Queue<MovementInput> _pendingInputs = new Queue<MovementInput>();
     private uint _lastAcknowledgedSequence;
+    private MovementState _lastReceivedState;
 
-    private Vector3 _correctionOffset = Vector3.zero;
-    private int _consecutiveLargeCorrections;
+    private MovementPredictionHandler _predictionHandler;
+    private MovementReconciliationHandler _reconciliationHandler;
+    private MovementNetworkBroadcaster _networkBroadcaster;
+    private DashHandler _dashHandler;
+    private MovementVisualHandler _visualHandler;
 
     private readonly InterpolationBuffer _interpolationBuffer = new InterpolationBuffer();
     private readonly PositionHistory _positionHistory = new PositionHistory();
 
-    private float _lastStateBroadcastTime;
-    private Vector3 _lastBroadcastPosition;
-    private MovementState _lastReceivedState;
+    private ReconciliationConfig _reconciliationConfig;
 
     #endregion
 
@@ -161,8 +170,6 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     public InterpolationBuffer InterpolationBuffer => _interpolationBuffer;
 
     private float AgentRadius => NavMesh.GetSettingsByID(serverAgent.agentTypeID).agentRadius;
-    private float StepHeight => NavMesh.GetSettingsByID(serverAgent.agentTypeID).agentClimb;
-    private float HalfHeight => capsuleCollider != null ? capsuleCollider.height / 2 : 1f;
 
     #endregion
 
@@ -180,8 +187,8 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
     private void Awake()
     {
-        _baseMaxSpeed = serverAgent != null ? serverAgent.speed : 0f;
-        RefreshMovementSpeedFromStats();
+        InitializeHandlers();
+        InitializeMovementSpeed();
     }
 
     private void OnEnable()
@@ -238,17 +245,13 @@ public class Movement : NetworkBehaviour, IAbilityMovement
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
         ConfigureNetworkRole();
     }
 
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
-
-        _pendingInputs.Clear();
-        _interpolationBuffer.Clear();
-        _positionHistory.Clear();
+        ResetHandlers();
     }
 
     #endregion
@@ -272,7 +275,7 @@ public class Movement : NetworkBehaviour, IAbilityMovement
             return false;
         }
 
-        MovementInput input = CreateClickToMoveInput(worldTo);
+        MovementInput input = _predictionHandler.CreateClickToMoveInput(worldTo, GetNetworkTime());
         ApplyLocalPrediction(input);
         SendInputToServer(input);
 
@@ -294,7 +297,7 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
         if (IsOwner)
         {
-            MovementInput input = CreateStopInput();
+            MovementInput input = _predictionHandler.CreateStopInput(GetNetworkTime());
             SendInputToServer(input);
         }
     }
@@ -355,31 +358,19 @@ public class Movement : NetworkBehaviour, IAbilityMovement
         }
 
         StopMovement();
+        StopExistingDashRoutine();
 
-        if (_dashRoutine != null)
-        {
-            StopCoroutine(_dashRoutine);
-        }
+        List<Vector3> dashPositions = _dashHandler.ComputeDashPositions(
+            dashData,
+            transform.position,
+            toward,
+            serverAgent,
+            groundLayerMask,
+            AgentRadius
+        );
 
-        List<Vector3> dashPositions = ComputeDashPositions(dashData, toward);
-
-        _canMove = false;
-        _isDashing = true;
-        _dashRoutine = StartCoroutine(DashRoutine(dashPositions, dashData));
-
-        if (IsOwner)
-        {
-            DashInputData dashInputData = new DashInputData
-            {
-                StartPosition = transform.position,
-                Direction = (toward - transform.position).normalized,
-                Distance = dashData.dashDistance,
-                Speed = dashData.dashSpeed
-            };
-
-            MovementInput input = CreateDashInput(dashInputData);
-            SendInputToServer(input);
-        }
+        StartDash(dashPositions, dashData);
+        SendDashInputIfOwner(dashData, toward);
     }
 
     /// <summary>
@@ -393,10 +384,7 @@ public class Movement : NetworkBehaviour, IAbilityMovement
             _baseMaxSpeed = globalSpeed;
         }
 
-        if (serverAgent != null && _baseMaxSpeed > 0f)
-        {
-            serverAgent.speed = _baseMaxSpeed;
-        }
+        ApplyMovementSpeedToAgent();
     }
 
     /// <summary>
@@ -419,26 +407,126 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
     #endregion
 
+    #region IInputReplayer Implementation
+
+    /// <summary>
+    /// Replays a click-to-move input by setting the NavMeshAgent destination.
+    /// </summary>
+    /// <param name="targetPosition">The world position to move toward.</param>
+    public void ReplayClickToMove(Vector3 targetPosition)
+    {
+        if (serverAgent.enabled && _canMove)
+        {
+            serverAgent.SetDestination(targetPosition);
+        }
+    }
+
+    /// <summary>
+    /// Replays a directional movement input.
+    /// </summary>
+    /// <param name="direction">The normalized movement direction.</param>
+    /// <param name="speed">The movement speed.</param>
+    /// <param name="deltaTime">The time delta for this movement step.</param>
+    public void ReplayDirectional(Vector3 direction, float speed, float deltaTime)
+    {
+        if (serverAgent.enabled && _canMove)
+        {
+            serverAgent.Move(direction * speed * deltaTime);
+        }
+    }
+
+    /// <summary>
+    /// Replays a dash input by teleporting to the dash end position.
+    /// </summary>
+    /// <param name="dashData">The dash input data containing start position, direction, and distance.</param>
+    public void ReplayDash(DashInputData dashData)
+    {
+        Vector3 dashEnd = dashData.StartPosition + dashData.Direction * dashData.Distance;
+        transform.position = dashEnd;
+    }
+
+    /// <summary>
+    /// Replays a stop input by resetting the path and velocity.
+    /// </summary>
+    public void ReplayStop()
+    {
+        if (serverAgent.enabled)
+        {
+            serverAgent.ResetPath();
+            serverAgent.velocity = Vector3.zero;
+        }
+    }
+
+    #endregion
+
     #region Private Methods
+
+    private void InitializeHandlers()
+    {
+        _predictionHandler = new MovementPredictionHandler();
+        _reconciliationHandler = new MovementReconciliationHandler();
+        _networkBroadcaster = new MovementNetworkBroadcaster();
+        _dashHandler = new DashHandler();
+        _visualHandler = new MovementVisualHandler();
+
+        _reconciliationConfig = new ReconciliationConfig
+        {
+            SnapThreshold = snapThreshold,
+            LargeErrorThreshold = LARGE_ERROR_THRESHOLD,
+            MaxConsecutiveLargeCorrections = MAX_CONSECUTIVE_LARGE_CORRECTIONS,
+            MinErrorThreshold = MIN_ERROR_THRESHOLD
+        };
+    }
+
+    private void InitializeMovementSpeed()
+    {
+        _baseMaxSpeed = serverAgent != null ? serverAgent.speed : 0f;
+        RefreshMovementSpeedFromStats();
+    }
+
+    private void ResetHandlers()
+    {
+        _predictionHandler.Reset();
+        _reconciliationHandler.Reset();
+        _networkBroadcaster.Reset();
+        _visualHandler.Reset();
+        _interpolationBuffer.Clear();
+        _positionHistory.Clear();
+    }
 
     private void ConfigureNetworkRole()
     {
         if (IsOwner)
         {
-            serverAgent.enabled = true;
-            serverAgent.updatePosition = true;
-            serverAgent.updateRotation = true;
+            ConfigureAsOwner();
         }
         else if (IsServer)
         {
-            serverAgent.enabled = true;
-            serverAgent.updatePosition = true;
-            serverAgent.updateRotation = true;
+            ConfigureAsServer();
         }
         else
         {
-            serverAgent.enabled = false;
+            ConfigureAsNonOwnerClient();
         }
+    }
+
+    private void ConfigureAsOwner()
+    {
+        serverAgent.enabled = true;
+        serverAgent.updatePosition = true;
+        serverAgent.updateRotation = true;
+    }
+
+    private void ConfigureAsServer()
+    {
+        serverAgent.enabled = true;
+        serverAgent.updatePosition = true;
+        serverAgent.updateRotation = true;
+    }
+
+    private void ConfigureAsNonOwnerClient()
+    {
+        serverAgent.enabled = false;
     }
 
     private float GetNetworkTime()
@@ -448,50 +536,6 @@ public class Movement : NetworkBehaviour, IAbilityMovement
             return (float)NetworkManager.Singleton.ServerTime.Time;
         }
         return Time.time;
-    }
-
-    private MovementInput CreateClickToMoveInput(Vector3 targetPosition)
-    {
-        MovementInput input = MovementInput.CreateClickToMove(
-            _nextSequenceNumber++,
-            GetNetworkTime(),
-            targetPosition
-        );
-
-        AddPendingInput(input);
-        return input;
-    }
-
-    private MovementInput CreateStopInput()
-    {
-        MovementInput input = MovementInput.CreateStop(
-            _nextSequenceNumber++,
-            GetNetworkTime()
-        );
-
-        AddPendingInput(input);
-        return input;
-    }
-
-    private MovementInput CreateDashInput(DashInputData dashData)
-    {
-        MovementInput input = MovementInput.CreateDash(
-            _nextSequenceNumber++,
-            GetNetworkTime(),
-            dashData
-        );
-
-        AddPendingInput(input);
-        return input;
-    }
-
-    private void AddPendingInput(MovementInput input)
-    {
-        while (_pendingInputs.Count >= MAX_PENDING_INPUTS)
-        {
-            _pendingInputs.Dequeue();
-        }
-        _pendingInputs.Enqueue(input);
     }
 
     private void ApplyLocalPrediction(MovementInput input)
@@ -541,6 +585,12 @@ public class Movement : NetworkBehaviour, IAbilityMovement
             return;
         }
 
+        ExecuteInputOnServer(input);
+        _lastAcknowledgedSequence = input.SequenceNumber;
+    }
+
+    private void ExecuteInputOnServer(MovementInput input)
+    {
         switch (input.InputType)
         {
             case MovementInputType.ClickToMove:
@@ -565,8 +615,6 @@ public class Movement : NetworkBehaviour, IAbilityMovement
             case MovementInputType.Dash:
                 break;
         }
-
-        _lastAcknowledgedSequence = input.SequenceNumber;
     }
 
     private bool ValidateInput(MovementInput input)
@@ -584,19 +632,27 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
     private void UpdateServerSimulation()
     {
-        float currentTime = GetNetworkTime();
+        RecordPositionHistory();
+        BroadcastStateIfNeeded();
+    }
 
+    private void RecordPositionHistory()
+    {
+        float currentTime = GetNetworkTime();
         _positionHistory.RecordPosition(
             currentTime,
             transform.position,
             transform.rotation,
             CalculateHitboxBounds()
         );
+    }
 
-        if (currentTime - _lastStateBroadcastTime >= stateBroadcastInterval)
+    private void BroadcastStateIfNeeded()
+    {
+        float currentTime = GetNetworkTime();
+        if (_networkBroadcaster.ShouldBroadcast(currentTime, stateBroadcastInterval))
         {
-            BroadcastState();
-            _lastStateBroadcastTime = currentTime;
+            BroadcastState(currentTime);
         }
     }
 
@@ -609,11 +665,11 @@ public class Movement : NetworkBehaviour, IAbilityMovement
         return new Bounds(transform.position, Vector3.one);
     }
 
-    private void BroadcastState()
+    private void BroadcastState(float currentTime)
     {
-        MovementState state = MovementState.Create(
+        MovementState state = _networkBroadcaster.CreateMovementState(
             _lastAcknowledgedSequence,
-            GetNetworkTime(),
+            currentTime,
             transform.position,
             serverAgent.velocity,
             transform.rotation,
@@ -624,7 +680,7 @@ public class Movement : NetworkBehaviour, IAbilityMovement
         );
 
         BroadcastMovementStateClientRpc(state);
-        _lastBroadcastPosition = transform.position;
+        _networkBroadcaster.RecordBroadcast(currentTime, transform.position);
     }
 
     [Rpc(SendTo.Everyone, Delivery = RpcDelivery.Unreliable)]
@@ -635,143 +691,93 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
     private void ReconcileWithServerState(MovementState state)
     {
-        RemoveAcknowledgedInputs(state.LastProcessedSequence);
-
-        if (!state.CanMove && _canMove)
-        {
-            _pendingInputs.Clear();
-            StopMovement();
-        }
-        _canMove = state.CanMove;
+        _predictionHandler.RemoveAcknowledgedInputs(state.LastProcessedSequence);
+        HandleCanMoveStateChange(state);
 
         if (_isDashing)
         {
             return;
         }
 
-        Vector3 predictedPosition = transform.position;
-        Vector3 serverPosition = state.Position;
-        Vector3 error = serverPosition - predictedPosition;
-        float errorMagnitude = error.magnitude;
+        PerformReconciliation(state);
+    }
 
-        if (errorMagnitude > snapThreshold)
+    private void HandleCanMoveStateChange(MovementState state)
+    {
+        if (!state.CanMove && _canMove)
         {
-            transform.position = serverPosition;
-            _correctionOffset = Vector3.zero;
-            _consecutiveLargeCorrections = 0;
+            _predictionHandler.ClearPendingInputs();
+            StopMovement();
         }
-        else if (errorMagnitude > 0.01f)
+        _canMove = state.CanMove;
+    }
+
+    private void PerformReconciliation(MovementState state)
+    {
+        Vector3 previousVisualPosition = _visualHandler.GetVisualPosition(transform.position);
+
+        ReconciliationResult result = _reconciliationHandler.Reconcile(
+            state,
+            transform.position,
+            previousVisualPosition,
+            _reconciliationConfig
+        );
+
+        ApplyReconciliationResult(result);
+    }
+
+    private void ApplyReconciliationResult(ReconciliationResult result)
+    {
+        if (result.ShouldSnap)
         {
-            if (errorMagnitude > LARGE_ERROR_THRESHOLD)
-            {
-                _consecutiveLargeCorrections++;
-
-                if (_consecutiveLargeCorrections > MAX_CONSECUTIVE_LARGE_CORRECTIONS)
-                {
-                    transform.position = serverPosition;
-                    _correctionOffset = Vector3.zero;
-                    _pendingInputs.Clear();
-                    _consecutiveLargeCorrections = 0;
-                    return;
-                }
-            }
-            else
-            {
-                _consecutiveLargeCorrections = 0;
-            }
-
-            Vector3 previousVisualPosition = transform.position + _correctionOffset;
-            transform.position = serverPosition;
-            ReplayPendingInputs();
-
-            _correctionOffset = previousVisualPosition - transform.position;
-            UpdateVisualPositionImmediate();
+            ApplySnapCorrection(result);
+        }
+        else if (result.ShouldSmooth)
+        {
+            ApplySmoothCorrection(result);
         }
     }
 
-    private void RemoveAcknowledgedInputs(uint lastProcessedSequence)
+    private void ApplySnapCorrection(ReconciliationResult result)
     {
-        while (_pendingInputs.Count > 0)
+        transform.position = result.CorrectedPosition;
+        _visualHandler.ResetCorrectionOffset();
+
+        if (result.ShouldClearInputs)
         {
-            MovementInput oldest = _pendingInputs.Peek();
-            if (IsSequenceNewer(lastProcessedSequence, oldest.SequenceNumber) ||
-                oldest.SequenceNumber == lastProcessedSequence)
-            {
-                _pendingInputs.Dequeue();
-            }
-            else
-            {
-                break;
-            }
+            _predictionHandler.ClearPendingInputs();
         }
     }
 
-    private bool IsSequenceNewer(uint a, uint b)
+    private void ApplySmoothCorrection(ReconciliationResult result)
     {
-        return (a > b) && (a - b < uint.MaxValue / 2) ||
-               (b > a) && (b - a > uint.MaxValue / 2);
-    }
+        Vector3 previousVisualPosition = _visualHandler.GetVisualPosition(transform.position);
+        transform.position = result.CorrectedPosition;
 
-    private void ReplayPendingInputs()
-    {
-        foreach (MovementInput input in _pendingInputs)
+        if (result.ShouldReplay)
         {
-            ReplayInput(input);
+            _predictionHandler.ReplayPendingInputs(this, serverAgent.speed, Time.fixedDeltaTime);
         }
-    }
 
-    private void ReplayInput(MovementInput input)
-    {
-        switch (input.InputType)
-        {
-            case MovementInputType.ClickToMove:
-                if (serverAgent.enabled && _canMove)
-                {
-                    serverAgent.SetDestination(input.TargetPosition);
-                }
-                break;
-
-            case MovementInputType.Directional:
-                if (serverAgent.enabled && _canMove)
-                {
-                    serverAgent.Move(input.MoveDirection * serverAgent.speed * Time.fixedDeltaTime);
-                }
-                break;
-
-            case MovementInputType.Dash:
-                Vector3 dashEnd = input.DashData.StartPosition +
-                                 input.DashData.Direction * input.DashData.Distance;
-                transform.position = dashEnd;
-                break;
-
-            case MovementInputType.Stop:
-                if (serverAgent.enabled)
-                {
-                    serverAgent.ResetPath();
-                    serverAgent.velocity = Vector3.zero;
-                }
-                break;
-        }
+        _visualHandler.ApplyCorrectionOffset(previousVisualPosition, transform.position);
+        _visualHandler.UpdateVisualPositionImmediate(visualTransform, transform.position, transform.rotation);
     }
 
     private void UpdateOwnerVisual()
     {
-        _correctionOffset = Vector3.Lerp(
-            _correctionOffset,
-            Vector3.zero,
-            correctionSmoothingRate * Time.deltaTime
-        );
-
-        UpdateVisualPositionImmediate();
-    }
-
-    private void UpdateVisualPositionImmediate()
-    {
-        if (visualTransform != null)
+        if (_isDashing)
         {
-            visualTransform.position = transform.position + _correctionOffset;
-            visualTransform.rotation = transform.rotation;
+            _visualHandler.SyncVisualToSimulation(visualTransform, transform.position, transform.rotation);
+            return;
         }
+
+        _visualHandler.UpdateOwnerVisual(
+            visualTransform,
+            transform.position,
+            transform.rotation,
+            correctionSmoothingRate,
+            Time.deltaTime
+        );
     }
 
     private void UpdateNonOwnerInterpolation()
@@ -781,161 +787,116 @@ public class Movement : NetworkBehaviour, IAbilityMovement
 
         if (snapshot.Timestamp > 0f)
         {
-            transform.position = snapshot.Position;
-            transform.rotation = snapshot.Rotation;
-
-            if (visualTransform != null)
-            {
-                visualTransform.position = snapshot.Position;
-                visualTransform.rotation = snapshot.Rotation;
-            }
+            ApplyInterpolatedSnapshot(snapshot);
         }
 
         _interpolationBuffer.PruneOldSnapshots(networkTime);
     }
 
+    private void ApplyInterpolatedSnapshot(PositionSnapshot snapshot)
+    {
+        transform.position = snapshot.Position;
+        transform.rotation = snapshot.Rotation;
+
+        if (visualTransform != null)
+        {
+            visualTransform.position = snapshot.Position;
+            visualTransform.rotation = snapshot.Rotation;
+        }
+    }
+
     private void UpdateAnimationFromMovement()
     {
-        if (animationHandler != null)
+        if (animationHandler == null)
         {
-            Vector3 velocity = serverAgent != null && serverAgent.enabled
-                ? serverAgent.velocity
-                : _lastReceivedState.Velocity;
+            return;
+        }
 
-            animationHandler.UpdateMovement(velocity);
+        Vector3 velocity = GetCurrentVelocity();
+        animationHandler.UpdateMovement(velocity);
+    }
+
+    private Vector3 GetCurrentVelocity()
+    {
+        if (serverAgent != null && serverAgent.enabled)
+        {
+            return serverAgent.velocity;
+        }
+        return _lastReceivedState.Velocity;
+    }
+
+    private void StopExistingDashRoutine()
+    {
+        if (_dashRoutine != null)
+        {
+            StopCoroutine(_dashRoutine);
         }
     }
 
-    private List<Vector3> ComputeDashPositions(DashData dashData, Vector3 toward)
+    private void StartDash(List<Vector3> dashPositions, DashData dashData)
     {
-        toward.y = transform.position.y;
-
-        Vector3 direction = toward - transform.position;
-        direction = direction.normalized;
-
-        Vector3 wantedDestination = transform.position + direction * dashData.dashDistance;
-
-        List<Vector3> dashPositions = CheckWalls(wantedDestination, dashData);
-
-        for (int i = 0; i < dashPositions.Count; i++)
-        {
-            DebugDrawer.DrawSphere(dashPositions[i], 0.1f, Color.green, 1f);
-        }
-
-        return dashPositions;
+        _canMove = false;
+        _isDashing = true;
+        _visualHandler.ResetCorrectionOffset();
+        _dashRoutine = StartCoroutine(DashRoutine(dashPositions, dashData));
     }
 
-    private List<Vector3> CheckWalls(Vector3 wantedPosition, DashData dashData)
+    private void SendDashInputIfOwner(DashData dashData, Vector3 toward)
     {
-        List<Vector3> dashPositions = new List<Vector3> { transform.position };
-        Vector3 wantedDirection = wantedPosition - dashPositions[^1];
-
-        Physics.Raycast(transform.position, Vector3.down, out RaycastHit down, 2f, groundLayerMask);
-        Vector3 groundNormal = down.normal;
-        Debug.DrawRay(transform.position, groundNormal, Color.red, 1f);
-
-        wantedDirection = Vector3.ProjectOnPlane(wantedDirection, groundNormal);
-        wantedDirection = wantedDirection.normalized;
-
-        Vector3 remaining = wantedPosition - dashPositions[^1];
-
-        bool forwardCheck = serverAgent.Raycast(wantedPosition, out NavMeshHit forwardHit);
-        int iterationCount = 0;
-        int maxIterations = dashData.maxWallIterations > 0
-            ? dashData.maxWallIterations
-            : DEFAULT_MAX_WALL_ITERATIONS;
-
-        while (forwardCheck && iterationCount < maxIterations)
+        if (!IsOwner)
         {
-            iterationCount++;
-            Debug.DrawRay(forwardHit.position, forwardHit.normal * 2, Color.red, 3f);
-            DebugDrawer.DrawSphere(forwardHit.position, AgentRadius, Color.cyan, 3f);
-
-            dashPositions.Add(forwardHit.position);
-
-            if (!dashData.slideOnWalls)
-            {
-                remaining = Vector3.zero;
-                break;
-            }
-
-            remaining = wantedPosition - dashPositions[^1];
-            remaining = Vector3.ProjectOnPlane(remaining, forwardHit.normal);
-            wantedPosition = remaining + dashPositions[^1];
-
-            wantedDirection = wantedPosition - dashPositions[^1];
-            wantedDirection = wantedDirection.normalized;
-
-            forwardCheck = NavMesh.Raycast(serverAgent.nextPosition, wantedPosition, out forwardHit, NavMesh.AllAreas);
+            return;
         }
 
-        if (forwardCheck && iterationCount >= maxIterations)
+        DashInputData dashInputData = new DashInputData
         {
-            LogWallCheckLimitReached(this, maxIterations);
-            remaining = Vector3.zero;
-        }
+            StartPosition = transform.position,
+            Direction = (toward - transform.position).normalized,
+            Distance = dashData.dashDistance,
+            Speed = dashData.dashSpeed
+        };
 
-        dashPositions.Add(dashPositions[^1] + wantedDirection * remaining.magnitude);
-
-        return dashPositions;
+        MovementInput input = _predictionHandler.CreateDashInput(dashInputData, GetNetworkTime());
+        SendInputToServer(input);
     }
 
-    internal static void LogWallCheckLimitReached(Component owner, int maxIterations)
+    private IEnumerator DashRoutine(List<Vector3> dashPositions, DashData dashData)
     {
-        string ownerName = owner != null ? owner.name : "(unknown object)";
-        Debug.LogWarning($"Dash wall check reached the max iteration count ({maxIterations}) for {ownerName}. Ending dash early to avoid infinite loop.");
-    }
+        SetBodyDashRotation(dashPositions);
 
-    private IEnumerator DashRoutine(List<Vector3> dashPosition, DashData dashData)
-    {
-        SetBodyDashRotation(dashPosition);
-
-        float dashDuration = dashData.dashDistance / dashData.dashSpeed;
-        float elapsedTime = 0;
-        float normalizedTime;
-        float curvePosition;
-        Vector3 nextPosition;
+        float dashDuration = _dashHandler.CalculateDashDuration(dashData.dashDistance, dashData.dashSpeed);
+        float elapsedTime = 0f;
 
         while (elapsedTime < dashDuration)
         {
             elapsedTime += Time.deltaTime;
-            normalizedTime = Mathf.Clamp01(elapsedTime / dashDuration);
+            float normalizedTime = Mathf.Clamp01(elapsedTime / dashDuration);
+            float curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
 
-            curvePosition = dashData.dashCurve.Evaluate(normalizedTime);
-            nextPosition = InterpolatePath(dashPosition, curvePosition);
+            Vector3 nextPosition = _dashHandler.InterpolatePath(dashPositions, curvePosition);
             serverAgent.nextPosition = nextPosition;
 
             yield return null;
         }
 
-        serverAgent.enabled = true;
-        _canMove = true;
-        _isDashing = false;
+        CompleteDash();
     }
 
-    private void SetBodyDashRotation(List<Vector3> dashPosition)
+    private void SetBodyDashRotation(List<Vector3> dashPositions)
     {
-        Vector3 startPos = transform.position;
-        Vector3 nextPos = dashPosition[0];
-
-        Vector3 lookAt = nextPos - startPos;
-        lookAt.y = 0f;
-        Quaternion lookRot = Vector3.SqrMagnitude(lookAt) == 0
-            ? Quaternion.LookRotation(transform.forward)
-            : Quaternion.LookRotation(lookAt);
+        Quaternion lookRot = _dashHandler.CalculateDashRotation(
+            transform.position,
+            dashPositions[0],
+            transform.forward
+        );
         body.rotation = lookRot;
     }
 
-    private Vector3 InterpolatePath(List<Vector3> path, float t)
+    private void CompleteDash()
     {
-        float segmentCount = path.Count - 1;
-        float segmentIndex = t * segmentCount;
-        int currentSegment = Mathf.FloorToInt(segmentIndex);
-        int nextSegment = Mathf.Clamp(currentSegment + 1, 0, path.Count - 1);
-
-        float segmentFraction = segmentIndex - currentSegment;
-
-        return Vector3.Lerp(path[currentSegment], path[nextSegment], segmentFraction);
+        serverAgent.enabled = true;
+        _canMove = true;
+        _isDashing = false;
     }
 
     private float GetGlobalMovementSpeed()
@@ -960,24 +921,36 @@ public class Movement : NetworkBehaviour, IAbilityMovement
         return serverAgent.speed;
     }
 
+    private void ApplyMovementSpeedToAgent()
+    {
+        if (serverAgent != null && _baseMaxSpeed > 0f)
+        {
+            serverAgent.speed = _baseMaxSpeed;
+        }
+    }
+
     private void SubscribeToModifierChanges()
     {
-        if (modifierManager != null)
+        if (modifierManager == null)
         {
-            modifierManager.OnGlobalModifiersChanged -= RefreshMovementSpeedFromStats;
-            modifierManager.OnGlobalModifiersChanged += RefreshMovementSpeedFromStats;
-            modifierManager.OnAnyModifiersChanged -= RefreshMovementSpeedFromStats;
-            modifierManager.OnAnyModifiersChanged += RefreshMovementSpeedFromStats;
+            return;
         }
+
+        modifierManager.OnGlobalModifiersChanged -= RefreshMovementSpeedFromStats;
+        modifierManager.OnGlobalModifiersChanged += RefreshMovementSpeedFromStats;
+        modifierManager.OnAnyModifiersChanged -= RefreshMovementSpeedFromStats;
+        modifierManager.OnAnyModifiersChanged += RefreshMovementSpeedFromStats;
     }
 
     private void UnsubscribeFromModifierChanges()
     {
-        if (modifierManager != null)
+        if (modifierManager == null)
         {
-            modifierManager.OnGlobalModifiersChanged -= RefreshMovementSpeedFromStats;
-            modifierManager.OnAnyModifiersChanged -= RefreshMovementSpeedFromStats;
+            return;
         }
+
+        modifierManager.OnGlobalModifiersChanged -= RefreshMovementSpeedFromStats;
+        modifierManager.OnAnyModifiersChanged -= RefreshMovementSpeedFromStats;
     }
 
     #endregion
