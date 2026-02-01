@@ -201,9 +201,6 @@ GameObject:
   - component: {fileID: 6938576570393643543}
   - component: {fileID: 5097382059795255847}
   - component: {fileID: 191472792769803370}
-  - component: {fileID: 5590197116553997273}
-  - component: {fileID: 6955822107361440141}
-  - component: {fileID: 4520124826983868011}
   m_Layer: 0
   m_Name: BaseCharacter
   m_TagString: Untagged
@@ -224,9 +221,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8996502358973285314}
   - {fileID: 6254904053806619409}
-  - {fileID: 9049208306780740738}
+  - {fileID: 8996502358973285314}
   - {fileID: 2807750838555338228}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -428,6 +424,10 @@ MonoBehaviour:
       m_Bits: 64
     maxWallIterations: 100
   animationHandler: {fileID: 191472792769803370}
+  visualTransform: {fileID: 8996502358973285314}
+  correctionSmoothingRate: 10
+  snapThreshold: 2
+  stateBroadcastInterval: 0.05
 --- !u!114 &1904220953553573043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,7 +479,7 @@ MonoBehaviour:
   debuffUpdater: {fileID: 6244960309705328274}
   modifierManager: {fileID: 1904220953553573043}
   globalStatSource: {fileID: 5097382059795255847}
-  animationHandler: {fileID: 0}
+  animationHandler: {fileID: 191472792769803370}
 --- !u!114 &6244960309705328274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -541,91 +541,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AnimationHandler
   ShowTopMostFoldoutHeaderGroup: 1
   animator: {fileID: 0}
-  orientationTransform: {fileID: 0}
+  orientationTransform: {fileID: 369680040252476415}
   moveSpeedParam: MoveSpeed
   forwardParam: Forward
   rightParam: Right
   upperBodyMask: {fileID: 0}
   defaultBlendInDuration: 0.1
   defaultBlendOutDuration: 0.1
---- !u!114 &5590197116553997273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2949185825831420414}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkTransform
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkTransformExpanded: 0
-  AutoOwnerAuthorityTickOffset: 1
-  PositionInterpolationType: 0
-  RotationInterpolationType: 0
-  ScaleInterpolationType: 0
-  PositionLerpSmoothing: 1
-  PositionMaxInterpolationTime: 0.33
-  RotationLerpSmoothing: 1
-  RotationMaxInterpolationTime: 0.33
-  ScaleLerpSmoothing: 1
-  ScaleMaxInterpolationTime: 0.1
-  AuthorityMode: 1
-  TickSyncChildren: 0
-  UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 1
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  SwitchTransformSpaceWhenParented: 0
-  Interpolate: 1
-  SlerpPosition: 0
---- !u!114 &6955822107361440141
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2949185825831420414}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 1
-  AutoSetKinematicOnDespawn: 1
---- !u!114 &4520124826983868011
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2949185825831420414}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkAnimator
-  ShowTopMostFoldoutHeaderGroup: 1
-  TransitionStateInfoList: []
-  m_Animator: {fileID: 0}
 --- !u!1 &3284660828925175538
 GameObject:
   m_ObjectHideFlags: 0
@@ -657,7 +579,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 369680040252476415}
+  m_Father: {fileID: 6254904053806619409}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &2266074424490625542
 CapsuleCollider:
@@ -798,7 +720,7 @@ GameObject:
   - component: {fileID: 8917544956100770672}
   - component: {fileID: 5301469400233989028}
   m_Layer: 7
-  m_Name: Hurbox
+  m_Name: HurboxRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -812,11 +734,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4144055507266724808}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 9049208306780740738}
   m_Father: {fileID: 369680040252476415}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &3774780328192534194

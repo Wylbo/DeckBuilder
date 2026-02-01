@@ -106,33 +106,216 @@ Client Input → ServerRpc → Server processes NavMeshAgent → NetworkTransfor
 
 This section defines the recommended prefab structure for networked player entities that support client-side prediction, visual interpolation, and lag compensation.
 
-### 3.1 Prefab Hierarchy
+### 3.1 Prefab Hierarchy & Script Placement
+
+#### 3.1.1 Complete Hierarchy with Components
 
 ```
-PlayerEntity (Root)
+PlayerEntity (Root GameObject)
+│   ├── NetworkObject              ← Required for Netcode
+│   ├── Character                  ← Facade for entity systems
+│   ├── Controller                 ← Input/AI authority management
+│   ├── Movement                   ← Prediction & reconciliation
+│   ├── NavMeshAgent               ← Pathfinding (enabled per role)
+│   ├── Rigidbody                  ← Physics body (kinematic)
+│   ├── CapsuleCollider            ← Physics collision shape
+│   ├── GlobalStatSource           ← Base stats (speed, etc.)
+│   ├── StatsModifierManager       ← Buff/debuff management
+│   ├── Health                     ← Damage & death
+│   ├── AbilityCaster              ← Ability execution
+│   └── Hurtbox                    ← Damage receiver
 │
-├── [Simulation]                    ← Physics/NavMesh simulation (invisible)
-│   ├── NavMeshObstacle (optional)  ← For other agents to avoid
-│   └── HitboxRoot                  ← Server-authoritative hitboxes
-│       ├── Hitbox_Head
-│       ├── Hitbox_Body
-│       └── Hitbox_Legs
+├── [Visual]                       ← Interpolated visual representation
+│   ├── VisualController           ← Smoothing script (optional)
+│   │
+│   └── Model                      ← 3D character model
+│       ├── Animator               ← Animation state machine
+│       ├── NetworkAnimator        ← Syncs animation state
+│       ├── AnimationHandler       ← Movement animation logic
+│       ├── CharacterVisual        ← Visual effects (death, etc.)
+│       │
+│       ├── Armature               ← Skeleton root
+│       │   └── (bone hierarchy)
+│       │
+│       └── Body                   ← SkinnedMeshRenderer
 │
-├── [Visual]                        ← Rendered representation (interpolated)
-│   ├── Model                       ← 3D character model
-│   │   ├── Armature               ← Skeleton root
-│   │   └── SkinnedMeshRenderer    ← Character mesh
-│   ├── VFX_Root                   ← Visual effects attachment point
-│   └── Shadow                     ← Blob shadow or projector
+├── [Hitboxes]                     ← Server-authoritative hit detection
+│   ├── Hitbox_Head                ← SphereCollider (trigger) + Hitbox script
+│   ├── Hitbox_Body                ← CapsuleCollider (trigger) + Hitbox script
+│   └── Hitbox_Legs                ← CapsuleCollider (trigger) + Hitbox script
 │
-├── [Audio]                         ← Sound sources
-│   ├── FootstepSource
-│   └── VoiceSource
+├── [Audio]                        ← Sound sources
+│   ├── FootstepSource             ← AudioSource
+│   └── VoiceSource                ← AudioSource
 │
-└── [UI]                            ← World-space UI elements
-    ├── Nameplate
-    └── HealthBar
+└── [UI]                           ← World-space UI elements
+    ├── Canvas                     ← WorldSpace canvas
+    ├── Nameplate                  ← TextMeshPro
+    └── HealthBar                  ← UI elements
 ```
+
+#### 3.1.2 Root GameObject Scripts
+
+The **root GameObject** contains all core gameplay and networking scripts:
+
+| Script | Purpose | Why on Root |
+|--------|---------|-------------|
+| `NetworkObject` | Netcode identity | Required by Unity Netcode |
+| `Character` | Entity facade | Central access point for all systems |
+| `Controller` | Authority management | Needs access to Movement, AbilityCaster |
+| `Movement` | Prediction/reconciliation | Needs NavMeshAgent, Rigidbody |
+| `NavMeshAgent` | Pathfinding | Must be on same GO as controlled transform |
+| `Rigidbody` | Physics | Required by NavMeshAgent |
+| `CapsuleCollider` | Collision shape | Represents physical body |
+| `GlobalStatSource` | Base stats | Referenced by Movement for speed |
+| `StatsModifierManager` | Stat modifiers | Modifies GlobalStatSource |
+| `Health` | Damage system | Core gameplay, needs NetworkVariable |
+| `AbilityCaster` | Ability system | Core gameplay, server authoritative |
+| `Hurtbox` | Damage receiver | Links collider to Health |
+
+```csharp
+// Root GameObject required components
+[RequireComponent(typeof(NetworkObject))]
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CapsuleCollider))]
+[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(GlobalStatSource))]
+[RequireComponent(typeof(StatsModifierManager))]
+[RequireComponent(typeof(AnimationHandler))]
+public class Movement : NetworkBehaviour, IAbilityMovement
+{
+    [Header("Network Prediction")]
+    [SerializeField]
+    [Tooltip("Reference to [Visual] child for interpolation smoothing")]
+    private Transform visualTransform;
+
+    // Movement handles prediction on root transform
+    // Visual child follows with smoothing
+}
+```
+
+#### 3.1.3 [Visual] Child Scripts
+
+The **[Visual] child** contains rendering and animation:
+
+| Script | GameObject | Purpose |
+|--------|------------|---------|
+| `VisualController` | [Visual] | Smooth position/rotation following (optional) |
+| `Animator` | Model | Unity animation state machine |
+| `NetworkAnimator` | Model | Syncs Animator parameters |
+| `AnimationHandler` | Model | Converts velocity to animation params |
+| `CharacterVisual` | Model | Visual effects (death fade, damage flash) |
+| `SkinnedMeshRenderer` | Body | Renders character mesh |
+
+```csharp
+/// <summary>
+/// Attach to [Visual] child. Smoothly follows root transform.
+/// </summary>
+public class VisualController : MonoBehaviour
+{
+    [SerializeField] private float smoothSpeed = 15f;
+
+    private Transform _simulationRoot;
+    private Vector3 _correctionOffset;
+
+    // Called by Movement to set target pose
+    public void SetCorrectionOffset(Vector3 offset)
+    {
+        _correctionOffset = offset;
+    }
+
+    private void LateUpdate()
+    {
+        // Smoothly reduce correction offset
+        _correctionOffset = Vector3.Lerp(
+            _correctionOffset,
+            Vector3.zero,
+            smoothSpeed * Time.deltaTime
+        );
+
+        // Follow simulation root with offset
+        transform.position = _simulationRoot.position + _correctionOffset;
+        transform.rotation = _simulationRoot.rotation;
+    }
+}
+```
+
+#### 3.1.4 [Hitboxes] Child Scripts
+
+The **[Hitboxes] child** contains server-authoritative hit detection:
+
+| Script | Purpose | Network Role |
+|--------|---------|--------------|
+| `Hitbox` | Hit detection component | Server only (disabled on clients) |
+| `Collider` (trigger) | Detection shape | Physics trigger |
+
+```csharp
+// Hitbox script on each hitbox child
+public class Hitbox : MonoBehaviour
+{
+    [SerializeField] private HitboxType hitboxType;
+    [SerializeField] private float damageMultiplier = 1f;
+
+    // Only enabled on server for authoritative hit detection
+}
+```
+
+#### 3.1.5 Script Reference Wiring
+
+When setting up the prefab, wire these serialized references:
+
+**Movement (on Root):**
+```
+├── visualTransform         → [Visual]
+├── body                    → (self) Rigidbody
+├── serverAgent             → (self) NavMeshAgent
+├── capsuleCollider         → (self) CapsuleCollider
+├── globalStatSource        → (self) GlobalStatSource
+├── modifierManager         → (self) StatsModifierManager
+└── animationHandler        → Model/AnimationHandler
+```
+
+**Character (on Root):**
+```
+├── movement               → (self) Movement
+├── controller             → (self) Controller
+├── abilityCaster          → (self) AbilityCaster
+├── health                 → (self) Health
+└── animationHandler       → Model/AnimationHandler
+```
+
+**AnimationHandler (on Model):**
+```
+├── animator               → (self) Animator
+└── movement               → Root/Movement (for velocity)
+```
+
+#### 3.1.6 Layer Configuration
+
+```
+Root GameObject:
+├── Layer: Player (8)      ← Physics collision
+├── Tag: Player
+
+[Visual]:
+├── Layer: Default         ← No physics interaction
+
+[Hitboxes]:
+├── Layer: Hitbox (9)      ← Hit detection only
+├── All children: Hitbox layer
+```
+
+#### 3.1.7 Prefab Setup Checklist
+
+- [ ] Root has `NetworkObject` component
+- [ ] Root has `Movement` with `visualTransform` referencing `[Visual]`
+- [ ] `NavMeshAgent` on root (will be enabled/disabled by `Movement`)
+- [ ] `Rigidbody` on root set to **Kinematic**
+- [ ] `[Visual]` child created with all renderers
+- [ ] `AnimationHandler` on Model child, references `Animator`
+- [ ] `[Hitboxes]` child with trigger colliders on Hitbox layer
+- [ ] All serialized references wired correctly
+- [ ] Prefab registered in `DefaultNetworkPrefabs.asset`
 
 ### 3.2 Root GameObject Components
 
@@ -452,7 +635,7 @@ The owning client **immediately simulates** movement locally without waiting for
 
 ### Implementation Details
 
-#### 3.1 Input Capture & Sequencing
+#### 4.1 Input Capture & Sequencing
 
 Every input is tagged with a **sequence number** for tracking:
 
@@ -467,7 +650,7 @@ public struct MovementInput : INetworkSerializable
 }
 ```
 
-#### 3.2 Local Prediction Loop
+#### 4.2 Local Prediction Loop
 
 ```
 1. Capture input (mouse click / WASD)
@@ -478,7 +661,7 @@ public struct MovementInput : INetworkSerializable
 6. Render predicted position
 ```
 
-#### 3.3 Prediction Rules
+#### 4.3 Prediction Rules
 
 | Input Type | Prediction Method |
 |------------|-------------------|
@@ -487,13 +670,82 @@ public struct MovementInput : INetworkSerializable
 | Dash | Execute full dash routine locally |
 | Stop | `NavMeshAgent.ResetPath()` immediately |
 
-#### 3.4 Pending Input Buffer
+**Important Implementation Note:**
+
+For owner clients, we use NavMeshAgent locally for prediction because:
+1. Owner already has NavMeshAgent enabled (current implementation)
+2. Provides consistent pathfinding behavior
+3. Handles obstacle avoidance identically to server
+
+For non-owner clients, we use **velocity-based interpolation** (not NavMeshAgent) because:
+1. NavMeshAgent is disabled on non-owners (performance)
+2. We interpolate between server snapshots instead
+3. Velocity provides smooth visual representation
+
+#### 4.4 Pending Input Buffer
 
 Maintain a circular buffer of unacknowledged inputs:
 
 ```csharp
 private Queue<MovementInput> _pendingInputs = new Queue<MovementInput>();
 private uint _nextSequenceNumber = 0;
+private const int MAX_PENDING_INPUTS = 64; // Prevent memory issues
+
+void AddPendingInput(MovementInput input)
+{
+    // Discard oldest if buffer full
+    while (_pendingInputs.Count >= MAX_PENDING_INPUTS)
+    {
+        _pendingInputs.Dequeue();
+    }
+    _pendingInputs.Enqueue(input);
+}
+```
+
+#### 4.5 Time Synchronization
+
+**Critical:** All timestamps must use synchronized network time:
+
+```csharp
+// Use Unity Netcode's synchronized server time
+float GetNetworkTime()
+{
+    return (float)NetworkManager.Singleton.ServerTime.Time;
+}
+
+// For input timestamps
+MovementInput input = new MovementInput
+{
+    SequenceNumber = _nextSequenceNumber++,
+    Timestamp = GetNetworkTime(),  // NOT Time.time
+    // ...
+};
+```
+
+#### 4.6 RTT Tracking for Lag Compensation
+
+Track round-trip time per client for accurate lag compensation:
+
+```csharp
+public class RttTracker
+{
+    private float _smoothedRtt = 0.1f;
+    private const float RTT_SMOOTHING = 0.1f; // Exponential moving average
+
+    public float SmoothedRtt => _smoothedRtt;
+
+    public void UpdateRtt(float measuredRtt)
+    {
+        _smoothedRtt = Mathf.Lerp(_smoothedRtt, measuredRtt, RTT_SMOOTHING);
+    }
+
+    // Called when server state is received
+    public void OnStateReceived(float serverTimestamp)
+    {
+        float rtt = GetNetworkTime() - serverTimestamp;
+        UpdateRtt(Mathf.Max(0f, rtt));
+    }
+}
 ```
 
 ---
@@ -830,13 +1082,17 @@ public enum MovementInputType : byte
 
 public struct DashInputData : INetworkSerializable
 {
+    public Vector3 StartPosition;  // For server validation
     public Vector3 Direction;
     public float Distance;
+    public float Speed;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
+        serializer.SerializeValue(ref StartPosition);
         serializer.SerializeValue(ref Direction);
         serializer.SerializeValue(ref Distance);
+        serializer.SerializeValue(ref Speed);
     }
 }
 ```
