@@ -47,7 +47,7 @@ public class Character : Entity, IFactionOwner
 
     public void CastAbility(int index, Vector3 worldPos)
     {
-        abilityCaster.Cast(index, worldPos);
+        abilityCaster.StartHold(index, worldPos);
     }
 
     public void PerformDodge(Vector3 worldPos)
