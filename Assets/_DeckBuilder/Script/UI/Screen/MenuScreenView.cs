@@ -18,7 +18,7 @@ public class MenuScreenView : UIView
     public override void OnShow()
     {
         base.OnShow();
-        RequestPause();
+        // RequestPause();
     }
 
     public override void OnHide()
