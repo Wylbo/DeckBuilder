@@ -4947,6 +4947,7 @@ GameObject:
   - component: {fileID: 1890738975}
   - component: {fileID: 1890738979}
   - component: {fileID: 1890738980}
+  - component: {fileID: 1890738981}
   m_Layer: 5
   m_Name: RootCanvas
   m_TagString: Untagged
@@ -5085,6 +5086,19 @@ MonoBehaviour:
   showDelay: 0.15
   screenOffset: {x: 16, y: -16}
   uiManager: {fileID: 1890738979}
+--- !u!114 &1890738981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1890738974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8128a145dcf5ce642b6276df15cfa5ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalPlayerHotbarBinder
+  hotbar: {fileID: 1506828300221591616}
 --- !u!224 &1941660746 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3284899006170514474, guid: efbf5e88494d0d0458242125ffd7538d, type: 3}
@@ -5411,8 +5425,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2031014420}
-  - component: {fileID: 2031014422}
   - component: {fileID: 2031014423}
+  - component: {fileID: 2031014422}
   m_Layer: 0
   m_Name: PlayerSpawner
   m_TagString: Untagged
@@ -6127,6 +6141,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 880ca30584288574ab762fddaf6d2ab0, type: 3}
+--- !u!114 &1506828300221591616 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1684529801171961594, guid: 880ca30584288574ab762fddaf6d2ab0, type: 3}
+  m_PrefabInstance: {fileID: 1506828300221591615}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55d1d53fc015f5e46a8b4b08bba344af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Hotbar
 --- !u!1001 &2697699696741287303
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6754,6 +6779,10 @@ PrefabInstance:
     - target: {fileID: 3806073588477009895, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
       propertyPath: m_Name
       value: BaseEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3806073588477009895, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3816733751779573615, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
       propertyPath: m_LocalPosition.y
