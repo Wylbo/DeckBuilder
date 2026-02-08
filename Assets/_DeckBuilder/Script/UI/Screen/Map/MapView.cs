@@ -26,8 +26,8 @@ public class MapView : UIView
     private RectTransform contentRoot;
 
     [SerializeField]
-    [Tooltip("Transform for connection LineRenderers")]
-    private Transform connectionRoot;
+    [Tooltip("RectTransform container for connection renderers")]
+    private RectTransform connectionRoot;
 
     [Header("Prefabs")]
     [SerializeField]
@@ -35,8 +35,8 @@ public class MapView : UIView
     private MapNodeView nodeViewPrefab;
 
     [SerializeField]
-    [Tooltip("Prefab for connection LineRenderers")]
-    private MapConnectionRenderer connectionPrefab;
+    [Tooltip("Prefab for UI-based line renderers used to draw connections")]
+    private UILineRenderer connectionPrefab;
 
     [Header("Layout Settings")]
     [SerializeField]
@@ -55,6 +55,23 @@ public class MapView : UIView
     [Tooltip("Duration of scroll animation in seconds")]
     private float scrollAnimationDuration = 0.5f;
 
+    [Header("Connection Settings")]
+    [SerializeField]
+    [Tooltip("Number of segments for connection curves (higher = smoother)")]
+    private int curveResolution = 20;
+
+    [SerializeField]
+    [Tooltip("Color for accessible connections")]
+    private Color accessibleConnectionColor = new Color(0.9f, 0.9f, 0.9f, 1f);
+
+    [SerializeField]
+    [Tooltip("Color for inaccessible connections")]
+    private Color inaccessibleConnectionColor = new Color(0.5f, 0.5f, 0.5f, 0.4f);
+
+    [SerializeField]
+    [Tooltip("Color for visited connections")]
+    private Color visitedConnectionColor = new Color(0.7f, 0.9f, 0.7f, 1f);
+
     #endregion
 
     #region Private Members
@@ -62,8 +79,8 @@ public class MapView : UIView
     private readonly Dictionary<(int floor, int column), MapNodeView> _spawnedNodes =
         new Dictionary<(int floor, int column), MapNodeView>();
 
-    private readonly List<MapConnectionRenderer> _spawnedConnections =
-        new List<MapConnectionRenderer>();
+    private readonly List<UILineRenderer> _spawnedConnections =
+        new List<UILineRenderer>();
 
     private readonly List<ConnectionData> _connectionDataList =
         new List<ConnectionData>();
@@ -254,7 +271,7 @@ public class MapView : UIView
 
         if (connectionPrefab == null)
         {
-            Debug.LogError("MapView: connectionPrefab is not assigned.", this);
+            Debug.LogError("MapView: connectionPrefab (UILineRenderer) is not assigned.", this);
         }
     }
 
@@ -304,6 +321,8 @@ public class MapView : UIView
 
         Vector2 position = _layoutCalculator.CalculateNodePosition(node.floor, node.column);
         RectTransform rectTransform = nodeView.GetComponent<RectTransform>();
+        rectTransform.anchorMin = new Vector2(0f, 0.5f);
+        rectTransform.anchorMax = new Vector2(0f, 0.5f);
         rectTransform.anchoredPosition = position;
 
         Sprite nodeSprite = spriteConfig.GetSprite(node.nodeType);
@@ -358,15 +377,20 @@ public class MapView : UIView
     /// <param name="endColumn">Ending column.</param>
     private void SpawnConnection(int startFloor, int startColumn, int endFloor, int endColumn)
     {
-        MapConnectionRenderer connection = Instantiate(connectionPrefab, connectionRoot);
+        UILineRenderer connection = Instantiate(connectionPrefab, connectionRoot);
 
-        Vector2 startPos2D = _layoutCalculator.CalculateNodePosition(startFloor, startColumn);
-        Vector2 endPos2D = _layoutCalculator.CalculateNodePosition(endFloor, endColumn);
+        SetupConnectionRectTransform(connection);
 
-        Vector3 startWorldPos = GetWorldPositionFromAnchoredPosition(startPos2D);
-        Vector3 endWorldPos = GetWorldPositionFromAnchoredPosition(endPos2D);
+        Vector2 startPos = _layoutCalculator.CalculateNodePosition(startFloor, startColumn);
+        Vector2 endPos = _layoutCalculator.CalculateNodePosition(endFloor, endColumn);
 
-        connection.SetConnection(startWorldPos, endWorldPos, isAccessible: false, isVisited: false);
+        List<Vector2> curvePoints = CalculateBezierPoints(startPos, endPos);
+
+        connection.UseDirectCoordinates = true;
+        connection.Points = curvePoints;
+        connection.color = inaccessibleConnectionColor;
+        connection.raycastTarget = false;
+        connection.SetVerticesDirty();
 
         _spawnedConnections.Add(connection);
         _connectionDataList.Add(new ConnectionData
@@ -380,14 +404,39 @@ public class MapView : UIView
     }
 
     /// <summary>
-    /// Converts an anchored position to world position.
+    /// Configures the connection RectTransform to fill its parent with matching coordinate space.
+    /// Uses pivot (0, 0.5) to align local origin with node anchor positions.
     /// </summary>
-    /// <param name="anchoredPosition">The anchored position.</param>
-    /// <returns>The world position.</returns>
-    private Vector3 GetWorldPositionFromAnchoredPosition(Vector2 anchoredPosition)
+    /// <param name="connection">The line renderer to configure.</param>
+    private void SetupConnectionRectTransform(UILineRenderer connection)
     {
-        Vector3 localPosition = new Vector3(anchoredPosition.x, anchoredPosition.y, 0f);
-        return contentRoot.TransformPoint(localPosition);
+        RectTransform rectTransform = connection.GetComponent<RectTransform>();
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
+        rectTransform.pivot = new Vector2(0f, 0.5f);
+    }
+
+    /// <summary>
+    /// Calculates Bezier curve points between two positions.
+    /// </summary>
+    /// <param name="start">The start position in local space.</param>
+    /// <param name="end">The end position in local space.</param>
+    /// <returns>A list of points along the Bezier curve.</returns>
+    private List<Vector2> CalculateBezierPoints(Vector2 start, Vector2 end)
+    {
+        Vector3 start3D = new Vector3(start.x, start.y, 0f);
+        Vector3 end3D = new Vector3(end.x, end.y, 0f);
+        Vector3[] points3D = BezierCurveCalculator.CalculateQuadraticBezier(start3D, end3D, curveResolution);
+
+        List<Vector2> points = new List<Vector2>(points3D.Length);
+        for (int i = 0; i < points3D.Length; i++)
+        {
+            points.Add(new Vector2(points3D[i].x, points3D[i].y));
+        }
+
+        return points;
     }
 
     /// <summary>
@@ -400,6 +449,8 @@ public class MapView : UIView
             return;
         }
 
+        int currentFloor = _selectionHandler.GetCurrentFloor();
+
         foreach (ConnectionData data in _connectionDataList)
         {
             MapNode startNode = _nodeGrid[data.startFloor, data.startColumn];
@@ -409,11 +460,34 @@ public class MapView : UIView
             bool endVisited = _selectionHandler.IsNodeVisited(endNode);
             bool isVisited = startVisited && endVisited;
 
-            bool endAccessible = _selectionHandler.CanSelectNode(endNode);
+            bool isFromCurrentNode = data.startFloor == currentFloor
+                && _selectionHandler.IsNodeVisited(startNode);
+            bool endAccessible = isFromCurrentNode && _selectionHandler.CanSelectNode(endNode);
 
-            data.renderer.UpdateVisited(isVisited);
-            data.renderer.UpdateAccessibility(endAccessible);
+            Color connectionColor = GetConnectionColor(isVisited, endAccessible);
+            data.renderer.color = connectionColor;
         }
+    }
+
+    /// <summary>
+    /// Determines the appropriate color for a connection based on its state.
+    /// </summary>
+    /// <param name="isVisited">Whether the connection has been traversed.</param>
+    /// <param name="isAccessible">Whether the connection leads to an accessible node.</param>
+    /// <returns>The color to apply to the connection.</returns>
+    private Color GetConnectionColor(bool isVisited, bool isAccessible)
+    {
+        if (isVisited)
+        {
+            return visitedConnectionColor;
+        }
+
+        if (isAccessible)
+        {
+            return accessibleConnectionColor;
+        }
+
+        return inaccessibleConnectionColor;
     }
 
     /// <summary>
@@ -446,7 +520,7 @@ public class MapView : UIView
     /// </summary>
     private void ClearConnections()
     {
-        foreach (MapConnectionRenderer connection in _spawnedConnections)
+        foreach (UILineRenderer connection in _spawnedConnections)
         {
             if (connection != null)
             {
@@ -516,7 +590,7 @@ public class MapView : UIView
         public int startColumn;
         public int endFloor;
         public int endColumn;
-        public MapConnectionRenderer renderer;
+        public UILineRenderer renderer;
     }
 
     #endregion

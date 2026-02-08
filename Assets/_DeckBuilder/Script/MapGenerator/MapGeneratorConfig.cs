@@ -48,17 +48,17 @@ public class MapGeneratorConfig : ScriptableObject
     [Header("Grid Settings")]
     [SerializeField]
     [Tooltip("Number of columns in the map grid")]
-    [Range(3, 15)]
+    [Range(1, 15)]
     private int gridWidth = 7;
 
     [SerializeField]
     [Tooltip("Total number of floors excluding boss floor")]
-    [Range(5, 30)]
+    [Range(2, 30)]
     private int totalFloors = 15;
 
     [SerializeField]
     [Tooltip("Number of paths to generate from bottom to top")]
-    [Range(2, 10)]
+    [Range(1, 10)]
     private int numberOfPaths = 6;
 
     [Header("Fixed Floor Assignments")]
@@ -95,20 +95,6 @@ public class MapGeneratorConfig : ScriptableObject
         new NodeTypeWeight(NodeType.Treasure, 0f),
         new NodeTypeWeight(NodeType.Shop, 5f)
     };
-
-    [Header("Visualization")]
-    [SerializeField]
-    [Tooltip("Horizontal spacing between nodes in gizmo view")]
-    private float horizontalSpacing = 2f;
-
-    [SerializeField]
-    [Tooltip("Vertical spacing between floors in gizmo view")]
-    private float verticalSpacing = 3f;
-
-    [SerializeField]
-    [Tooltip("Size of node spheres in gizmo view")]
-    private float nodeSize = 0.4f;
-
     #endregion
 
     #region Getters
@@ -157,21 +143,6 @@ public class MapGeneratorConfig : ScriptableObject
     /// Gets the node type weights for random selection.
     /// </summary>
     public List<NodeTypeWeight> NodeTypeWeights => nodeTypeWeights;
-
-    /// <summary>
-    /// Gets the horizontal spacing for visualization.
-    /// </summary>
-    public float HorizontalSpacing => horizontalSpacing;
-
-    /// <summary>
-    /// Gets the vertical spacing for visualization.
-    /// </summary>
-    public float VerticalSpacing => verticalSpacing;
-
-    /// <summary>
-    /// Gets the node size for visualization.
-    /// </summary>
-    public float NodeSize => nodeSize;
 
     #endregion
 

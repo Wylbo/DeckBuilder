@@ -27,9 +27,6 @@ public class MapGenerator : MonoBehaviour
     #endregion
 
     #region Private Members
-
-    [ShowInInspector]
-    [TableMatrix(DrawElementMethod = "DrawMapNodeElement", ResizableColumns = false, SquareCells = true)]
     private MapNode[,] _nodeGrid;
 
     private List<List<int>> _paths;
@@ -56,11 +53,6 @@ public class MapGenerator : MonoBehaviour
     private void Awake()
     {
         ValidateDependencies();
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        DrawMapGizmos();
     }
 
     #endregion
@@ -562,161 +554,5 @@ public class MapGenerator : MonoBehaviour
             }
         }
     }
-
-    /// <summary>
-    /// Draws the map visualization using Unity Gizmos.
-    /// </summary>
-    private void DrawMapGizmos()
-    {
-        if (_nodeGrid == null || config == null)
-        {
-            return;
-        }
-
-        DrawNodes();
-        DrawConnections();
-    }
-
-    /// <summary>
-    /// Draws all nodes as colored spheres.
-    /// </summary>
-    private void DrawNodes()
-    {
-        for (int floor = 0; floor <= config.TotalFloors; floor++)
-        {
-            for (int column = 0; column < config.GridWidth; column++)
-            {
-                MapNode node = _nodeGrid[floor, column];
-                if (node == null)
-                {
-                    continue;
-                }
-
-                Vector3 position = GetNodeWorldPosition(floor, column);
-                Gizmos.color = GetNodeColor(node.nodeType);
-                Gizmos.DrawSphere(position, config.NodeSize);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Draws connections between nodes.
-    /// </summary>
-    private void DrawConnections()
-    {
-        Gizmos.color = new Color(0.5f, 1f, 0.5f, 0.6f);
-
-        for (int floor = 0; floor < config.TotalFloors; floor++)
-        {
-            for (int column = 0; column < config.GridWidth; column++)
-            {
-                MapNode node = _nodeGrid[floor, column];
-                if (node == null)
-                {
-                    continue;
-                }
-
-                Vector3 startPosition = GetNodeWorldPosition(floor, column);
-
-                foreach (int targetColumn in node.connections)
-                {
-                    Vector3 endPosition = GetNodeWorldPosition(floor + 1, targetColumn);
-                    Gizmos.DrawLine(startPosition, endPosition);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Calculates the world position for a node.
-    /// </summary>
-    /// <param name="floor">The floor index.</param>
-    /// <param name="column">The column index.</param>
-    /// <returns>The world position of the node.</returns>
-    private Vector3 GetNodeWorldPosition(int floor, int column)
-    {
-        float xOffset = (config.GridWidth - 1) * config.HorizontalSpacing * 0.5f;
-        float x = column * config.HorizontalSpacing - xOffset;
-        float y = floor * config.VerticalSpacing;
-
-        return transform.position + new Vector3(x, y, 0f);
-    }
-
-    /// <summary>
-    /// Gets the color for a node type for visualization.
-    /// </summary>
-    /// <param name="nodeType">The node type.</param>
-    /// <returns>The color for the node type.</returns>
-    private Color GetNodeColor(NodeType nodeType)
-    {
-        return nodeType switch
-        {
-            NodeType.Monster => Color.gray,
-            NodeType.Elite => new Color(1f, 0.5f, 0f),
-            NodeType.RestSite => Color.green,
-            NodeType.Shop => Color.yellow,
-            NodeType.Treasure => Color.cyan,
-            NodeType.Event => Color.magenta,
-            NodeType.Boss => Color.red,
-            _ => Color.white
-        };
-    }
-
-#if UNITY_EDITOR
-    /// <summary>
-    /// Draws a MapNode element in the TableMatrix inspector.
-    /// </summary>
-    /// <param name="rect">The rect to draw in.</param>
-    /// <param name="node">The node to draw.</param>
-    /// <returns>The node value (unchanged).</returns>
-    private static MapNode DrawMapNodeElement(Rect rect, MapNode node)
-    {
-        Rect paddedRect = new Rect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
-
-        if (node == null)
-        {
-            EditorGUI.DrawRect(paddedRect, new Color(0.1f, 0.1f, 0.1f, 0.5f));
-            return null;
-        }
-
-        Color nodeColor = node.nodeType switch
-        {
-            NodeType.Monster => new Color(0.5f, 0.5f, 0.5f),
-            NodeType.Elite => new Color(1f, 0.5f, 0f),
-            NodeType.RestSite => new Color(0.2f, 0.8f, 0.2f),
-            NodeType.Shop => new Color(1f, 0.9f, 0.2f),
-            NodeType.Treasure => new Color(0.2f, 0.8f, 1f),
-            NodeType.Event => new Color(0.9f, 0.3f, 0.9f),
-            NodeType.Boss => new Color(0.9f, 0.2f, 0.2f),
-            _ => Color.white
-        };
-
-        EditorGUI.DrawRect(paddedRect, nodeColor);
-
-        string label = node.nodeType switch
-        {
-            NodeType.Monster => "M",
-            NodeType.Elite => "E",
-            NodeType.RestSite => "R",
-            NodeType.Shop => "$",
-            NodeType.Treasure => "T",
-            NodeType.Event => "?",
-            NodeType.Boss => "B",
-            _ => "?"
-        };
-
-        GUIStyle style = new GUIStyle(GUI.skin.label)
-        {
-            alignment = TextAnchor.MiddleCenter,
-            fontStyle = FontStyle.Bold,
-            normal = { textColor = Color.white }
-        };
-
-        EditorGUI.LabelField(rect, label, style);
-
-        return node;
-    }
-#endif
-
     #endregion
 }

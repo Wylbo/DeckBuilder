@@ -30,9 +30,6 @@ MonoBehaviour:
   - nodeType: 2
     weight: 12
   - nodeType: 4
-    weight: 5
+    weight: 0
   - nodeType: 3
     weight: 5
-  horizontalSpacing: 2
-  verticalSpacing: 3
-  nodeSize: 0.4
