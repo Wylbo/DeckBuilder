@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 /// <summary>
@@ -10,6 +11,8 @@ public class UIManager : MonoBehaviour, IUIManager
 {
     [SerializeField] private List<UILayerConfig> layerConfigs = new List<UILayerConfig>();
     [SerializeField] private List<UIView> registeredViews = new List<UIView>();
+    [Title("Debug")]
+    [SerializeField] private bool OpenFirstRegisteredViewOnStart = false;
 
     private GameStateManager gameStateManager;
     private IUIViewFactory viewFactory;
@@ -30,6 +33,15 @@ public class UIManager : MonoBehaviour, IUIManager
     private void Awake()
     {
         InitializeServices();
+    }
+
+    void Start()
+    {
+        if (registeredViews.Count > 0 && OpenFirstRegisteredViewOnStart)
+        {
+            Type type = registeredViews[0].GetType();
+            typeof(UIManager).GetMethod(nameof(Show)).MakeGenericMethod(type).Invoke(this, new object[] { null, null });
+        }
     }
 
     public void ConfigureServices(IUIViewFactory viewFactory, IUILayerController layerController, IUIHistoryTracker historyTracker, IPauseService pauseService)

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:www.gabrielgambetta.com)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebFetch(domain:kosgames.com)",
+      "Bash(xargs:*)"
     ]
   }
 }
