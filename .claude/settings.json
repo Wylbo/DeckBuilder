@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(Assets/_DeckBuilder/**)",
+      "Edit(Assets/_DeckBuilder/Script/**/*.cs)",
+      "Write(Assets/_DeckBuilder/Script/**/*.cs)"
+    ],
+    "deny": [
+      "Bash(dotnet *)",
+      "Bash(rm -rf *)"
+    ]
+  }
+}

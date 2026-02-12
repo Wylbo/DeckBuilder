@@ -1,0 +1,43 @@
+# Unity generated
+Library/
+Temp/
+obj/
+Logs/
+Build/
+UIElementsSchema/
+UserSettings/
+
+# Binary and serialized assets
+*.meta
+*.asset
+*.prefab
+*.unity
+*.lighting
+*.shadergraph
+*.shadersubgraph
+*.mat
+*.mixer
+*.controller
+*.anim
+*.mask
+*.physicMaterial
+*.physicsMaterial2D
+*.renderTexture
+*.flare
+*.giparams
+
+# Third-party assets
+Assets/Plugins/
+Assets/TextMesh Pro/
+Assets/kenney_*/
+Assets/Lofelt/
+Assets/MoreMountains/
+Assets/SingularityGroup/
+Assets/Sirenix/
+
+# IDE and project files
+*.csproj
+*.sln
+*.slnx
+*.DotSettings
+JumpTo/

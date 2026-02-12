@@ -5070,6 +5070,7 @@ MonoBehaviour:
   - {fileID: 5388095207502220314, guid: d06ea442ffd7fdf44985ef501cc8ba82, type: 3}
   - {fileID: 9140996025355289725, guid: f60d3287a4a1ecb4e81196b2a9f1cd3f, type: 3}
   - {fileID: 1126322684300013423, guid: dad59d635a004f249ba6f05ea99aaf3f, type: 3}
+  OpenFirstRegisteredViewOnStart: 0
 --- !u!114 &1890738980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6782,7 +6783,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3806073588477009895, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3816733751779573615, guid: d72346555c0222641bc573c0f8cafa1d, type: 3}
       propertyPath: m_LocalPosition.y
